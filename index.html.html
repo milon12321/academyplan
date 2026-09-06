@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>200 English Sentence Connectors — English guide for Bangladeshi students</title>
+<meta name="description" content="A Bangla-explained PDF guide to 200 English sentence connectors, with real example sentences, built for HSC, admission and IELTS-level writing." />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          paper: '#FBF7EE',
+          ink: '#1F2A24',
+          forest: { DEFAULT: '#1B4332', dark: '#123024', light: '#2C5A46' },
+          marigold: { DEFAULT: '#E8A33D', dark: '#C97F1D' },
+          rust: '#C1440E',
+          line: '#DED5BE',
+          bkash: '#E2136E',
+          nagad: '#EE6C29',
+        },
+        fontFamily: {
+          serif: ['"Fraunces"', 'ui-serif', 'Georgia', 'serif'],
+          sans: ['"Inter"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        },
+        maxWidth: { prose: '70ch' },
+      }
+    }
+  }
+</script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  body { background-color: #FBF7EE; }
+  section[id] { scroll-margin-top: 5.5rem; }
+
+  /* Reveal-on-load, single orchestrated entrance for the hero */
+  .reveal { opacity: 0; transform: translateY(14px); }
+  .reveal.is-shown {
+    opacity: 1; transform: translateY(0);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* Hairline divider used between major sections */
+  .rule { border-top: 1px solid #DED5BE; }
+
+  /* Connector chip used as the feature-list "bullet" */
+  .connector-chip {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  /* Modal open state */
+  #checkout-modal.is-open { display: flex; }
+  #checkout-modal { display: none; }
+
+  /* Star rating buttons */
+  .star-btn svg { transition: fill .15s ease, stroke .15s ease; }
+
+  /* Simple focus ring, visible everywhere */
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid #1B4332;
+    outline-offset: 2px;
+  }
+</style>
+</head>
+
+<body class="font-sans text-ink antialiased">
+
+<!-- ============ HEADER ============ -->
+<header class="sticky top-0 z-40 bg-paper/90 backdrop-blur border-b border-line">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+    <a href="#hero" class="flex items-center gap-2">
+      <span class="w-8 h-8 rounded-full bg-forest text-paper flex items-center justify-center font-serif italic text-lg">&amp;</span>
+      <span class="font-serif text-lg font-600 leading-none">200 Connectors</span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-8 text-sm">
+      <a href="#features" class="hover:text-forest">What's inside</a>
+      <a href="#pricing" class="hover:text-forest">Price</a>
+      <a href="#reviews" class="hover:text-forest">Reviews</a>
+    </nav>
+
+    <div class="hidden md:block">
+      <button type="button" data-open-modal
+        class="bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">
+        Get instant access
+      </button>
+    </div>
+
+    <!-- Mobile menu toggle -->
+    <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu"
+      class="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-line">
+      <svg id="menu-icon-open" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg id="menu-icon-close" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile menu panel -->
+  <div id="mobile-menu" class="hidden md:hidden border-t border-line bg-paper px-5 py-4 space-y-3">
+    <a href="#features" class="block text-sm py-1">What's inside</a>
+    <a href="#pricing" class="block text-sm py-1">Price</a>
+    <a href="#reviews" class="block text-sm py-1">Reviews</a>
+    <button type="button" data-open-modal
+      class="w-full bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">
+      Get instant access
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section id="hero" class="bg-paper">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 pt-14 pb-16 md:pt-20 md:pb-24 grid md:grid-cols-2 gap-12 md:gap-8 items-center">
+
+      <div class="reveal" data-reveal>
+        <p class="text-sm font-semibold text-forest tracking-normal mb-4">A PDF guide for Bangladeshi students</p>
+        <h1 class="font-serif text-4xl sm:text-5xl leading-[1.08] font-600 text-forest-dark">
+          Master the words that hold every English sentence together.
+        </h1>
+        <p class="mt-6 text-lg text-ink/80 max-w-prose leading-relaxed">
+          200 English Sentence Connectors explains every linking word in Bangla, then shows you
+          exactly how it's used with two real example sentences — built for HSC, admission tests,
+          and IELTS-level writing.
+        </p>
+
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 sm:items-center">
+          <button type="button" data-open-modal
+            class="inline-flex justify-center items-center bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-7 py-3.5 rounded-full text-base transition-colors shadow-[0_6px_0_0_#C97F1D] active:translate-y-1 active:shadow-none">
+            Buy the guide — ৳30
+          </button>
+          <span class="text-sm text-ink/60">PDF sent by email after payment verification</span>
+        </div>
+
+        <div class="mt-8 flex items-center gap-4 text-sm text-ink/60">
+          <div class="flex -space-x-2">
+            <span class="w-8 h-8 rounded-full bg-forest/20 border-2 border-paper"></span>
+            <span class="w-8 h-8 rounded-full bg-marigold/40 border-2 border-paper"></span>
+            <span class="w-8 h-8 rounded-full bg-rust/20 border-2 border-paper"></span>
+          </div>
+          <span>Made for students across Bangladesh</span>
+        </div>
+      </div>
+<!-- Hero visual -->
+      <div class="reveal" data-reveal>
+        <div class="relative mx-auto w-full max-w-sm md:max-w-md aspect-square">
+          <svg class="hidden md:block absolute inset-0 w-full h-full" viewBox="0 0 400 400" fill="none">
+            <path d="M200 200 L70 90" stroke="#DED5BE" stroke-width="1.5"/>
+            <path d="M200 200 L340 80" stroke="#DED5BE" stroke-width="1.5"/>
+            <path d="M200 200 L60 300" stroke="#DED5BE" stroke-width="1.5"/>
+            <path d="M200 200 L350 310" stroke="#DED5BE" stroke-width="1.5"/>
+            <path d="M200 200 L200 30" stroke="#DED5BE" stroke-width="1.5"/>
+          </svg>
+
+          <!-- PDF Card Image Container (Lower Layer: z-10) -->
+          <div class="absolute inset-[14%] rounded-2xl bg-forest text-paper shadow-2xl -rotate-2 flex flex-col justify-between p-7 overflow-hidden z-10">
+            <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-marigold/20"></div>
+            <div>
+              <p class="text-xs tracking-normal text-paper/70">PDF guide · English</p>
+              <h2 class="font-serif text-2xl leading-tight mt-3">200 English<br/>Sentence<br/>Connectors</h2>
+            </div>
+            <div class="text-xs text-paper/70 leading-relaxed">
+              Bangla meanings · Example sentences<br/>Built for HSC &amp; admission tests
+            </div>
+          </div>
+
+          <!-- Connector Tags (Higher Layer: z-20 & Always Visible) -->
+          <span class="inline-block absolute top-[14%] left-[6%] connector-chip bg-white border border-line px-3 py-1.5 rounded-full text-sm shadow-md z-20">However,</span>
+          <span class="inline-block absolute top-[10%] right-[2%] connector-chip bg-white border border-line px-3 py-1.5 rounded-full text-sm shadow-md z-20">In addition,</span>
+          <span class="inline-block absolute top-[2%] left-[38%] connector-chip bg-white border border-line px-3 py-1.5 rounded-full text-sm shadow-md z-20">Because</span>
+          <span class="inline-block absolute bottom-[12%] left-[2%] connector-chip bg-white border border-line px-3 py-1.5 rounded-full text-sm shadow-md z-20">As a result,</span>
+          <span class="inline-block absolute bottom-[8%] right-[0%] connector-chip bg-white border border-line px-3 py-1.5 rounded-full text-sm shadow-md z-20">Therefore,</span>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section id="features" class="rule bg-white">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-16 md:py-20">
+      <div class="max-w-prose">
+        <h2 class="font-serif text-3xl sm:text-4xl font-600 text-forest-dark">What's inside the guide</h2>
+        <p class="mt-4 text-ink/70 leading-relaxed">
+          Every connector is grouped, translated, and demonstrated — so you're never guessing which
+          word fits your sentence.
+        </p>
+      </div>
+
+      <div class="mt-12 grid md:grid-cols-2 gap-x-12 gap-y-8">
+        <div class="flex gap-4 items-start">
+          <span class="connector-chip shrink-0 bg-forest/5 text-forest-dark px-3 py-1 rounded-lg">So,</span>
+          <p class="text-ink/80 leading-relaxed">Every connector grouped by function — addition, contrast,
+            cause, result, sequence — so you always reach for the right one.</p>
+        </div>
+
+        <div class="flex gap-4 items-start">
+          <span class="connector-chip shrink-0 bg-forest/5 text-forest-dark px-3 py-1 rounded-lg">Because,</span>
+          <p class="text-ink/80 leading-relaxed">A Bangla meaning sits beside every English connector,
+            so nothing gets lost in translation.</p>
+        </div>
+
+        <div class="flex gap-4 items-start">
+          <span class="connector-chip shrink-0 bg-forest/5 text-forest-dark px-3 py-1 rounded-lg">For example,</span>
+          <p class="text-ink/80 leading-relaxed">Two real example sentences per connector, drawn from
+            essays, emails, and everyday spoken English.</p>
+        </div>
+
+        <div class="flex gap-4 items-start">
+          <span class="connector-chip shrink-0 bg-forest/5 text-forest-dark px-3 py-1 rounded-lg">Therefore,</span>
+          <p class="text-ink/80 leading-relaxed">Practice sentences at the end of every chapter, written
+            for HSC and university admission test formats.</p>
+        </div>
+
+        <div class="flex gap-4 items-start">
+          <span class="connector-chip shrink-0 bg-forest/5 text-forest-dark px-3 py-1 rounded-lg">In short,</span>
+          <p class="text-ink/80 leading-relaxed">A clean, high-resolution PDF format designed for comfortable reading on phones, tablets, or laptops.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section id="pricing" class="rule bg-paper">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-16 md:py-20 text-center">
+      <h2 class="font-serif text-3xl sm:text-4xl font-600 text-forest-dark">Simple, one-time price</h2>
+      <p class="mt-4 text-ink/70 max-w-md mx-auto">Get full lifetime access to the PDF guide with a single payment.</p>
+
+      <div class="mt-10 max-w-sm mx-auto bg-white border border-line rounded-2xl p-8 shadow-sm text-center relative overflow-hidden">
+        <span class="absolute top-4 right-4 bg-red-100 text-red-600 font-bold text-xs px-2.5 py-1 rounded-full border border-red-200">
+          70% OFF
+        </span>
+
+        <p class="text-xs font-semibold uppercase tracking-wider text-forest">Digital Edition</p>
+
+        <div class="mt-4 flex items-baseline justify-center gap-2">
+          <span class="text-xl font-serif text-ink/40 line-through">৳100</span>
+          <span class="text-4xl font-serif font-bold text-forest-dark">৳30</span>
+          <span class="text-sm text-ink/60">/ one-time</span>
+        </div>
+
+        <ul class="mt-6 space-y-3 text-sm text-ink/80 text-left border-t border-line pt-6">
+          <li class="flex items-center gap-2">
+            <span class="text-forest">✓</span> Full 200 Connectors Guide (PDF)
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-forest">✓</span> Bangla Explanations &amp; Examples
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-forest">✓</span> Manual payment verification and PDF delivery by email
+          </li>
+        </ul>
+
+        <button type="button" data-open-modal class="mt-8 w-full bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold py-3 rounded-full text-sm transition-colors">
+          Get instant access
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ REVIEWS ============ -->
+  <section id="reviews" class="rule bg-white">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-16 md:py-20">
+      <div class="text-center max-w-prose mx-auto">
+        <h2 class="font-serif text-3xl sm:text-4xl font-600 text-forest-dark">Reviews</h2>
+        <p class="mt-3 text-ink/70">Here is what students say about using our connector guide.</p>
+      </div>
+
+      <div class="mt-12 grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div class="p-6 bg-paper rounded-xl border border-line">
+          <p class="text-sm text-ink/80 italic">"HSC English second paper sentence connectors block-e full marks paoya onak easy hoye gese."</p>
+          <div class="mt-4 text-xs font-semibold text-forest-dark">— Tanvir H., Dhaka</div>
+        </div>
+        <div class="p-6 bg-paper rounded-xl border border-line">
+          <p class="text-sm text-ink/80 italic">"Bangla meaning shothe example thakay bujte ar kono somossha hoy na."</p>
+          <div class="mt-4 text-xs font-semibold text-forest-dark">— Sadia A., Chittagong</div>
+        </div>
+        <div class="p-6 bg-paper rounded-xl border border-line">
+          <p class="text-sm text-ink/80 italic">"IELTS writing task 2 sentence link korar jonno powerful ekta resource!"</p>
+          <div class="mt-4 text-xs font-semibold text-forest-dark">— Rafiq M., Sylhet</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ============ RATING & REVIEW FORM ============ -->
+    <section class="bg-paper border-t border-line py-12">
+      <div class="max-w-xl mx-auto px-5 text-center">
+        <h3 class="font-serif text-2xl font-bold text-forest-dark">Leave Your Rating</h3>
+        <p class="text-sm text-ink/70 mt-1">Share your feedback about the guide</p>
+
+        <form id="review-form" class="mt-6 bg-white p-6 rounded-2xl border border-line shadow-sm text-left space-y-4">
+          <div>
+            <label for="review-name" class="block text-xs font-semibold uppercase text-ink/70 mb-1">Your Name</label>
+            <input id="review-name" name="name" type="text" autocomplete="name" placeholder="Enter your name" class="w-full px-4 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-forest" required />
+          </div>
+
+          <div>
+            <label for="review-rating" class="block text-xs font-semibold uppercase text-ink/70 mb-1">Rating</label>
+            <select id="review-rating" name="rating" class="w-full px-4 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-forest">
+              <option value="5">⭐⭐⭐⭐⭐ (5/5) Excellent</option>
+              <option value="4">⭐⭐⭐⭐ (4/5) Very Good</option>
+              <option value="3">⭐⭐⭐ (3/5) Good</option>
+              <option value="2">⭐⭐ (2/5) Average</option>
+              <option value="1">⭐ (1/5) Poor</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="review-feedback" class="block text-xs font-semibold uppercase text-ink/70 mb-1">Your Feedback</label>
+            <textarea id="review-feedback" name="feedback" rows="3" placeholder="Write your review here..." class="w-full px-4 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-forest" required></textarea>
+          </div>
+
+          <button type="submit" class="w-full bg-forest text-paper py-2.5 rounded-lg text-sm font-semibold hover:bg-forest-dark transition">Submit Rating</button>
+          <p id="review-status" class="hidden text-sm text-forest font-semibold text-center" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="rule bg-paper border-t border-line py-8">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 text-center text-xs text-ink/60">
+    &copy; 2026 200 English Sentence Connectors. All rights reserved.
+  </div>
+</footer>
+
+<!-- ============ CHECKOUT MODAL ============ -->
+<div id="checkout-modal" class="fixed inset-0 z-50 bg-forest-dark/60 backdrop-blur-sm items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+  <div class="bg-white rounded-2xl max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto p-5 sm:p-6 relative shadow-xl border border-line">
+    <button id="close-modal" type="button" aria-label="Close purchase dialog" class="absolute top-3 right-4 text-ink/50 hover:text-ink text-lg font-bold">&times;</button>
+    <h3 id="checkout-title" class="font-serif text-2xl text-forest-dark font-600 pr-8">Complete Purchase</h3>
+    <p class="text-sm text-ink/70 mt-1">Pay ৳30, then send your details for quick verification.</p>
+
+    <div class="mt-4 rounded-xl bg-paper border border-line p-3.5 text-sm leading-relaxed">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <p class="font-semibold text-forest-dark">Send ৳30 via bKash or Nagad</p>
+        <span class="font-bold text-rust">01767309757</span>
+      </div>
+      <p class="mt-1.5 text-xs text-ink/60">After payment, enter your payment number and transaction ID below.</p>
+      <a href="https://wa.me/8801767309757" target="_blank" rel="noopener noreferrer"
+        class="mt-3 inline-flex items-center justify-center w-full border border-[#25D366] text-[#128C7E] hover:bg-[#25D366]/10 font-semibold py-2 rounded-full text-sm transition-colors">
+        Need help? Contact us on WhatsApp
+      </a>
+    </div>
+
+    <form id="checkout-form" class="mt-4 space-y-3">
+      <div>
+        <label for="checkout-name" class="block text-xs font-semibold text-ink/80 mb-1">Your Name</label>
+        <input id="checkout-name" name="name" type="text" autocomplete="name" required class="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-none" placeholder="Full name">
+      </div>
+      <div>
+        <label for="checkout-email" class="block text-xs font-semibold text-ink/80 mb-1">Email Address</label>
+        <input id="checkout-email" name="email" type="email" autocomplete="email" required class="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-none" placeholder="name@example.com">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-ink/80 mb-1">Payment Method</label>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="border border-line rounded-lg p-3 flex items-center gap-2 cursor-pointer hover:border-bkash">
+            <input type="radio" name="payment" value="bKash" checked>
+            <span class="text-xs font-semibold text-bkash">bKash</span>
+          </label>
+          <label class="border border-line rounded-lg p-3 flex items-center gap-2 cursor-pointer hover:border-nagad">
+            <input type="radio" name="payment" value="Nagad">
+            <span class="text-xs font-semibold text-nagad">Nagad</span>
+          </label>
+        </div>
+      </div>
+      <div>
+        <label for="checkout-sender" class="block text-xs font-semibold text-ink/80 mb-1">Number used for payment</label>
+        <input id="checkout-sender" name="senderNumber" type="tel" inputmode="numeric" autocomplete="tel" required class="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-none" placeholder="01XXXXXXXXX">
+      </div>
+      <div>
+        <label for="checkout-trx" class="block text-xs font-semibold text-ink/80 mb-1">Transaction ID</label>
+        <input id="checkout-trx" name="transactionId" type="text" required class="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-none" placeholder="Enter your transaction ID">
+      </div>
+      <button type="submit" class="w-full bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold py-3 rounded-full text-sm transition-colors mt-2">
+        Submit payment details
+      </button>
+      <p id="checkout-status" class="hidden text-sm text-forest font-semibold text-center" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ============ INTERACTIVE SCRIPTS ============ -->
+<script>
+  // Reveal animation on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const reveals = document.querySelectorAll('[data-reveal]');
+    reveals.forEach(el => el.classList.add('is-shown'));
+  });
+
+  // Mobile Menu Toggle
+  const menuToggle = document.getElementById('menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const iconOpen = document.getElementById('menu-icon-open');
+  const iconClose = document.getElementById('menu-icon-close');
+
+  menuToggle.addEventListener('click', () => {
+    const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+    menuToggle.setAttribute('aria-expanded', !isExpanded);
+    mobileMenu.classList.toggle('hidden');
+    iconOpen.classList.toggle('hidden');
+    iconClose.classList.toggle('hidden');
+  });
+
+  // Modal Handlers
+  // REQUIRED: replace this with the owner's real email address.
+  // Customer emails must never be used as the destination address.
+  const ownerEmail = 'milonsarkar1231@gmail.com';
+
+  const modal = document.getElementById('checkout-modal');
+  const openButtons = document.querySelectorAll('[data-open-modal]');
+  const closeButton = document.getElementById('close-modal');
+  const checkoutForm = document.getElementById('checkout-form');
+  const checkoutStatus = document.getElementById('checkout-status');
+  const reviewForm = document.getElementById('review-form');
+  const reviewStatus = document.getElementById('review-status');
+
+  openButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modal.classList.add('is-open');
+      document.body.classList.add('overflow-hidden');
+      closeButton.focus();
+    });
+  });
+
+  const closeModal = () => {
+    modal.classList.remove('is-open');
+    document.body.classList.remove('overflow-hidden');
+    checkoutStatus.classList.add('hidden');
+    checkoutForm.reset();
+  };
+
+  closeButton.addEventListener('click', closeModal);
+
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+  });
+
+  checkoutForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (ownerEmail === 'your-email@example.com') {
+      checkoutStatus.textContent = 'The owner email must be configured before orders can be submitted.';
+      checkoutStatus.classList.remove('hidden');
+      return;
+    }
+
+    const submitButton = checkoutForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Submitting...';
+    checkoutStatus.classList.add('hidden');
+
+    const formData = new FormData(checkoutForm);
+    formData.append('_subject', 'New 200 Connectors payment submission');
+    formData.append('_captcha', 'false');
+    formData.append('_template', 'table');
+
+    try {
+      const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(ownerEmail)}`, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: formData
+      });
+
+      if (!response.ok) throw new Error('Submission failed');
+
+      checkoutStatus.textContent = 'Submitted successfully. We will verify your payment and send the PDF to your email.';
+      checkoutStatus.classList.remove('hidden');
+      checkoutForm.reset();
+    } catch (error) {
+      checkoutStatus.textContent = 'We could not submit your details. Please check your connection and try again.';
+      checkoutStatus.classList.remove('hidden');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Submit payment details';
+    }
+  });
+
+  reviewForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    reviewStatus.textContent = 'Thank you for your feedback!';
+    reviewStatus.classList.remove('hidden');
+    reviewForm.reset();
+  });
+</script>
+
+</body>
+</html>
