@@ -1,511 +1,1284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>200 English Sentence Connectors — English guide for Bangladeshi students</title>
-<meta name="description" content="A Bangla-explained PDF guide to 200 English sentence connectors, with real example sentences, built for HSC, admission and IELTS-level writing." />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Academy Plan — 200 English Sentence Connectors</title>
+  <meta name="description" content="A calm, elegant seven-day journal and progress tracker for your English learning goals." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      colors: {
+        paper:'#FBF7EE', 'paper-deep':'#F3EDDC',
+        ink:'#1F2A24',
+        forest:{DEFAULT:'#1B4332', dark:'#0F2A20', light:'#2C5A46'},
+        marigold:{DEFAULT:'#E8A33D', dark:'#C97F1D'},
+        rust:{DEFAULT:'#B3552F', dark:'#8F3F20'},
+        line:'#DED5BE'
+      },
+      fontFamily: { serif:['"Fraunces"','Georgia','serif'], sans:['"Inter"','system-ui','sans-serif'] }
+    }}};
+  </script>
+  <style>
+    html { scroll-behavior:smooth; }
+    body { background:#F8FAFC; }
 
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Tailwind CDN -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          paper: '#FBF7EE',
-          ink: '#1F2A24',
-          forest: { DEFAULT: '#1B4332', dark: '#123024', light: '#2C5A46' },
-          marigold: { DEFAULT: '#E8A33D', dark: '#C97F1D' },
-          rust: '#C1440E',
-          line: '#DED5BE',
-          bkash: '#E2136E',
-          nagad: '#EE6C29',
-        },
-        fontFamily: {
-          serif: ['"Fraunces"', 'ui-serif', 'Georgia', 'serif'],
-          sans: ['"Inter"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        },
-        maxWidth: { prose: '70ch' },
-      }
+    /* Consistent premium card treatment for the planning workspace */
+    #plan-workspace > section { background:#F8FAFC; }
+    #plan-workspace .workspace-card {
+      background:#FFFFFF;
+      border:1px solid #E2E8F0;
+      border-radius:12px;
+      box-shadow:0 4px 6px -1px rgba(0,0,0,.05);
     }
-  }
-</script>
+    #plan-workspace .workspace-card .workspace-card {
+      border-color:#E2E8F0;
+      box-shadow:0 2px 4px -1px rgba(15,23,42,.04);
+    }
+    #plan-workspace .workspace-heading { color:#0F172A; }
+    #plan-workspace .workspace-button-primary { background:#1E293B; color:#FFFFFF; }
+    #plan-workspace .workspace-button-primary:hover { background:#0F172A; }
+    #plan-workspace .results-card { color:#0F172A; background:linear-gradient(145deg,#FFFFFF 0%,#F8FAFC 100%); border-color:#CBD5E1; box-shadow:0 12px 28px -16px rgba(15,23,42,.35); }
+    #plan-workspace .results-card .results-muted { color:#475569; }
+    #plan-workspace .results-card .results-tile { background:#FFFFFF; border:1px solid #E2E8F0; box-shadow:0 4px 10px -7px rgba(15,23,42,.35); }
+    #plan-workspace .results-card .results-progress-track { background:#E2E8F0; }
+    #plan-workspace .results-card .results-border { border-color:#CBD5E1; }
+    #plan-workspace .results-card .report-status-badge { display:inline-flex; align-items:center; gap:.35rem; border-radius:9999px; padding:.25rem .6rem; font-size:.7rem; font-weight:700; }
+    #plan-workspace .results-card .report-status-complete { color:#166534; background:#DCFCE7; }
+    #plan-workspace .results-card .report-status-active { color:#1D4ED8; background:#DBEAFE; }
+    #plan-workspace .results-card .report-status-pending { color:#92400E; background:#FEF3C7; }
+    #plan-workspace .results-card .report-bar-complete { background:#22C55E; }
+    #plan-workspace .results-card .report-bar-active { background:#3B82F6; }
+    #plan-workspace .results-card .report-bar-pending { background:#F59E0B; }
+    #plan-workspace .results-card .report-day-card { background:#FFFFFF; border:1px solid #E2E8F0; border-radius:1rem; padding:1rem; box-shadow:0 5px 14px -10px rgba(15,23,42,.45); }
+    #plan-workspace .results-card .text-paper,
+    #plan-workspace .results-card [class*="text-paper/"] { color:#1E293B !important; }
+    #plan-workspace .results-card [class*="bg-paper/"] { background:#F8FAFC; }
+    #plan-workspace .results-card [class*="border-paper/"] { border-color:#CBD5E1; }
+    #plan-workspace button.bg-forest,
+    #plan-workspace button.bg-forest-dark { background:#1E293B; color:#FFFFFF; }
+    #plan-workspace button.bg-forest:hover,
+    #plan-workspace button.bg-forest-dark:hover { background:#0F172A; }
 
-<style>
-  html { scroll-behavior: smooth; }
-  body { background-color: #FBF7EE; }
-  section[id] { scroll-margin-top: 5.5rem; }
+    /* subtle paper texture on the dark bands */
+    .grain-forest {
+      background-color:#0F2A20;
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(232,163,61,.08), transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(44,90,70,.35), transparent 45%);
+    }
 
-  /* Reveal-on-load, single orchestrated entrance for the hero */
-  .reveal { opacity: 0; transform: translateY(14px); }
-  .reveal.is-shown {
-    opacity: 1; transform: translateY(0);
-    transition: opacity .7s ease, transform .7s ease;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-  }
+    /* hero entrance — one deliberate moment, not per-card fades */
+    .journal-in { opacity:0; transform:translateY(10px); animation:journalIn .7s cubic-bezier(.2,.7,.2,1) forwards; }
+    .journal-in.delay-1 { animation-delay:.08s; }
+    .journal-in.delay-2 { animation-delay:.16s; }
+    @keyframes journalIn { to { opacity:1; transform:translateY(0); } }
+    @media (prefers-reduced-motion:reduce) { .journal-in { animation:none; opacity:1; transform:none; } }
 
-  /* Hairline divider used between major sections */
-  .rule { border-top: 1px solid #DED5BE; }
+    .day-tab { --p:0; background:conic-gradient(#E8A33D calc(var(--p) * 1%), #E3DAC3 0); transition:background .3s ease; }
+    .day-tab .day-tab-inner { background:#ffffff; color:#1B4332; transition:background .2s ease, color .2s ease; }
+    .day-tab.is-active { background:#1B4332; }
+    .day-tab.is-active .day-tab-inner { background:transparent; color:#FBF7EE; }
 
-  /* Connector chip used as the feature-list "bullet" */
-  .connector-chip {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-weight: 500;
-  }
+    .task-row { transition:background-color .2s ease, border-color .2s ease; }
+    .task-row.is-done { background:#F0F6F1; border-color:#CFE1D3; }
+    .workflow-step { position:relative; }
+    .workflow-step + .workflow-step::before { content:'→'; position:absolute; left:-1.15rem; top:1.05rem; color:#C97F1D; font-weight:700; }
+    @media (max-width:640px) { .workflow-step + .workflow-step::before { content:'↓'; left:50%; top:-1.1rem; } }
+    .task-row.is-done .task-label { text-decoration:line-through; color:#6B786F; }
+    .check-btn { transition:transform .15s ease, background-color .15s ease, border-color .15s ease; }
+    .check-btn:active { transform:scale(.9); }
 
-  /* Modal open state */
-  #checkout-modal.is-open { display: flex; }
-  #checkout-modal { display: none; }
+    .progress-fill { transition:width .5s cubic-bezier(.2,.7,.2,1); }
+    #progress-ring-arc { transition:stroke-dashoffset .6s cubic-bezier(.2,.7,.2,1); }
 
-  /* Star rating buttons */
-  .star-btn svg { transition: fill .15s ease, stroke .15s ease; }
+    .avatar-image { object-fit:cover; }
+    a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible { outline:2px solid #1B4332; outline-offset:2px; }
 
-  /* Simple focus ring, visible everywhere */
-  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
-    outline: 2px solid #1B4332;
-    outline-offset: 2px;
-  }
-</style>
+    .field-label { font-size:.75rem; font-weight:600; color:rgba(31,42,36,.7); margin-bottom:.25rem; display:block; }
+    .eyebrow { font-family:"Fraunces","Georgia",serif; font-style:italic; color:#C97F1D; }
+    .eyebrow-dark { font-family:"Fraunces","Georgia",serif; font-style:italic; color:#1B4332; }
+
+    /* Study storage opens as a focused workspace instead of occupying the dashboard. */
+    #study-storage { display:none; position:fixed; inset:0; z-index:50; overflow-y:auto; padding:1rem 0; background:transparent; }
+    #study-storage.storage-modal-open { display:block; }
+    #study-storage::before { content:''; position:fixed; inset:0; z-index:40; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); pointer-events:none; }
+    #study-storage .storage-modal-panel { position:relative; z-index:50; background:#FFFFFF; color:#0F172A; }
+    #study-storage .storage-modal-panel .workspace-heading,
+    #study-storage .storage-modal-panel h2,
+    #study-storage .storage-modal-panel h3,
+    #study-storage .storage-modal-panel p,
+    #study-storage .storage-modal-panel span,
+    #study-storage .storage-modal-panel div,
+    #study-storage .storage-modal-panel button,
+    #study-storage .storage-modal-panel label,
+    #study-storage .storage-modal-panel legend { color:#0F172A; }
+    #study-storage .storage-modal-panel .workspace-button-primary { background:#1E293B; color:#FFFFFF !important; }
+    #study-storage .storage-modal-panel .eyebrow-dark { color:#0F172A; }
+    #study-storage .storage-modal-panel .text-slate-500 { color:#475569 !important; }
+    #study-storage .storage-modal-panel #storage-status { color:#0F172A !important; }
+    #study-storage .storage-modal-panel #storage-close { color:#0F172A; background:#FFFFFF; border-color:#64748B; font-size:1.5rem; line-height:1; }
+    #study-storage .storage-modal-panel #storage-close:hover { background:#E2E8F0; }
+    body.public-home #profile, body.public-home #plan-workspace, body.public-home #member-welcome { display:none !important; }
+    body.logged-in #landing-hero { display:none; }
+    body.logged-in #member-welcome { display:block; }
+  </style>
 </head>
-
 <body class="font-sans text-ink antialiased">
-
-<!-- ============ HEADER ============ -->
-<header class="sticky top-0 z-40 bg-paper/90 backdrop-blur border-b border-line">
-  <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-    <a href="#hero" class="flex items-center gap-2">
-      <span class="w-8 h-8 rounded-full bg-forest text-paper flex items-center justify-center font-serif italic text-lg">&amp;</span>
-      <span class="font-serif text-lg font-600 leading-none">200 Connectors</span>
-    </a>
-
-    <nav class="hidden md:flex items-center gap-8 text-sm">
-      <a href="#features" class="hover:text-forest">What's inside</a>
-      <a href="#pricing" class="hover:text-forest">Price</a>
-      <a href="#reviews" class="hover:text-forest">Reviews</a>
-    </nav>
-
-    <div class="hidden md:block">
-      <button type="button" data-open-modal
-        class="bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">
-        Get instant access
+  <header class="sticky top-0 z-40 bg-paper/90 backdrop-blur border-b border-line">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+      <a href="index.html?account#profile" class="flex items-center gap-3" aria-label="Open study workspace">
+        <span class="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center text-lg">▦</span>
+        <span class="font-serif text-lg font-semibold leading-none text-slate-800">Study Workspace</span>
+      </a>
+      <div class="flex items-center gap-3 text-sm">
+        <button id="storage-open" type="button" class="rounded-full border border-slate-300 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" aria-haspopup="dialog" aria-controls="study-storage" aria-expanded="false">📁 Study Storage</button>
+        <a href="index.html?account#profile" class="rounded-full border border-slate-300 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100">Account</a>
+      </div>
+      <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" class="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-line">
+        <svg id="menu-icon-open" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        <svg id="menu-icon-close" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
+    <div id="mobile-menu" class="hidden md:hidden border-t border-line bg-paper px-5 py-4 space-y-3"><button id="storage-open-mobile" type="button" class="block text-left text-sm py-1 font-semibold">📁 Study Storage</button><a href="index.html?account#profile" class="block text-sm py-1">Account</a><button id="mobile-logout" type="button" class="hidden text-left text-sm py-1 text-rust font-semibold">Log out</button></div>
+  </header>
 
-    <!-- Mobile menu toggle -->
-    <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu"
-      class="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-line">
-      <svg id="menu-icon-open" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-      <svg id="menu-icon-close" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
-
-  <!-- Mobile menu panel -->
-  <div id="mobile-menu" class="hidden md:hidden border-t border-line bg-paper px-5 py-4 space-y-3">
-    <a href="#features" class="block text-sm py-1">What's inside</a>
-    <a href="#pricing" class="block text-sm py-1">Price</a>
-    <a href="#reviews" class="block text-sm py-1">Reviews</a>
-    <button type="button" data-open-modal
-      class="w-full bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">
-      Get instant access
-    </button>
-  </div>
-</header>
-
-<main>
-
-  <!-- ============ HERO ============ -->
-  <section id="hero" class="bg-paper">
-    <div class="max-w-6xl mx-auto px-5 sm:px-8 pt-14 pb-16 md:pt-20 md:pb-24 grid md:grid-cols-2 gap-12 md:gap-8 items-center">
-
-      <div class="reveal" data-reveal>
-        <p class="text-sm font-semibold text-forest tracking-normal mb-4">A PDF guide for Bangladeshi students</p>
-        <h1 class="font-serif text-4xl sm:text-5xl leading-[1.08] font-600 text-forest-dark">
-          Master the words that hold every English sentence together.
-        </h1>
-        <p class="mt-6 text-lg text-ink/80 max-w-prose leading-relaxed">
-          200 English Sentence Connectors explains every linking word in Bangla, then shows you
-          exactly how it's used with two real example sentences — built for HSC, admission tests,
-          and IELTS-level writing.
-        </p>
-
-        <div class="mt-8 flex flex-col sm:flex-row gap-4 sm:items-center">
-          <button type="button" data-open-modal
-            class="inline-flex justify-center items-center bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-7 py-3.5 rounded-full text-base transition-colors shadow-[0_6px_0_0_#C97F1D] active:translate-y-1 active:shadow-none">
-            Buy the guide — ৳30
-          </button>
-          <span class="text-sm text-ink/60">PDF sent by email after payment verification</span>
-        </div>
-
-        <div class="mt-8 flex items-center gap-4 text-sm text-ink/60">
-          <div class="flex -space-x-2">
-            <span class="w-8 h-8 rounded-full bg-forest/20 border-2 border-paper"></span>
-            <span class="w-8 h-8 rounded-full bg-marigold/40 border-2 border-paper"></span>
-            <span class="w-8 h-8 rounded-full bg-rust/20 border-2 border-paper"></span>
-          </div>
-          <span>Made for students across Bangladesh</span>
-        </div>
-      </div>
-<!-- Hero visual -->
-      <div class="reveal" data-reveal>
-        <div class="relative mx-auto w-full max-w-sm md:max-w-md aspect-square">
-          <svg class="hidden md:block absolute inset-0 w-full h-full" viewBox="0 0 400 400" fill="none">
-            <path d="M200 200 L70 90" stroke="#DED5BE" stroke-width="1.5"/>
-            <path d="M200 200 L340 80" stroke="#DED5BE" stroke-width="1.5"/>
-            <path d="M200 200 L60 300" stroke="#DED5BE" stroke-width="1.5"/>
-            <path d="M200 200 L350 310" stroke="#DED5BE" stroke-width="1.5"/>
-            <path d="M200 200 L200 30" stroke="#DED5BE" stroke-width="1.5"/>
-          </svg>
-
-          <!-- PDF Card Image Container (Lower Layer: z-10) -->
-          <div class="absolute inset-[14%] rounded-2xl bg-forest text-paper shadow-2xl -rotate-2 flex flex-col justify-between p-7 overflow-hidden z-10">
-            <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-marigold/20"></div>
-            <div>
-              <p class="text-xs tracking-normal text-paper/70">PDF guide · English</p>
-              <h2 class="font-serif text-2xl leading-tight mt-3">200 English<br/>Sentence<br/>Connectors</h2>
-            </div>
-            <div class="text-xs text-paper/70 leading-relaxed">
-              Bangla meanings · Example sentences<br/>Built for HSC &amp; admission tests
-            </div>
-          </div>
-
-          <!-- Connector Tags (Higher Layer: z-20 & Always Visible) -->
-          <span class="inline-block absolute top-[14%] left-[6%] connector-chip bg-white border border-line px-3 py-1.5 rounded-full text-sm shadow-md z-20">However,</span>
-          <span class="inline-block absolute top-[10%] right-[2%] connector-chip bg-white border border-line px-3 py-1.5 rounded-full text-sm shadow-md z-20">In addition,</span>
-          <span class="inline-block absolute top-[2%] left-[38%] connector-chip bg-white border border-line px-3 py-1.5 rounded-full text-sm shadow-md z-20">Because</span>
-          <span class="inline-block absolute bottom-[12%] left-[2%] connector-chip bg-white border border-line px-3 py-1.5 rounded-full text-sm shadow-md z-20">As a result,</span>
-          <span class="inline-block absolute bottom-[8%] right-[0%] connector-chip bg-white border border-line px-3 py-1.5 rounded-full text-sm shadow-md z-20">Therefore,</span>
-
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ FEATURES ============ -->
-  <section id="features" class="rule bg-white">
-    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-16 md:py-20">
-      <div class="max-w-prose">
-        <h2 class="font-serif text-3xl sm:text-4xl font-600 text-forest-dark">What's inside the guide</h2>
-        <p class="mt-4 text-ink/70 leading-relaxed">
-          Every connector is grouped, translated, and demonstrated — so you're never guessing which
-          word fits your sentence.
-        </p>
-      </div>
-
-      <div class="mt-12 grid md:grid-cols-2 gap-x-12 gap-y-8">
-        <div class="flex gap-4 items-start">
-          <span class="connector-chip shrink-0 bg-forest/5 text-forest-dark px-3 py-1 rounded-lg">So,</span>
-          <p class="text-ink/80 leading-relaxed">Every connector grouped by function — addition, contrast,
-            cause, result, sequence — so you always reach for the right one.</p>
-        </div>
-
-        <div class="flex gap-4 items-start">
-          <span class="connector-chip shrink-0 bg-forest/5 text-forest-dark px-3 py-1 rounded-lg">Because,</span>
-          <p class="text-ink/80 leading-relaxed">A Bangla meaning sits beside every English connector,
-            so nothing gets lost in translation.</p>
-        </div>
-
-        <div class="flex gap-4 items-start">
-          <span class="connector-chip shrink-0 bg-forest/5 text-forest-dark px-3 py-1 rounded-lg">For example,</span>
-          <p class="text-ink/80 leading-relaxed">Two real example sentences per connector, drawn from
-            essays, emails, and everyday spoken English.</p>
-        </div>
-
-        <div class="flex gap-4 items-start">
-          <span class="connector-chip shrink-0 bg-forest/5 text-forest-dark px-3 py-1 rounded-lg">Therefore,</span>
-          <p class="text-ink/80 leading-relaxed">Practice sentences at the end of every chapter, written
-            for HSC and university admission test formats.</p>
-        </div>
-
-        <div class="flex gap-4 items-start">
-          <span class="connector-chip shrink-0 bg-forest/5 text-forest-dark px-3 py-1 rounded-lg">In short,</span>
-          <p class="text-ink/80 leading-relaxed">A clean, high-resolution PDF format designed for comfortable reading on phones, tablets, or laptops.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ PRICING ============ -->
-  <section id="pricing" class="rule bg-paper">
-    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-16 md:py-20 text-center">
-      <h2 class="font-serif text-3xl sm:text-4xl font-600 text-forest-dark">Simple, one-time price</h2>
-      <p class="mt-4 text-ink/70 max-w-md mx-auto">Get full lifetime access to the PDF guide with a single payment.</p>
-
-      <div class="mt-10 max-w-sm mx-auto bg-white border border-line rounded-2xl p-8 shadow-sm text-center relative overflow-hidden">
-        <span class="absolute top-4 right-4 bg-red-100 text-red-600 font-bold text-xs px-2.5 py-1 rounded-full border border-red-200">
-          70% OFF
-        </span>
-
-        <p class="text-xs font-semibold uppercase tracking-wider text-forest">Digital Edition</p>
-
-        <div class="mt-4 flex items-baseline justify-center gap-2">
-          <span class="text-xl font-serif text-ink/40 line-through">৳100</span>
-          <span class="text-4xl font-serif font-bold text-forest-dark">৳30</span>
-          <span class="text-sm text-ink/60">/ one-time</span>
-        </div>
-
-        <ul class="mt-6 space-y-3 text-sm text-ink/80 text-left border-t border-line pt-6">
-          <li class="flex items-center gap-2">
-            <span class="text-forest">✓</span> Full 200 Connectors Guide (PDF)
-          </li>
-          <li class="flex items-center gap-2">
-            <span class="text-forest">✓</span> Bangla Explanations &amp; Examples
-          </li>
-          <li class="flex items-center gap-2">
-            <span class="text-forest">✓</span> Manual payment verification and PDF delivery by email
-          </li>
-        </ul>
-
-        <button type="button" data-open-modal class="mt-8 w-full bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold py-3 rounded-full text-sm transition-colors">
-          Get instant access
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ REVIEWS ============ -->
-  <section id="reviews" class="rule bg-white">
-    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-16 md:py-20">
-      <div class="text-center max-w-prose mx-auto">
-        <h2 class="font-serif text-3xl sm:text-4xl font-600 text-forest-dark">Reviews</h2>
-        <p class="mt-3 text-ink/70">Here is what students say about using our connector guide.</p>
-      </div>
-
-      <div class="mt-12 grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <div class="p-6 bg-paper rounded-xl border border-line">
-          <p class="text-sm text-ink/80 italic">"HSC English second paper sentence connectors block-e full marks paoya onak easy hoye gese."</p>
-          <div class="mt-4 text-xs font-semibold text-forest-dark">— Tanvir H., Dhaka</div>
-        </div>
-        <div class="p-6 bg-paper rounded-xl border border-line">
-          <p class="text-sm text-ink/80 italic">"Bangla meaning shothe example thakay bujte ar kono somossha hoy na."</p>
-          <div class="mt-4 text-xs font-semibold text-forest-dark">— Sadia A., Chittagong</div>
-        </div>
-        <div class="p-6 bg-paper rounded-xl border border-line">
-          <p class="text-sm text-ink/80 italic">"IELTS writing task 2 sentence link korar jonno powerful ekta resource!"</p>
-          <div class="mt-4 text-xs font-semibold text-forest-dark">— Rafiq M., Sylhet</div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- ============ RATING & REVIEW FORM ============ -->
-    <section class="bg-paper border-t border-line py-12">
-      <div class="max-w-xl mx-auto px-5 text-center">
-        <h3 class="font-serif text-2xl font-bold text-forest-dark">Leave Your Rating</h3>
-        <p class="text-sm text-ink/70 mt-1">Share your feedback about the guide</p>
-
-        <form id="review-form" class="mt-6 bg-white p-6 rounded-2xl border border-line shadow-sm text-left space-y-4">
-          <div>
-            <label for="review-name" class="block text-xs font-semibold uppercase text-ink/70 mb-1">Your Name</label>
-            <input id="review-name" name="name" type="text" autocomplete="name" placeholder="Enter your name" class="w-full px-4 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-forest" required />
-          </div>
-
-          <div>
-            <label for="review-rating" class="block text-xs font-semibold uppercase text-ink/70 mb-1">Rating</label>
-            <select id="review-rating" name="rating" class="w-full px-4 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-forest">
-              <option value="5">⭐⭐⭐⭐⭐ (5/5) Excellent</option>
-              <option value="4">⭐⭐⭐⭐ (4/5) Very Good</option>
-              <option value="3">⭐⭐⭐ (3/5) Good</option>
-              <option value="2">⭐⭐ (2/5) Average</option>
-              <option value="1">⭐ (1/5) Poor</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="review-feedback" class="block text-xs font-semibold uppercase text-ink/70 mb-1">Your Feedback</label>
-            <textarea id="review-feedback" name="feedback" rows="3" placeholder="Write your review here..." class="w-full px-4 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-forest" required></textarea>
-          </div>
-
-          <button type="submit" class="w-full bg-forest text-paper py-2.5 rounded-lg text-sm font-semibold hover:bg-forest-dark transition">Submit Rating</button>
-          <p id="review-status" class="hidden text-sm text-forest font-semibold text-center" role="status" aria-live="polite"></p>
-        </form>
+  <main>
+    <section id="landing-hero" class="grain-forest text-paper">
+      <div class="max-w-6xl mx-auto px-5 sm:px-8 pt-16 pb-20 md:pt-24 md:pb-24">
+        <p class="eyebrow journal-in text-lg">A calmer way to learn English</p>
+        <h1 class="journal-in delay-1 font-serif text-4xl sm:text-5xl font-semibold mt-3 max-w-2xl leading-[1.1]">Build stronger sentences, one connector at a time.</h1>
+        <svg class="journal-in delay-1 mt-4 w-40 h-4" viewBox="0 0 200 20" fill="none" aria-hidden="true"><path d="M2 12 Q 50 -2, 100 12 T 198 10" stroke="#E8A33D" stroke-width="3" stroke-linecap="round"/></svg>
+        <p class="journal-in delay-2 mt-5 text-paper/75 leading-relaxed max-w-xl">Explore 200 useful English sentence connectors and follow a focused seven-day plan with tasks, notes, and progress saved in your browser.</p>
+        <a href="index.html?account#profile" class="journal-in delay-2 inline-flex mt-7 bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-6 py-3 rounded-full text-sm transition-colors">Open my Academy</a>
       </div>
     </section>
 
-</main>
-
-<!-- ============ FOOTER ============ -->
-<footer class="rule bg-paper border-t border-line py-8">
-  <div class="max-w-6xl mx-auto px-5 sm:px-8 text-center text-xs text-ink/60">
-    &copy; 2026 200 English Sentence Connectors. All rights reserved.
-  </div>
-</footer>
-
-<!-- ============ CHECKOUT MODAL ============ -->
-<div id="checkout-modal" class="fixed inset-0 z-50 bg-forest-dark/60 backdrop-blur-sm items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
-  <div class="bg-white rounded-2xl max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto p-5 sm:p-6 relative shadow-xl border border-line">
-    <button id="close-modal" type="button" aria-label="Close purchase dialog" class="absolute top-3 right-4 text-ink/50 hover:text-ink text-lg font-bold">&times;</button>
-    <h3 id="checkout-title" class="font-serif text-2xl text-forest-dark font-600 pr-8">Complete Purchase</h3>
-    <p class="text-sm text-ink/70 mt-1">Pay ৳30, then send your details for quick verification.</p>
-
-    <div class="mt-4 rounded-xl bg-paper border border-line p-3.5 text-sm leading-relaxed">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <p class="font-semibold text-forest-dark">Send ৳30 via bKash or Nagad</p>
-        <span class="font-bold text-rust">01767309757</span>
-      </div>
-      <p class="mt-1.5 text-xs text-ink/60">After payment, enter your payment number and transaction ID below.</p>
-      <a href="https://wa.me/8801767309757" target="_blank" rel="noopener noreferrer"
-        class="mt-3 inline-flex items-center justify-center w-full border border-[#25D366] text-[#128C7E] hover:bg-[#25D366]/10 font-semibold py-2 rounded-full text-sm transition-colors">
-        Need help? Contact us on WhatsApp
-      </a>
-    </div>
-
-    <form id="checkout-form" class="mt-4 space-y-3">
-      <div>
-        <label for="checkout-name" class="block text-xs font-semibold text-ink/80 mb-1">Your Name</label>
-        <input id="checkout-name" name="name" type="text" autocomplete="name" required class="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-none" placeholder="Full name">
-      </div>
-      <div>
-        <label for="checkout-email" class="block text-xs font-semibold text-ink/80 mb-1">Email Address</label>
-        <input id="checkout-email" name="email" type="email" autocomplete="email" required class="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-none" placeholder="name@example.com">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-ink/80 mb-1">Payment Method</label>
-        <div class="grid grid-cols-2 gap-3">
-          <label class="border border-line rounded-lg p-3 flex items-center gap-2 cursor-pointer hover:border-bkash">
-            <input type="radio" name="payment" value="bKash" checked>
-            <span class="text-xs font-semibold text-bkash">bKash</span>
-          </label>
-          <label class="border border-line rounded-lg p-3 flex items-center gap-2 cursor-pointer hover:border-nagad">
-            <input type="radio" name="payment" value="Nagad">
-            <span class="text-xs font-semibold text-nagad">Nagad</span>
-          </label>
+    <section id="member-welcome" class="hidden grain-forest text-paper">
+      <div class="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-14">
+        <div class="max-w-3xl mx-auto text-center">
+          <p class="eyebrow text-base">Your learning space</p>
+          <h1 id="member-welcome-heading" class="font-serif text-3xl sm:text-4xl font-semibold mt-2">Welcome back</h1>
+          <p class="mt-3 text-paper/70 leading-relaxed">Your seven-day English plan is ready. Continue with today’s tasks, notes, and progress.</p>
+          <a href="#plan-workspace" class="inline-flex mt-6 bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">Continue learning</a>
         </div>
       </div>
-      <div>
-        <label for="checkout-sender" class="block text-xs font-semibold text-ink/80 mb-1">Number used for payment</label>
-        <input id="checkout-sender" name="senderNumber" type="tel" inputmode="numeric" autocomplete="tel" required class="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-none" placeholder="01XXXXXXXXX">
+    </section>
+
+    <section id="study-storage" class="p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="storage-title">
+      <div class="max-w-6xl mx-auto storage-modal-panel">
+        <div class="workspace-card p-5 sm:p-7">
+          <div class="flex items-start justify-between gap-4 mb-5">
+            <div>
+              <p class="eyebrow-dark text-base">Private browser storage</p>
+              <h2 id="storage-title" class="workspace-heading font-serif text-3xl mt-0.5">Study Workspace Storage</h2>
+            </div>
+            <button id="storage-close" type="button" aria-label="Close Study Storage" class="w-10 h-10 rounded-full border border-slate-300 text-xl text-slate-700 hover:bg-slate-100">×</button>
+          </div>
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="text-sm text-slate-500 mt-2">Organize PDFs, Word documents, and text files privately in this browser.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button id="storage-new-folder" type="button" class="workspace-button-primary px-4 py-2.5 rounded-xl text-sm font-semibold">New folder</button>
+              <label class="cursor-pointer border border-slate-300 hover:bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-semibold">Upload files<input id="storage-file-input" type="file" multiple accept=".pdf,.doc,.docx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" class="hidden"></label>
+            </div>
+          </div>
+          <nav id="storage-breadcrumbs" class="flex flex-wrap items-center gap-1.5 mt-6 text-sm" aria-label="Storage breadcrumbs"></nav>
+          <div id="storage-status" class="hidden mt-3 text-sm font-semibold text-forest" role="status"></div>
+          <div id="storage-items" class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+          <p id="storage-empty" class="hidden mt-5 rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">This folder is empty. Create a folder or upload a study file.</p>
+        </div>
       </div>
-      <div>
-        <label for="checkout-trx" class="block text-xs font-semibold text-ink/80 mb-1">Transaction ID</label>
-        <input id="checkout-trx" name="transactionId" type="text" required class="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-none" placeholder="Enter your transaction ID">
+    </section>
+
+    <section id="profile" class="bg-paper py-10 md:py-12">
+      <div class="max-w-6xl mx-auto px-5 sm:px-8">
+        <div id="account-card" class="max-w-2xl mx-auto bg-white rounded-2xl border border-line shadow-sm p-5 sm:p-7">
+          <div class="flex items-start gap-4">
+            <div id="profile-avatar" class="w-16 h-16 shrink-0 rounded-full bg-forest/10 text-forest flex items-center justify-center text-2xl font-serif font-semibold overflow-hidden ring-2 ring-marigold/40 ring-offset-2 ring-offset-white">👋</div>
+            <div class="min-w-0 flex-1">
+              <p class="eyebrow-dark text-base">Your Academy profile</p>
+              <h2 id="profile-heading" class="font-serif text-2xl text-forest-dark mt-0.5">Create your account</h2>
+              <p id="profile-help" class="text-sm text-ink/65 mt-2 leading-relaxed">Add your name, email, and an optional profile picture. Your account and plan will be remembered on this device.</p>
+            </div>
+            <div id="profile-menu-wrap" class="hidden relative shrink-0">
+              <button id="account-menu-toggle" type="button" aria-label="Open profile options" aria-expanded="false" aria-controls="account-menu" class="w-9 h-9 rounded-full border border-line flex items-center justify-center text-lg hover:bg-forest/5">⋯</button>
+              <div id="account-menu" class="hidden absolute right-0 top-11 z-50 w-56 bg-white border border-line rounded-xl shadow-lg p-2">
+                <div class="border-b border-line px-3 py-2 mb-1">
+                  <div class="text-xs text-ink/55">Academy ID</div>
+                  <div id="menu-profile-id" class="font-mono text-sm font-semibold text-forest-dark mt-0.5"></div>
+                </div>
+                <button id="edit-profile" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Edit profile</button>
+                <button id="change-picture" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Change profile picture</button>
+                <button id="export-account" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Export account data</button>
+                <button id="import-account" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Import account data</button>
+                <div class="border-t border-line mt-1 pt-1 space-y-1">
+                  <button id="saved-plans-toggle" type="button" aria-expanded="false" aria-controls="saved-plans-panel" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">
+                    <span>Saved plans</span>
+                    <span class="text-xs">▸</span>
+                  </button>
+                  <div id="saved-plans-panel" class="hidden px-3 pb-2">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-xs text-ink/60">Your plans</span>
+                      <span id="plan-count" class="text-[10px] text-ink/50"></span>
+                    </div>
+                    <label for="plan-search" class="sr-only">Search saved plans</label>
+                    <input id="plan-search" type="search" class="w-full mt-2 px-3 py-2 border border-line rounded-lg text-xs" placeholder="Search plans...">
+                    <div id="plan-list" class="mt-2 space-y-2 max-h-56 overflow-y-auto"></div>
+                  </div>
+                  <button id="restore-plans-toggle" type="button" aria-expanded="false" aria-controls="restore-plans-panel" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">
+                    <span>Restore plans</span>
+                    <span class="text-xs">▸</span>
+                  </button>
+                  <div id="restore-plans-panel" class="hidden px-3 pb-2">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-xs text-ink/60">Deleted plans</span>
+                      <span class="text-[10px] text-ink/50">Deletes after 3 days</span>
+                    </div>
+                    <div id="account-trash-list" class="mt-1 space-y-1"></div>
+                  </div>
+                </div>
+                <input id="profile-picture-change" type="file" accept="image/*" class="hidden" aria-label="Choose a new profile picture">
+                <input id="account-file" type="file" accept="application/json,.json" class="hidden" aria-label="Choose an account backup file">
+                <button id="logout" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-rust hover:bg-rust/5">Log out</button>
+              </div>
+            </div>
+          </div>
+
+          <form id="login-form" class="hidden mt-6 space-y-3">
+            <p class="text-sm text-ink/70 leading-relaxed">Your Academy ID identifies your account, but this website currently saves account data in this browser only. To move your profile and plans to another browser, import the backup file you downloaded there.</p>
+            <div><label for="login-id" class="field-label">Academy ID</label><input id="login-id" name="id" type="text" autocomplete="username" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm uppercase" placeholder="Example: AC-1234ABCD"></div>
+            <button type="submit" class="w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Open my Academy plan</button>
+            <button id="import-login-account" type="button" class="w-full border border-forest text-forest-dark font-semibold py-3 rounded-full text-sm hover:bg-forest/5 transition-colors">Import account backup</button>
+            <p class="text-xs text-ink/55 leading-relaxed">On your old browser: open your profile menu → <strong>Export account data</strong>. Then bring that downloaded JSON file to this browser and import it here.</p>
+            <p id="login-status" class="hidden text-sm text-rust font-semibold" role="status" aria-live="polite"></p>
+            <button id="show-create-account" type="button" class="text-sm text-forest font-semibold underline underline-offset-2">I don't have an Academy ID — create an account</button>
+          </form>
+
+          <form id="profile-form" class="mt-6 grid sm:grid-cols-2 gap-3">
+            <div><label for="profile-name" class="field-label">Full name</label><input id="profile-name" name="name" type="text" autocomplete="name" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your full name"></div>
+            <div><label for="profile-email" class="field-label">Email address</label><input id="profile-email" name="email" type="email" autocomplete="email" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
+            <div><label for="profile-institution" class="field-label">Institution / university</label><input id="profile-institution" name="institution" type="text" autocomplete="organization" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your institution or university"></div>
+            <div><label for="profile-department" class="field-label">Department</label><input id="profile-department" name="department" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your department"></div>
+            <div><label for="profile-session" class="field-label">Session</label><input id="profile-session" name="session" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="2024–2025"></div>
+            <div><label for="profile-year" class="field-label">Year</label><select id="profile-year" name="year" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select year</option><option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option><option>Graduate</option></select></div>
+            <div><label for="profile-semester" class="field-label">Semester</label><select id="profile-semester" name="semester" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select semester</option><option>1st semester</option><option>2nd semester</option><option>3rd semester</option><option>4th semester</option><option>5th semester</option><option>6th semester</option><option>7th semester</option><option>8th semester</option></select></div>
+            <div class="sm:col-span-2"><label for="profile-picture" class="field-label">Profile picture (optional)</label><input id="profile-picture" name="picture" type="file" accept="image/*" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-paper"></div>
+            <button type="submit" class="bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Save account</button>
+            <button id="show-login-account" type="button" class="sm:col-span-2 text-sm text-forest font-semibold underline underline-offset-2">I already have an Academy ID</button>
+          </form>
+
+          <div id="profile-details" class="hidden mt-6 grid sm:grid-cols-2 gap-3 text-sm"></div>
+          <div id="profile-id" class="hidden" role="status"></div>
+          <div id="profile-actions" class="hidden"></div>
+          <div id="profile-saved" class="hidden mt-4 text-sm font-semibold text-forest" role="status" aria-live="polite"></div>
+        </div>
       </div>
-      <button type="submit" class="w-full bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold py-3 rounded-full text-sm transition-colors mt-2">
-        Submit payment details
-      </button>
-      <p id="checkout-status" class="hidden text-sm text-forest font-semibold text-center" role="status" aria-live="polite"></p>
-    </form>
+    </section>
+
+    <div id="plan-workspace" class="hidden">
+      <section class="pb-8 pt-2">
+        <div class="w-full max-w-6xl mx-auto px-5 sm:px-8">
+            <div class="workspace-card w-full p-5 sm:p-7">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between rounded-xl border border-[#E2E8F0] bg-white p-4 shadow-sm">
+                <div class="min-w-0 flex-1">
+                  <label for="active-plan-selector" class="field-label text-slate-800">Saved Plans</label>
+                  <select id="active-plan-selector" class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white focus:border-slate-400" aria-label="Select active plan"></select>
+                </div>
+                <button id="new-plan-top" type="button" class="w-full sm:w-auto border border-[#CBD5E1] hover:bg-slate-50 text-slate-800 font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors">New Plan</button>
+              </div>
+
+              <div class="mt-5">
+                <label for="plan-title" class="field-label text-slate-800">Plan name</label>
+                <input id="plan-title" type="text" class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm font-serif text-lg text-slate-800 bg-white placeholder:text-slate-400 focus:border-slate-400" placeholder="My 7-day English plan">
+              </div>
+
+              <div class="workspace-card mt-5 p-4">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div><label for="plan-start-date" class="field-label text-slate-800">Start date</label><input id="plan-start-date" type="date" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
+                  <div><label for="plan-start-time" class="field-label text-slate-800">Start time</label><input id="plan-start-time" type="time" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
+                  <div><label for="plan-duration" class="field-label text-slate-800">Plan days</label><input id="plan-duration" type="number" min="1" max="365" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white" placeholder="7"></div>
+                  <div><label for="plan-end-date" class="field-label text-slate-800">End date</label><input id="plan-end-date" type="date" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
+                </div>
+                <p id="plan-schedule-summary" class="text-xs text-slate-500 mt-3">Choose a start date and duration to generate your schedule.</p>
+              </div>
+
+              <div class="workspace-card mt-5 p-4">
+                <div class="flex items-start gap-3">
+                  <div class="flex-1 min-w-0">
+                    <label for="global-goal-input" class="field-label text-forest">Your Weekly Direction</label>
+                    <div class="flex flex-col gap-2 sm:flex-row">
+                      <input id="global-goal-input" type="text" class="min-w-0 flex-1 px-4 py-3 border border-line rounded-xl text-sm" placeholder="Add one goal for the week...">
+                      <button id="add-global-goal" type="button" aria-label="Add weekly goal" class="shrink-0 bg-forest hover:bg-forest-dark text-paper px-4 py-3 rounded-xl text-xl leading-none transition-colors">+</button>
+                    </div>
+                    <div id="global-goal-list" class="mt-3 space-y-2"></div>
+                    <p class="text-xs text-ink/55 mt-2">Each goal is added to every day in your scheduled plan. Complete it separately on each day.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-end">
+                <button id="save-plan" type="button" class="workspace-button-primary w-full sm:w-auto font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors">Save Plan</button>
+                <button id="view-report" type="button" class="w-full sm:w-auto border border-[#CBD5E1] hover:bg-slate-50 text-slate-800 font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors">View Report</button>
+              </div>
+              <p id="plan-status" class="text-xs text-forest font-semibold mt-3" role="status" aria-live="polite">Your plan is saved automatically on this device.</p>
+            </div>
+        </div>
+      </section>
+
+      <section class="py-4 md:py-8">
+      <div class="max-w-6xl mx-auto px-5 sm:px-8">
+        <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-6 items-start">
+          <div class="workspace-card p-5 sm:p-7">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="eyebrow-dark text-base">Daily checklist</p>
+                <h2 id="day-heading" class="workspace-heading font-serif text-2xl mt-0.5">Day 1</h2>
+              </div>
+              <span id="day-score" class="text-sm font-semibold text-forest">0/0 done</span>
+            </div>
+            <div id="day-tabs" class="flex flex-wrap gap-2.5 mt-5"></div>
+            <div class="mt-5 grid sm:grid-cols-2 gap-4">
+              <section class="rounded-xl border border-line bg-paper/60 p-4">
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-forest">Scheduled plan</p>
+                    <p class="text-xs text-ink/55 mt-1">Tasks planned in advance</p>
+                  </div>
+                  <span id="planned-score" class="text-xs font-semibold text-forest"></span>
+                </div>
+                <div id="planned-task-list" class="mt-3 space-y-2"></div>
+              </section>
+              <section class="rounded-xl border border-marigold/50 bg-marigold/10 p-4">
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-marigold-dark">Added today</p>
+                    <p class="text-xs text-ink/55 mt-1">Flexible tasks for this day</p>
+                  </div>
+                  <span id="added-score" class="text-xs font-semibold text-marigold-dark"></span>
+                </div>
+                <div id="added-task-list" class="mt-3 space-y-2"></div>
+              </section>
+            </div>
+            <form id="task-form" class="mt-5 space-y-3">
+              <div class="rounded-xl border border-marigold/40 bg-marigold/10 p-4">
+                <div class="flex items-start gap-3 mb-3">
+                  <span class="w-7 h-7 shrink-0 rounded-full bg-marigold text-forest-dark grid place-items-center text-xs font-bold">2</span>
+                  <div><p class="text-sm font-semibold text-forest-dark">Build your roadmap</p><p class="text-xs text-ink/60 mt-1">Add a task, then decide whether it belongs to one day, several days, or only today.</p></div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2">
+                <label for="task-input" class="sr-only">Add a task</label>
+                <input id="task-input" type="text" class="min-w-0 flex-1 px-4 py-3 border border-line rounded-xl text-sm bg-white" placeholder="Example: Read chapter 1" required>
+                <select id="task-kind" class="px-3 py-3 border border-line rounded-xl text-sm bg-white" aria-label="Task type">
+                  <option value="added">Add for this day</option>
+                  <option value="planned">Plan in advance</option>
+                </select>
+                <button type="submit" aria-label="Add task" class="shrink-0 bg-forest hover:bg-forest-dark text-paper px-4 rounded-xl text-xl leading-none transition-colors">+</button>
+                </div>
+              <fieldset id="planned-days" class="hidden border border-line rounded-xl p-3">
+                <legend class="field-label px-1 mb-0">Assign this plan to</legend>
+                <div id="planned-day-options" class="flex flex-wrap gap-2 mt-2"></div>
+              </fieldset>
+              </div>
+            </form>
+            <p class="mt-3 text-xs text-ink/55">Extra tasks are saved only for <strong id="task-day-label">this day</strong>. Advance plans can be assigned to several days.</p>
+            <div class="mt-6 rounded-xl border border-forest/20 bg-forest/5 p-4">
+              <div class="flex items-start gap-3">
+                <span class="w-7 h-7 shrink-0 rounded-full bg-forest text-paper grid place-items-center text-xs font-bold">3</span>
+                <div><p class="text-sm font-semibold text-forest-dark">Work on the selected day</p><p class="text-xs text-ink/60 mt-1">Use the day buttons above. Planned tasks are your commitment; added tasks capture unexpected work.</p></div>
+              </div>
+            </div>
+            <label for="day-note" class="field-label mt-6">Today's note</label><textarea id="day-note" rows="3" class="w-full px-4 py-3 border border-line rounded-xl text-sm resize-y" placeholder="What did you learn, finish, or discover today?"></textarea><button id="save-day" type="button" class="mt-3 w-full bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold py-3 rounded-full text-sm transition-colors">Save today's update</button>
+          </div>
+
+          <aside class="workspace-card results-card p-5 sm:p-7">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="eyebrow text-base">Your results</p>
+                <h2 class="workspace-heading font-serif text-2xl mt-0.5">Progress overview</h2>
+              </div>
+              <div class="flex flex-wrap items-center justify-end gap-2">
+                <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                  <label for="report-recipient" class="sr-only">Report recipient email</label>
+                  <input id="report-recipient" type="email" value="milonsarkar1231@gmail.com" autocomplete="email" class="min-w-0 flex-1 sm:w-64 px-3 py-2 border border-[#CBD5E1] rounded-full text-xs text-slate-900 bg-white focus:border-blue-500" placeholder="recipient@example.com">
+                  <button id="send-report" type="button" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-xs font-semibold shadow-sm transition-colors">✉ Send report</button>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+              <label for="auto-daily-report" class="flex items-center gap-2 text-xs font-semibold text-slate-800"><input id="auto-daily-report" type="checkbox" class="w-4 h-4 accent-amber-500"> Auto-send daily at 10:00 PM</label>
+              <span id="report-send-status" class="text-xs font-semibold text-slate-600" role="status" aria-live="polite">Daily reporting is off.</span>
+            </div>
+
+            <div class="mt-7 flex items-center gap-5">
+              <div class="relative w-28 h-28 shrink-0">
+                <svg viewBox="0 0 120 120" class="w-28 h-28 -rotate-90">
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="#E2E8F0" stroke-width="10"/>
+                  <circle id="progress-ring-arc" cx="60" cy="60" r="52" fill="none" stroke="#E8A33D" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <span id="total-rate" class="font-serif text-2xl leading-none">0%</span>
+                  <span class="text-[10px] text-paper/60 mt-1">complete</span>
+                </div>
+              </div>
+              <div class="flex-1 grid grid-cols-2 gap-2 text-center">
+                                  <div class="results-tile rounded-xl p-3"><div id="total-done" class="font-serif text-2xl">0</div><div class="results-muted text-[10px] mt-0.5">tasks done</div></div>
+                <div class="results-tile rounded-xl p-3"><div id="best-day" class="font-serif text-2xl">—</div><div class="results-muted text-[10px] mt-0.5">best day</div></div>
+              </div>
+            </div>
+
+            <div id="day-summary" class="mt-7 space-y-3"></div>
+            <div id="global-goals-preview" class="hidden mt-6 rounded-xl bg-slate-50 border border-[#E2E8F0] p-4 text-sm text-slate-700 whitespace-pre-wrap"></div>
+            <p id="finish-note" class="hidden mt-5 rounded-xl bg-slate-100 text-slate-800 p-3 text-sm font-semibold"></p>
+          </aside>
+        </div>
+      </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="report-preview" class="hidden fixed inset-0 z-[60] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="report-preview-title">
+    <div class="min-h-full flex items-center justify-center">
+      <div class="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
+        <div class="flex items-start justify-between gap-4">
+          <div><p class="eyebrow-dark text-base">Seven-day review</p><h2 id="report-preview-title" class="font-serif text-2xl text-forest-dark mt-0.5">Plan versus results</h2></div>
+          <button id="close-report" type="button" aria-label="Close report" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
+        </div>
+        <div id="report-content" class="mt-5 space-y-4"></div>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- ============ INTERACTIVE SCRIPTS ============ -->
-<script>
-  // Reveal animation on load
-  document.addEventListener('DOMContentLoaded', () => {
-    const reveals = document.querySelectorAll('[data-reveal]');
-    reveals.forEach(el => el.classList.add('is-shown'));
-  });
+  <div id="saved-plan-preview" class="hidden fixed inset-0 z-[60] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="saved-plan-preview-title">
+    <div class="min-h-full flex items-center justify-center">
+      <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="eyebrow-dark text-base">Saved plan</p>
+            <h2 id="saved-plan-preview-title" class="font-serif text-2xl text-forest-dark mt-0.5"></h2>
+            <p id="saved-plan-preview-date" class="text-xs text-ink/55 mt-1"></p>
+          </div>
+          <button id="close-saved-plan-preview" type="button" aria-label="Close saved plan preview" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
+        </div>
+        <div id="saved-plan-preview-content" class="mt-5 space-y-4"></div>
+        <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <button id="cancel-saved-plan-preview" type="button" class="border border-line hover:bg-forest/5 text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm">Close</button>
+          <button id="open-saved-plan" type="button" class="bg-forest hover:bg-forest-dark text-paper font-semibold px-5 py-2.5 rounded-full text-sm">Open this plan</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  // Mobile Menu Toggle
-  const menuToggle = document.getElementById('menu-toggle');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const iconOpen = document.getElementById('menu-icon-open');
-  const iconClose = document.getElementById('menu-icon-close');
+  <div id="trash-preview" class="hidden fixed inset-0 z-[60] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="trash-preview-title">
+    <div class="min-h-full flex items-center justify-center">
+      <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="eyebrow-dark text-base">Trash preview</p>
+            <h2 id="trash-preview-title" class="font-serif text-2xl text-forest-dark mt-0.5"></h2>
+            <p id="trash-preview-date" class="text-xs text-ink/55 mt-1"></p>
+          </div>
+          <button id="close-trash-preview" type="button" aria-label="Close Trash preview" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
+        </div>
+        <div id="trash-preview-content" class="mt-5 space-y-4"></div>
+        <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <button id="cancel-trash-preview" type="button" class="border border-line hover:bg-forest/5 text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm">Close</button>
+          <button id="restore-preview-plan" type="button" class="bg-forest hover:bg-forest-dark text-paper font-semibold px-5 py-2.5 rounded-full text-sm">Restore this plan</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  menuToggle.addEventListener('click', () => {
-    const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
-    menuToggle.setAttribute('aria-expanded', !isExpanded);
-    mobileMenu.classList.toggle('hidden');
-    iconOpen.classList.toggle('hidden');
-    iconClose.classList.toggle('hidden');
-  });
+  <footer class="border-t border-line bg-paper py-8 text-center text-xs text-ink/60">&copy; 2026 200 English Sentence Connectors. All rights reserved.</footer>
 
-  // Modal Handlers
-  // REQUIRED: replace this with the owner's real email address.
-  // Customer emails must never be used as the destination address.
-  const ownerEmail = 'milonsarkar1231@gmail.com';
+  <script>
+    const KEY = 'academyPollPlan';
+    const PLANS_KEY = 'academySavedPlans';
+    const TRASH_KEY = 'academyTrashPlans';
+    const TRASH_RETENTION_DAYS = 3;
+    const PROFILE_KEY = 'academyProfile';
+    const SESSION_KEY = 'academyLoggedIn';
+    const RING_CIRCUMFERENCE = 2 * Math.PI * 52;
+    const savedPlans = JSON.parse(localStorage.getItem(PLANS_KEY) || '[]');
+    const legacyPlan = JSON.parse(localStorage.getItem(KEY) || 'null');
+    const state = { plans: savedPlans.length ? savedPlans : (legacyPlan ? [legacyPlan] : []), trash: JSON.parse(localStorage.getItem(TRASH_KEY) || '[]'), plan: null, profile: JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'), day: 0 };
+    cleanTrash();
+    function cleanTrash() {
+      const cutoff = Date.now() - TRASH_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+      state.trash = state.trash.filter(item => new Date(item.deletedAt).getTime() > cutoff);
+      localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+    }
+    state.plan = state.plans[0] || null;
+    const $ = id => document.getElementById(id);
+    const save = () => {
+      if (!state.plan) return;
+      const index = state.plans.findIndex(plan => plan.id === state.plan.id);
+      if (index === -1) state.plans.unshift(state.plan); else state.plans[index] = state.plan;
+      localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+      localStorage.setItem(KEY, JSON.stringify(state.plan));
+    };
+    const planLength = () => Math.max(1, Number(state.plan?.duration) || 7);
+    const scheduleDate = (i, plan = state.plan) => {
+      const start = new Date(`${plan?.startDate || new Date().toISOString().slice(0, 10)}T${plan?.startTime || '09:00'}`);
+      start.setDate(start.getDate() + i);
+      return start;
+    };
+    const dayLabel = (i, plan = state.plan) => {
+      const date = scheduleDate(i, plan);
+      return `Day ${i + 1} (${date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })})`;
+    };
+    const dateValue = date => date.toISOString().slice(0, 10);
+    const formatTime = time => {
+      if (!time) return '';
+      const [hours, minutes] = time.split(':').map(Number);
+      if (Number.isNaN(hours) || Number.isNaN(minutes)) return time;
+      const suffix = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours % 12 || 12;
+      return `${String(displayHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${suffix}`;
+    };
+    const currentTimeValue = () => {
+      const now = new Date();
+      return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    };
+    const taskTimeMarkup = task => task.time ? ` <time class="ml-1 text-xs font-semibold text-slate-500">· ${escapeHtml(formatTime(task.time))}</time>` : '';
 
-  const modal = document.getElementById('checkout-modal');
-  const openButtons = document.querySelectorAll('[data-open-modal]');
-  const closeButton = document.getElementById('close-modal');
-  const checkoutForm = document.getElementById('checkout-form');
-  const checkoutStatus = document.getElementById('checkout-status');
-  const reviewForm = document.getElementById('review-form');
-  const reviewStatus = document.getElementById('review-status');
-
-  openButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      modal.classList.add('is-open');
-      document.body.classList.add('overflow-hidden');
-      closeButton.focus();
-    });
-  });
-
-  const closeModal = () => {
-    modal.classList.remove('is-open');
-    document.body.classList.remove('overflow-hidden');
-    checkoutStatus.classList.add('hidden');
-    checkoutForm.reset();
-  };
-
-  closeButton.addEventListener('click', closeModal);
-
-  window.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
-  });
-
-  checkoutForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    if (ownerEmail === 'your-email@example.com') {
-      checkoutStatus.textContent = 'The owner email must be configured before orders can be submitted.';
-      checkoutStatus.classList.remove('hidden');
-      return;
+    function renderActivePlanSelector() {
+      const selector = $('active-plan-selector');
+      if (!selector || !state.plans.length) return;
+      selector.innerHTML = state.plans.map(plan => `<option value="${plan.id}">${escapeHtml(plan.title || 'Untitled plan')}</option>`).join('');
+      selector.value = state.plan?.id || state.plans[0].id;
     }
 
-    const submitButton = checkoutForm.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    submitButton.textContent = 'Submitting...';
-    checkoutStatus.classList.add('hidden');
+    function renderProfile() {
+      const profile = state.profile;
+      if (profile && !profile.id) {
+        profile.id = `AC-${crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()}`;
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+        localStorage.setItem(SESSION_KEY, JSON.stringify(profile));
+      }
+      const hasProfile = Boolean(profile);
+      $('plan-workspace').classList.toggle('hidden', !hasProfile);
+      document.body.classList.toggle('logged-in', hasProfile && accountMode);
+      $('member-welcome-heading').textContent = hasProfile ? `Welcome back, ${profile.name}` : 'Welcome back';
+      $('login-form').classList.toggle('hidden', hasProfile);
+      $('profile-id').classList.add('hidden');
+      $('menu-profile-id').textContent = hasProfile ? profile.id : '';
+      $('profile-name').value = profile?.name || '';
+      $('profile-email').value = profile?.email || '';
+      $('profile-institution').value = profile?.institution || '';
+      $('profile-department').value = profile?.department || '';
+      $('profile-session').value = profile?.session || '';
+      $('profile-year').value = profile?.year || '';
+      $('profile-semester').value = profile?.semester || '';
+      $('profile-heading').textContent = hasProfile ? `Welcome back, ${profile.name}` : 'Create your account';
+      $('profile-help').textContent = hasProfile ? 'Your profile is saved on this device. You can edit your details whenever you like.' : 'Add your personal and academic details to create your Academy profile.';
+      const showLogin = !hasProfile && Boolean(localStorage.getItem(PROFILE_KEY));
+      $('profile-form').classList.toggle('hidden', hasProfile || showLogin);
+      $('login-form').classList.toggle('hidden', hasProfile || !showLogin);
+      $('profile-details').classList.toggle('hidden', !hasProfile);
+      $('profile-actions').classList.toggle('hidden', !hasProfile);
+      $('logout').classList.toggle('hidden', !hasProfile);
+      $('mobile-logout').classList.toggle('hidden', !hasProfile);
+      $('profile-saved').classList.add('hidden');
+      if (hasProfile) {
+        $('profile-details').innerHTML = [
+          ['Institution / university', profile.institution], ['Department', profile.department],
+          ['Session', profile.session], ['Year', profile.year], ['Semester', profile.semester]
+        ].map(([label, value]) => `<div class="rounded-xl bg-paper border border-line p-3"><div class="text-xs text-ink/55">${label}</div><div class="font-semibold text-forest-dark mt-1">${escapeHtml(value || 'Not provided')}</div></div>`).join('');
+      }
+      const avatar = $('profile-avatar');
+      avatar.innerHTML = profile?.picture ? `<img src="${profile.picture}" alt="${escapeHtml(profile.name)}" class="avatar-image w-full h-full">` : escapeHtml((profile?.name || '👋').charAt(0).toUpperCase());
+      $('profile-menu-wrap').classList.toggle('hidden', !hasProfile);
+      if (!hasProfile) {
+        $('account-menu').classList.add('hidden');
+        $('account-menu-toggle').setAttribute('aria-expanded', 'false');
+      }
+    }
 
-    const formData = new FormData(checkoutForm);
-    formData.append('_subject', 'New 200 Connectors payment submission');
-    formData.append('_captcha', 'false');
-    formData.append('_template', 'table');
+    function ensurePlan() {
+      if (!state.plan) {
+        state.plan = { id: crypto.randomUUID(), title: 'My plan', created: new Date().toISOString(), duration: 7, startDate: dateValue(new Date()), startTime: '09:00', goals: [], tasks: [], notes: Array(7).fill('') };
+        state.plans.unshift(state.plan);
+      }
+      state.plan.id = state.plan.id || crypto.randomUUID();
+      state.plan.duration = Math.max(1, Number(state.plan.duration) || Math.max(7, state.plan.notes?.length || 7));
+      state.plan.startDate = state.plan.startDate || dateValue(new Date(state.plan.created || Date.now()));
+      state.plan.startTime = state.plan.startTime || '09:00';
+      state.plan.endDate = state.plan.endDate || dateValue(scheduleDate(planLength() - 1, state.plan));
+      const length = planLength();
+      state.plan.notes = Array.from({length}, (_, i) => state.plan.notes?.[i] || '');
+      if (typeof state.plan.goals === 'string') {
+        state.plan.goals = state.plan.goals.split('\n').map(text => text.trim()).filter(Boolean).map(text => ({ id: crypto.randomUUID(), text, done: Array(planLength()).fill(false) }));
+      }
+      state.plan.goals = (state.plan.goals || []).map(goal => ({
+        id: goal.id || crypto.randomUUID(), text: goal.text || String(goal), time: goal.time || '', done: Array.from({length}, (_, i) => Boolean(goal.done?.[i]))
+      }));
+      const goalTasks = state.plan.goals.map(goal => ({
+        id: `goal-${goal.id}`, goalId: goal.id, text: goal.text, time: goal.time || '', source: 'goal', days: Array(length).fill(true), done: goal.done
+      }));
+      state.plan.tasks = (state.plan.tasks || []).filter(task => task.source !== 'goal').map(task => ({
+        ...task,
+        text: task.text,
+        source: task.source || 'planned',
+        time: task.time || '',
+        days: Array.from({length}, (_, i) => Boolean(task.days?.[i])),
+        done: Array.from({length}, (_, i) => Boolean(task.done?.[i]))
+      }));
+      state.plan.tasks = [...goalTasks, ...state.plan.tasks];
+    }
+    function renderGoalList() {
+      const goals = state.plan?.goals || [];
+      $('global-goal-list').innerHTML = goals.length ? goals.map(goal => `<div class="flex items-center gap-2 rounded-xl border border-line bg-white px-3 py-2"><span class="flex-1 min-w-0 text-sm text-forest-dark">${escapeHtml(goal.text)}${goal.time ? ` <time class="ml-1 text-xs font-semibold text-slate-500">· ${escapeHtml(formatTime(goal.time))}</time>` : ''}</span><button type="button" data-remove-goal="${goal.id}" aria-label="Delete goal" class="shrink-0 text-ink/35 hover:text-rust text-lg">×</button></div>`).join('') : '<p class="text-xs text-ink/50">No weekly goals added yet.</p>';
+      $('global-goal-list').querySelectorAll('[data-remove-goal]').forEach(button => button.addEventListener('click', () => {
+        state.plan.goals = state.plan.goals.filter(goal => goal.id !== button.dataset.removeGoal);
+        save();
+        render();
+      }));
+    }
+    function renderPlanList() {
+      cleanTrash();
+      const query = $('plan-search').value.trim().toLowerCase();
+      const matches = state.plans.filter(plan => plan.title.toLowerCase().includes(query));
+      $('plan-count').textContent = `${state.plans.length} plan${state.plans.length === 1 ? '' : 's'}`;
+      $('plan-list').innerHTML = matches.length ? matches.map(plan => `<div class="flex items-center gap-2"><button type="button" data-plan-id="${plan.id}" class="min-w-0 flex-1 text-left px-3 py-2.5 rounded-xl border transition-colors ${plan.id === state.plan.id ? 'border-forest bg-forest/5' : 'border-line hover:bg-forest/5'}"><span class="block text-sm font-semibold text-forest-dark truncate">${escapeHtml(plan.title)}</span><span class="block text-xs text-ink/55 mt-0.5">Created ${new Date(plan.created).toLocaleDateString()}</span></button><button type="button" data-delete-plan="${plan.id}" aria-label="Move ${escapeHtml(plan.title)} to trash" class="shrink-0 w-10 h-10 rounded-xl border border-line text-rust hover:bg-rust/5 text-lg transition-colors">×</button></div>`).join('') : '<p class="text-xs text-ink/55 py-2">No matching plans found.</p>';
+      $('plan-list').querySelectorAll('[data-plan-id]').forEach(button => button.addEventListener('click', () => openSavedPlanPreview(button.dataset.planId)));
+      renderTrashMenu();
+      $('plan-list').querySelectorAll('[data-delete-plan]').forEach(button => button.addEventListener('click', () => {
+        const plan = state.plans.find(item => item.id === button.dataset.deletePlan);
+        if (!plan || !confirm(`Move “${plan.title}” to Trash? It will be permanently deleted after ${TRASH_RETENTION_DAYS} days.`)) return;
+        state.plans = state.plans.filter(item => item.id !== plan.id);
+        state.trash.unshift({ plan, deletedAt: new Date().toISOString() });
+        if (state.plan?.id === plan.id) state.plan = state.plans[0] || null;
+        localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+        localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+        if (state.plan) localStorage.setItem(KEY, JSON.stringify(state.plan));
+        else localStorage.removeItem(KEY);
+        state.day = 0;
+        render();
+        $('plan-status').textContent = 'Plan deleted.';
+      }));
+    }
+    let previewPlanId = null;
+    function openSavedPlanPreview(id) {
+      const plan = state.plans.find(item => item.id === id);
+      if (!plan) return;
+      previewPlanId = id;
+      $('saved-plan-preview-title').textContent = plan.title;
+      $('saved-plan-preview-date').textContent = `Created ${new Date(plan.created).toLocaleDateString()} · Read-only preview`;
+      $('saved-plan-preview-content').innerHTML = Array.from({length: plan.duration || 7}, (_, day) => {
+        const tasks = (plan.tasks || []).filter(task => task.days?.[day]);
+        const note = plan.notes?.[day] || '';
+        return `<section class="border border-line rounded-xl p-4"><h3 class="font-serif text-lg text-forest-dark">${dayLabel(day, plan)}</h3><ul class="mt-2 space-y-1 text-sm">${tasks.length ? tasks.map(task => `<li class="flex gap-2"><span class="text-marigold-dark">${task.done?.[day] ? '✓' : '○'}</span><span>${escapeHtml(task.text)}${taskTimeMarkup(task)}</span></li>`).join('') : '<li class="text-ink/50">No tasks</li>'}</ul>${note ? `<p class="mt-3 pt-3 border-t border-line text-sm text-ink/70"><strong>Note:</strong> ${escapeHtml(note)}</p>` : ''}</section>`;
+      }).join('');
+      $('saved-plan-preview').classList.remove('hidden');
+      $('open-saved-plan').focus();
+    }
+    function closeSavedPlanPreview() {
+      previewPlanId = null;
+      $('saved-plan-preview').classList.add('hidden');
+    }
 
-    try {
-      const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(ownerEmail)}`, {
-        method: 'POST',
-        headers: { Accept: 'application/json' },
-        body: formData
+    let previewTrashId = null;
+    function openTrashPreview(id) {
+      const item = state.trash.find(entry => entry.plan.id === id);
+      if (!item) return;
+      previewTrashId = id;
+      const plan = item.plan;
+      $('trash-preview-title').textContent = plan.title;
+      $('trash-preview-date').textContent = `Deleted ${new Date(item.deletedAt).toLocaleDateString()} · Read-only preview`;
+      const days = Array.from({length: plan.duration || 7}, (_, day) => {
+        const tasks = (plan.tasks || []).filter(task => task.days?.[day]);
+        const note = plan.notes?.[day] || '';
+        return `<section class="border border-line rounded-xl p-4"><h3 class="font-serif text-lg text-forest-dark">${dayLabel(day, plan)}</h3><ul class="mt-2 space-y-1 text-sm">${tasks.length ? tasks.map(task => `<li class="flex gap-2"><span class="text-marigold-dark">${task.done?.[day] ? '✓' : '○'}</span><span>${escapeHtml(task.text)}${taskTimeMarkup(task)}</span></li>`).join('') : '<li class="text-ink/50">No tasks</li>'}</ul>${note ? `<p class="mt-3 pt-3 border-t border-line text-sm text-ink/70"><strong>Note:</strong> ${escapeHtml(note)}</p>` : ''}</section>`;
+      }).join('');
+      $('trash-preview-content').innerHTML = days;
+      $('trash-preview').classList.remove('hidden');
+      $('restore-preview-plan').focus();
+    }
+    function closeTrashPreview() {
+      previewTrashId = null;
+      $('trash-preview').classList.add('hidden');
+    }
+    function renderTrashMenu() {
+      const trashMenu = $('restore-plans-panel');
+      const trashList = $('account-trash-list');
+      if (!state.trash.length) {
+        trashMenu.classList.add('hidden');
+        trashList.innerHTML = '';
+        return;
+      }
+      trashMenu.classList.remove('hidden');
+      trashList.innerHTML = state.trash.map(item => `<div class="flex items-center gap-2"><button type="button" data-preview-plan="${item.plan.id}" class="min-w-0 flex-1 text-left"><span class="block text-xs font-semibold text-forest-dark truncate hover:underline">${escapeHtml(item.plan.title)}</span><span class="block text-[10px] text-ink/50">Deleted ${new Date(item.deletedAt).toLocaleDateString()} · View plan</span></button><button type="button" data-restore-plan="${item.plan.id}" class="shrink-0 px-2 py-1 rounded-lg border border-forest text-forest-dark hover:bg-forest/5 text-[10px] font-semibold">Restore</button></div>`).join('');
+      trashList.querySelectorAll('[data-preview-plan]').forEach(button => button.addEventListener('click', () => openTrashPreview(button.dataset.previewPlan)));
+      trashList.querySelectorAll('[data-restore-plan]').forEach(button => button.addEventListener('click', () => {
+        const index = state.trash.findIndex(item => item.plan.id === button.dataset.restorePlan);
+        if (index === -1) return;
+        const [item] = state.trash.splice(index, 1);
+        state.plans.unshift(item.plan);
+        state.plan = item.plan;
+        localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+        localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+        state.day = 0;
+        render();
+        $('plan-status').textContent = 'Plan restored from Trash.';
+      }));
+    }
+    function renderReport() {
+      ensurePlan();
+      const planned = state.plan.tasks.filter(task => task.source !== 'added');
+      const added = state.plan.tasks.filter(task => task.source === 'added');
+      const count = tasks => ({ total: tasks.reduce((n, task) => n + task.days.filter(Boolean).length, 0), done: tasks.reduce((n, task) => n + task.done.filter(Boolean).length, 0) });
+      const plannedCount = count(planned), addedCount = count(added), allCount = count(state.plan.tasks);
+      const percent = allCount.total ? Math.round(allCount.done / allCount.total * 100) : 0;
+      $('report-content').innerHTML = `<div class="grid sm:grid-cols-3 gap-3"><div class="rounded-2xl bg-gradient-to-br from-emerald-600 to-green-500 text-white p-4 shadow-lg"><div class="text-xs text-white/80">Overall score</div><div class="font-serif text-3xl mt-1">${percent}%</div><div class="text-xs text-white/80 mt-1">${allCount.done}/${allCount.total} tasks complete</div></div><div class="rounded-2xl border border-blue-200 bg-blue-50 p-4 shadow-sm"><div class="text-xs text-slate-600">Planned tasks</div><div class="font-serif text-2xl text-slate-900 mt-1">${plannedCount.done}/${plannedCount.total}</div><div class="text-xs text-slate-600 mt-1">${plannedCount.total ? Math.round(plannedCount.done / plannedCount.total * 100) : 0}% complete</div></div><div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm"><div class="text-xs text-slate-600">Added today</div><div class="font-serif text-2xl text-slate-900 mt-1">${addedCount.done}/${addedCount.total}</div><div class="text-xs text-slate-600 mt-1">${addedCount.total ? Math.round(addedCount.done / addedCount.total * 100) : 0}% complete</div></div></div><div class="rounded-xl border border-line p-4"><h3 class="font-serif text-xl text-forest-dark">Daily breakdown</h3><div class="mt-3 space-y-3">${Array.from({length: planLength()}, (_, day) => { const plannedTasks = planned.filter(task => task.days[day]); const addedTasks = added.filter(task => task.days[day]); const tasks = [...plannedTasks, ...addedTasks]; const done = tasks.filter(task => task.done[day]).length; const rate = tasks.length ? Math.round(done / tasks.length * 100) : 0; return `<div class="border-b border-line pb-3 last:border-0 last:pb-0"><div class="flex justify-between text-xs mb-1"><span class="font-semibold">${dayLabel(day)}</span><span>${done}/${tasks.length} · ${rate}%</span></div><div class="flex justify-between text-[10px] text-ink/55 mb-1"><span>Planned: ${plannedTasks.filter(task => task.done[day]).length}/${plannedTasks.length}</span><span>Added: ${addedTasks.filter(task => task.done[day]).length}/${addedTasks.length}</span></div><div class="h-2 bg-paper-deep rounded-full overflow-hidden"><div class="h-full bg-marigold rounded-full" style="width:${rate}%"></div></div>${tasks.length ? `<ul class="mt-2 space-y-1 text-xs text-ink/70">${tasks.map(task => `<li>${task.done[day] ? '✓' : '○'} ${escapeHtml(task.text)}${taskTimeMarkup(task)}</li>`).join('')}</ul>` : ''}</div>`; }).join('')}</div></div><div class="rounded-xl bg-forest/5 border border-line p-4"><h3 class="font-serif text-xl text-forest-dark">Global plan goals</h3><ul class="text-sm text-ink/70 mt-2 space-y-1">${state.plan.goals.length ? state.plan.goals.map(goal => `<li>• ${escapeHtml(goal.text)}${goal.time ? ` <time class="text-xs font-semibold text-slate-500">· ${escapeHtml(formatTime(goal.time))}</time>` : ''}</li>`).join('') : '<li>No global goals added.</li>'}</ul></div>`;
+      $('report-preview').classList.remove('hidden');
+      $('close-report').focus();
+    }
+    function closeReport() { $('report-preview').classList.add('hidden'); }
+    function render() {
+      ensurePlan();
+      renderActivePlanSelector();
+      $('plan-title').value = state.plan.title;
+      $('plan-start-date').value = state.plan.startDate;
+      $('plan-start-time').value = state.plan.startTime;
+      $('plan-duration').value = planLength();
+      const endDate = scheduleDate(planLength() - 1);
+      state.plan.endDate = state.plan.endDate || dateValue(endDate);
+      $('plan-end-date').value = state.plan.endDate;
+      $('plan-schedule-summary').textContent = `${planLength()} days · ${scheduleDate(0).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })} to ${scheduleDate(planLength() - 1).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })}`;
+      renderGoalList();
+      renderPlanList();
+      $('day-heading').textContent = dayLabel(state.day); $('day-note').value = state.plan.notes[state.day] || '';
+      const goals = state.plan.goals || [];
+      $('global-goals-preview').classList.toggle('hidden', !goals.length);
+      $('global-goals-preview').textContent = goals.length ? `Seven-day goals:\n${goals.map(goal => `• ${goal.text}`).join('\n')}` : '';
+      if ($('task-kind').value === 'planned') renderPlannedDayOptions();
+      $('day-tabs').innerHTML = Array.from({length:planLength()}, (_,i) => {
+        const dayTasks = state.plan.tasks.filter(t=>t.days[i]);
+        const dayDone = dayTasks.filter(t=>t.done[i]).length;
+        const pct = dayTasks.length ? Math.round(dayDone/dayTasks.length*100) : 0;
+        return `<button type="button" data-day="${i}" aria-label="${dayLabel(i)}: ${dayDone} of ${dayTasks.length} done" class="day-tab ${i===state.day?'is-active':''} min-h-12 px-2 rounded-full grid place-items-center" style="--p:${pct}"><span class="day-tab-inner min-h-[38px] px-2 rounded-full grid place-items-center text-[11px] font-semibold text-center leading-tight">${dayLabel(i)}</span></button>`;
+      }).join('');
+      const today = state.plan.tasks.filter(t => t.days[state.day]);
+      const planned = today.filter(t => t.source !== 'added');
+      const added = today.filter(t => t.source === 'added');
+      const taskMarkup = (tasks, emptyText) => tasks.length ? tasks.map(task => {
+        const index = state.plan.tasks.indexOf(task);
+        return `<div class="task-row ${task.done[state.day]?'is-done':''} flex items-center gap-2 border border-line rounded-xl p-2.5"><label class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"><input type="checkbox" data-check="${index}" ${task.done[state.day]?'checked':''} aria-label="Mark ${escapeHtml(task.text)} complete" class="task-checkbox w-5 h-5 shrink-0 accent-marigold"><span class="task-label text-sm">${escapeHtml(task.text)}${taskTimeMarkup(task)}</span></label>${task.source === 'goal' ? '<span class="text-[10px] font-semibold text-forest/60">Weekly goal</span>' : `<button type="button" data-remove="${index}" aria-label="Remove task" class="text-ink/35 hover:text-rust text-lg">×</button>`}</div>`;
+      }).join('') : `<div class="border border-dashed border-line rounded-lg p-4 text-center text-xs text-ink/55">${emptyText}</div>`;
+      $('day-score').textContent = `${today.filter(t=>t.done[state.day]).length}/${today.length} done`;
+      $('planned-score').textContent = `${planned.filter(t=>t.done[state.day]).length}/${planned.length}`;
+      $('added-score').textContent = `${added.filter(t=>t.done[state.day]).length}/${added.length}`;
+      $('task-day-label').textContent = dayLabel(state.day).toLowerCase();
+      $('planned-task-list').innerHTML = taskMarkup(planned, 'No advance tasks assigned.');
+      $('added-task-list').innerHTML = taskMarkup(added, 'No extra tasks added today.');
+      const totals = state.plan.tasks.reduce((n,t) => n + t.done.filter(Boolean).length, 0), possible = state.plan.tasks.reduce((n,t) => n + t.days.filter(Boolean).length, 0);
+      const rate = possible ? Math.round(totals/possible*100) : 0;
+      $('total-done').textContent=totals; $('total-rate').textContent=`${rate}%`;
+      const ring = $('progress-ring-arc');
+      ring.style.strokeDashoffset = String(RING_CIRCUMFERENCE - (rate/100)*RING_CIRCUMFERENCE);
+      const scores = Array.from({length:planLength()},(_,i)=>({done:state.plan.tasks.filter(t=>t.days[i]&&t.done[i]).length,total:state.plan.tasks.filter(t=>t.days[i]).length})); const best=scores.reduce((a,s,i)=>s.total && s.done/s.total > a.rate ? {rate:s.done/s.total,day:i+1}:a,{rate:0,day:null}); $('best-day').textContent=best.day?best.day:'—';
+      $('day-summary').innerHTML = scores.map((s,i)=>{ const rate=s.total?Math.round(s.done/s.total*100):0; const status=rate===100&&s.total?'Complete':s.done?'Active':'Pending'; const statusClass=rate===100&&s.total?'report-status-complete':s.done?'report-status-active':'report-status-pending'; const barClass=rate===100&&s.total?'report-bar-complete':s.done?'report-bar-active':'report-bar-pending'; return `<div class="report-day-card"><div class="flex items-center justify-between gap-2 text-xs mb-2"><span class="font-semibold text-slate-900">${dayLabel(i)}</span><span class="report-status-badge ${statusClass}">${status}</span></div><div class="flex justify-between text-[11px] text-slate-600 mb-1"><span>${s.done}/${s.total} complete</span><span>${rate}%</span></div><div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="progress-fill h-full rounded-full ${barClass}" style="width:${rate}%"></div></div></div>`; }).join('');
+      const complete = possible > 0 && totals === possible; $('finish-note').classList.toggle('hidden',!complete); $('finish-note').textContent = complete ? '🎉 Excellent! You completed every task across this plan.' : '';
+      $('day-tabs').querySelectorAll('[data-day]').forEach(b=>b.addEventListener('click',()=>{state.day=Number(b.dataset.day);render();}));
+      ['planned-task-list', 'added-task-list'].forEach(listId => {
+        $(listId).querySelectorAll('[data-check]').forEach(b=>b.addEventListener('change',()=>{const t=state.plan.tasks[Number(b.dataset.check)];if (!t) return;t.done[state.day]=b.checked;save();render();}));
+        $(listId).querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{state.plan.tasks.splice(Number(b.dataset.remove),1);save();render();}));
       });
-
-      if (!response.ok) throw new Error('Submission failed');
-
-      checkoutStatus.textContent = 'Submitted successfully. We will verify your payment and send the PDF to your email.';
-      checkoutStatus.classList.remove('hidden');
-      checkoutForm.reset();
-    } catch (error) {
-      checkoutStatus.textContent = 'We could not submit your details. Please check your connection and try again.';
-      checkoutStatus.classList.remove('hidden');
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = 'Submit payment details';
     }
-  });
+    function escapeHtml(value) { return value.replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+    $('profile-form').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const formData = new FormData(e.currentTarget);
+      const picture = $('profile-picture').files[0];
+      const saveProfile = picture ? new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(picture);
+      }) : Promise.resolve(state.profile?.picture || '');
+      state.profile = {
+        id: state.profile?.id || `AC-${crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()}`,
+        name: formData.get('name').trim(), email: formData.get('email').trim(),
+        institution: formData.get('institution').trim(), department: formData.get('department').trim(),
+        session: formData.get('session').trim(), year: formData.get('year'), semester: formData.get('semester'),
+        picture: await saveProfile
+      };
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile));
+      localStorage.setItem(SESSION_KEY, JSON.stringify(state.profile));
+      renderProfile();
+      render();
+    });
+    $('show-create-account').addEventListener('click', () => {
+      $('login-form').classList.add('hidden');
+      $('profile-form').classList.remove('hidden');
+      $('profile-heading').textContent = 'Create your account';
+      $('profile-help').textContent = 'Add your personal and academic details to create your Academy profile.';
+      $('login-status').classList.add('hidden');
+    });
+    $('show-login-account').addEventListener('click', () => {
+      $('profile-form').classList.add('hidden');
+      $('login-form').classList.remove('hidden');
+      $('profile-heading').textContent = 'Open your account';
+      $('profile-help').textContent = 'Enter your Academy ID to return to your saved profile and learning plan.';
+      $('login-status').classList.add('hidden');
+      $('login-id').focus();
+    });
+    $('import-login-account').addEventListener('click', () => $('account-file').click());
+    $('login-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const enteredId = $('login-id').value.trim().toUpperCase();
+      const savedProfile = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
+      if (savedProfile?.id === enteredId) {
+        state.profile = savedProfile;
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedProfile));
+        $('login-status').classList.add('hidden');
+        $('login-form').reset();
+        renderProfile();
+        render();
+        $('profile').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        $('login-status').textContent = 'That Academy ID was not found on this device.';
+        $('login-status').classList.remove('hidden');
+      }
+    });
 
-  reviewForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    reviewStatus.textContent = 'Thank you for your feedback!';
-    reviewStatus.classList.remove('hidden');
-    reviewForm.reset();
-  });
-</script>
+    $('edit-profile').addEventListener('click', () => {
+      $('profile-form').classList.remove('hidden');
+      $('profile-details').classList.add('hidden');
+      $('profile-actions').classList.add('hidden');
+      $('profile-help').textContent = 'Update your account information below, then save your changes.';
+    });
+    $('change-picture').addEventListener('click', () => $('profile-picture-change').click());
+    $('export-account').addEventListener('click', () => {
+      ensurePlan();
+      const backup = {
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        profile: state.profile,
+        plans: state.plans
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${(state.profile?.name || 'academy-account').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.json`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      $('account-menu').classList.add('hidden');
+    });
+    $('import-account').addEventListener('click', () => $('account-file').click());
+    $('account-file').addEventListener('change', async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const backup = JSON.parse(await file.text());
+        const importedPlans = backup.plans || (backup.plan ? [backup.plan] : null);
+        if (!backup.profile?.id || !backup.profile?.name || !backup.profile?.email || !importedPlans?.length) throw new Error('Invalid backup');
+        if (!confirm('Import this account and replace the current profile and saved plans?')) return;
+        state.profile = backup.profile;
+        state.plans = importedPlans.map(plan => ({ ...plan, id: plan.id || crypto.randomUUID() }));
+        state.plan = state.plans[0];
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile));
+        localStorage.setItem(SESSION_KEY, JSON.stringify(state.profile));
+        save();
+        state.day = 0;
+        renderProfile();
+        render();
+        $('profile-saved').textContent = 'Account and Academy plan restored successfully.';
+        $('profile-saved').classList.remove('hidden');
+      } catch (error) {
+        alert('This is not a valid Academy account backup file.');
+      } finally {
+        event.target.value = '';
+      }
+    });
+    $('close-saved-plan-preview').addEventListener('click', closeSavedPlanPreview);
+    $('cancel-saved-plan-preview').addEventListener('click', closeSavedPlanPreview);
+    $('saved-plan-preview').addEventListener('click', event => {
+      if (event.target === $('saved-plan-preview')) closeSavedPlanPreview();
+    });
+    $('open-saved-plan').addEventListener('click', () => {
+      if (!previewPlanId) return;
+      state.plan = state.plans.find(plan => plan.id === previewPlanId);
+      if (!state.plan) return closeSavedPlanPreview();
+      state.day = 0;
+      closeSavedPlanPreview();
+      render();
+      $('plan-status').textContent = 'Saved plan opened.';
+      $('plan-workspace').scrollIntoView({ behavior: 'smooth' });
+    });
+    $('close-trash-preview').addEventListener('click', closeTrashPreview);
+    $('cancel-trash-preview').addEventListener('click', closeTrashPreview);
+    $('trash-preview').addEventListener('click', event => {
+      if (event.target === $('trash-preview')) closeTrashPreview();
+    });
+    $('restore-preview-plan').addEventListener('click', () => {
+      if (!previewTrashId) return;
+      const index = state.trash.findIndex(item => item.plan.id === previewTrashId);
+      if (index === -1) return closeTrashPreview();
+      const [item] = state.trash.splice(index, 1);
+      state.plans.unshift(item.plan);
+      state.plan = item.plan;
+      localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+      localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+      state.day = 0;
+      closeTrashPreview();
+      render();
+      $('plan-status').textContent = 'Plan restored from Trash.';
+    });
+    $('profile-picture-change').addEventListener('change', () => {
+      const picture = $('profile-picture-change').files[0];
+      if (!picture || !picture.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (!state.profile) return;
+        state.profile.picture = reader.result;
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile));
+        renderProfile();
+        $('profile-saved').textContent = 'Your profile picture has been updated.';
+      };
+      reader.readAsDataURL(picture);
+    });
+    function logout() {
+      // Keep the profile and plan saved so the user can return with the Academy ID.
+      state.profile = null;
+      localStorage.removeItem(SESSION_KEY);
+      $('profile-form').reset();
+      $('login-form').reset();
+      renderProfile();
+      $('profile-saved').textContent = 'You have been logged out. Your plan remains saved on this device.';
+      $('profile-saved').classList.remove('hidden');
+    }
+    $('logout').addEventListener('click', logout);
+    $('mobile-logout').addEventListener('click', logout);
+    $('account-menu-toggle').addEventListener('click', () => {
+      const menu = $('account-menu');
+      const isOpen = !menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', isOpen);
+      $('account-menu-toggle').setAttribute('aria-expanded', String(!isOpen));
+    });
+    document.addEventListener('click', event => {
+      if (!$('profile-menu-wrap').contains(event.target)) {
+        $('account-menu').classList.add('hidden');
+        $('account-menu-toggle').setAttribute('aria-expanded', 'false');
+      }
+    });
+    $('task-kind').addEventListener('change', () => {
+      const isPlanned = $('task-kind').value === 'planned';
+      $('planned-days').classList.toggle('hidden', !isPlanned);
+      if (isPlanned && !$('planned-day-options').children.length) renderPlannedDayOptions();
+    });
+    function renderPlannedDayOptions() {
+      $('planned-day-options').innerHTML = Array.from({length: planLength()}, (_, day) => `<label class="inline-flex items-center gap-1.5 text-xs border border-line rounded-full px-3 py-2 cursor-pointer hover:bg-forest/5"><input type="checkbox" value="${day}" ${day === state.day ? 'checked' : ''}>${dayLabel(day)}</label>`).join('');
+    }
+    $('task-form').addEventListener('submit', e=>{
+      e.preventDefault();
+      ensurePlan();
+      const text=$('task-input').value.trim();
+      if(!text)return;
+      const planned = $('task-kind').value === 'planned';
+      const days = planned ? Array.from($('planned-day-options').querySelectorAll('input:checked')).map(input => Number(input.value)) : [state.day];
+      if (planned && !days.length) return;
+      const assignedDays = Array(planLength()).fill(false);
+      days.forEach(day => assignedDays[day] = true);
+      state.plan.tasks.push({text, time:currentTimeValue(), source:planned?'planned':'added',days:assignedDays,done:Array(planLength()).fill(false)});
+      $('task-input').value='';
+      $('task-kind').value='added';
+      $('planned-days').classList.add('hidden');
+      save();
+      render();
+    });
+    $('add-global-goal').addEventListener('click', () => {
+      ensurePlan();
+      const input = $('global-goal-input');
+      const text = input.value.trim();
+      if (!text) return;
+      state.plan.goals.push({ id: crypto.randomUUID(), text, time: currentTimeValue(), done: Array(planLength()).fill(false) });
+      input.value = '';
+      save();
+      render();
+      input.focus();
+    });
+    $('global-goal-input').addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        $('add-global-goal').click();
+      }
+    });
+    function updatePlanSchedule() {
+      ensurePlan();
+      const duration = Math.min(365, Math.max(1, Number($('plan-duration').value) || 7));
+      state.plan.duration = duration;
+      state.plan.startDate = $('plan-start-date').value || dateValue(new Date());
+      state.plan.startTime = $('plan-start-time').value || '09:00';
+      state.plan.endDate = dateValue(scheduleDate(duration - 1, state.plan));
+      const length = duration;
+      state.plan.notes = Array.from({length}, (_, i) => state.plan.notes?.[i] || '');
+      state.plan.goals = (state.plan.goals || []).map(goal => ({...goal, done: Array.from({length}, (_, i) => Boolean(goal.done?.[i]))}));
+      state.plan.tasks = (state.plan.tasks || []).map(task => ({...task, days: Array.from({length}, (_, i) => Boolean(task.days?.[i])), done: Array.from({length}, (_, i) => Boolean(task.done?.[i]))}));
+      state.plan.tasks = state.plan.tasks.filter(task => task.source !== 'goal');
+      state.plan.goals.forEach(goal => state.plan.tasks.unshift({id:`goal-${goal.id}`, goalId:goal.id, text:goal.text, source:'goal', days:Array(length).fill(true), done:goal.done}));
+      state.day = Math.min(state.day, length - 1);
+      save();
+      render();
+    }
+    ['plan-start-date', 'plan-start-time', 'plan-duration'].forEach(id => {
+      const field = $(id);
+      if (!field) return;
+      field.addEventListener('input', updatePlanSchedule);
+      field.addEventListener('change', updatePlanSchedule);
+    });
+    $('plan-end-date').addEventListener('change', () => {
+      ensurePlan();
+      const chosen = $('plan-end-date').value;
+      if (!chosen) return;
+      const start = new Date(`${state.plan.startDate}T00:00:00`);
+      const end = new Date(`${chosen}T00:00:00`);
+      const duration = Math.min(365, Math.max(1, Math.round((end - start) / 86400000) + 1));
+      state.plan.endDate = chosen;
+      state.plan.duration = duration;
+      $('plan-duration').value = duration;
+      updatePlanSchedule();
+    });
+    $('view-report').addEventListener('click', renderReport);
+    $('close-report').addEventListener('click', closeReport);
+    $('report-preview').addEventListener('click', event => { if (event.target === $('report-preview')) closeReport(); });
+    $('save-day').addEventListener('click',()=>{ensurePlan();state.plan.notes[state.day]=$('day-note').value.trim();save();$('plan-status').textContent=`${dayLabel(state.day)} update saved.`;});
+    $('plan-title').addEventListener('input',()=>{
+      ensurePlan();
+      state.plan.title=$('plan-title').value.trim()||'My 7-day plan';
+      save();
+      renderActivePlanSelector();
+      $('plan-status').textContent='Your plan is saved automatically on this device.';
+    });
+    $('save-plan').addEventListener('click',()=>{
+      ensurePlan();
+      state.plan.title=$('plan-title').value.trim()||'My 7-day plan';
+      save();
+      $('plan-title').value=state.plan.title;
+      $('plan-status').textContent='Your plan has been saved.';
+    });
+    function createNewPlan() {
+      ensurePlan();
+      save();
+      state.plan={id:crypto.randomUUID(),title:'My plan',created:new Date().toISOString(),duration:7,startDate:dateValue(new Date()),startTime:'09:00',goals:[],tasks:[],notes:Array(7).fill('')};
+      state.plans.unshift(state.plan);
+      state.day=0;
+      save();
+      render();
+      $('plan-status').textContent='A new plan is ready. Your previous plans remain saved.';
+    }
+    const legacyNewPlan = $('new-plan');
+    if (legacyNewPlan) legacyNewPlan.remove();
+    $('new-plan-top').addEventListener('click', createNewPlan);
+    $('active-plan-selector').addEventListener('change', event => {
+      const selected = state.plans.find(plan => plan.id === event.target.value);
+      if (!selected) return;
+      state.plan = selected;
+      state.day = 0;
+      render();
+      $('plan-status').textContent = 'Active plan switched.';
+    });
+    function toggleMenuPanel(buttonId, panelId) {
+      const button = $(buttonId);
+      const panel = $(panelId);
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!expanded));
+      panel.classList.toggle('hidden', expanded);
+      button.querySelector('span:last-child').textContent = expanded ? '▸' : '▾';
+    }
+    $('saved-plans-toggle').addEventListener('click', () => toggleMenuPanel('saved-plans-toggle', 'saved-plans-panel'));
+    $('restore-plans-toggle').addEventListener('click', () => toggleMenuPanel('restore-plans-toggle', 'restore-plans-panel'));
+    $('plan-search').addEventListener('input', renderPlanList);
+    const DAILY_REPORT_KEY = 'academyDailyReportSettings';
+    const DEFAULT_REPORT_RECIPIENT = 'milonsarkar1231@gmail.com';
+    const REPORT_API_URL = ''; // Set this to your EmailJS/Formspree endpoint for background delivery.
+    function reportText() {
+      ensurePlan();
+      const lines = Array.from({length:planLength()}, (_, i) => `${dayLabel(i)}: ${state.plan.tasks.filter(t=>t.days[i]).map(t=>`${t.done[i]?'✓':'○'} ${t.text}${t.time ? ` · ${formatTime(t.time)}` : ''}`).join(', ') || 'No tasks'}\nNote: ${state.plan.notes[i] || 'No note'}`);
+      const total = state.plan.tasks.reduce((n,t)=>n+t.done.filter(Boolean).length,0);
+      const possible = state.plan.tasks.reduce((n,t)=>n+t.days.filter(Boolean).length,0);
+      return `Plan: ${state.plan.title}\nProgress: ${total}/${possible} tasks (${possible ? Math.round(total/possible*100) : 0}%)\n\n${lines.join('\n\n')}`;
+    }
+    function reportRecipient() {
+      return $('report-recipient').value.trim();
+    }
+    function showReportToast(message, isError = false) {
+      const status = $('report-send-status');
+      status.textContent = message;
+      status.className = `text-xs font-semibold ${isError ? 'text-red-700' : 'text-green-700'}`;
+      status.setAttribute('role', 'status');
+      status.setAttribute('aria-live', 'polite');
+    }
+    async function sendProgressReport(reason = 'Report sent') {
+      const recipient = reportRecipient();
+      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(recipient)) {
+        showReportToast('Enter a valid recipient email address.', true);
+        $('report-recipient').focus();
+        return false;
+      }
+      if (!REPORT_API_URL) {
+        showReportToast('Configure REPORT_API_URL to enable background email delivery.', true);
+        return false;
+      }
+      const subject = `${state.plan?.title || 'Study plan'} — progress report`;
+      const button = $('send-report');
+      if (button) { button.disabled = true; button.textContent = 'Sending…'; }
+      try {
+        const response = await fetch(REPORT_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ to: recipient, email: recipient, subject, message: reportText(), report: reportText(), reason })
+        });
+        if (!response.ok) throw new Error(`Email service returned ${response.status}`);
+        showReportToast(`Report successfully sent to ${recipient}!`);
+        return true;
+      } catch (error) {
+        showReportToast('The report could not be sent. Check the email service configuration.', true);
+        return false;
+      } finally {
+        if (button) { button.disabled = false; button.textContent = '✉ Send report'; }
+      }
+    }
+    function checkDailyReport() {
+      const settings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+      const now = new Date();
+      const today = dateValue(now);
+      if (!settings.enabled || now.getHours() !== 22 || now.getMinutes() !== 0 || settings.lastSent === today) return;
+      sendProgressReport('Daily report').then(sent => {
+        if (!sent) return;
+        settings.lastSent = today;
+        localStorage.setItem(DAILY_REPORT_KEY, JSON.stringify(settings));
+      });
+    }
+    $('report-recipient').value = localStorage.getItem('academyReportRecipient') || DEFAULT_REPORT_RECIPIENT;
+    $('report-recipient').addEventListener('input', event => localStorage.setItem('academyReportRecipient', event.target.value));
+    $('send-report').addEventListener('click', () => sendProgressReport());
+    $('auto-daily-report').addEventListener('change', event => {
+      const settings = { enabled:event.target.checked, lastSent:JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}').lastSent || '' };
+      localStorage.setItem(DAILY_REPORT_KEY, JSON.stringify(settings));
+      $('report-send-status').textContent = event.target.checked ? 'Daily report is enabled for 10:00 PM.' : 'Daily reporting is off.';
+      if (event.target.checked) checkDailyReport();
+    });
+    const dailyReportSettings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+    $('auto-daily-report').checked = Boolean(dailyReportSettings.enabled);
+    $('report-send-status').textContent = dailyReportSettings.enabled ? 'Daily report is enabled for 10:00 PM.' : 'Daily reporting is off.';
+    setInterval(checkDailyReport, 30000);
+    const menuToggle=$('menu-toggle');menuToggle.addEventListener('click',()=>{const open=menuToggle.getAttribute('aria-expanded')==='true';menuToggle.setAttribute('aria-expanded',String(!open));$('mobile-menu').classList.toggle('hidden');$('menu-icon-open').classList.toggle('hidden');$('menu-icon-close').classList.toggle('hidden');});
 
+    const storageModal = $('study-storage');
+    const storageOpenButtons = [$('storage-open'), $('storage-open-mobile')].filter(Boolean);
+    function openStorageModal() {
+      if (!storageModal) return;
+      storageModal.classList.add('storage-modal-open');
+      $('storage-open')?.setAttribute('aria-expanded', 'true');
+      $('storage-open-mobile')?.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('overflow-hidden');
+      renderStorage();
+      $('storage-close')?.focus();
+    }
+    function closeStorageModal() {
+      if (!storageModal) return;
+      storageModal.classList.remove('storage-modal-open');
+      $('storage-open')?.setAttribute('aria-expanded', 'false');
+      $('storage-open-mobile')?.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('overflow-hidden');
+    }
+    storageOpenButtons.forEach(button => button.addEventListener('click', () => {
+      $('mobile-menu')?.classList.add('hidden');
+      openStorageModal();
+    }));
+    $('storage-close')?.addEventListener('click', closeStorageModal);
+    storageModal?.addEventListener('click', event => {
+      if (event.target === storageModal) closeStorageModal();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && storageModal?.classList.contains('storage-modal-open')) closeStorageModal();
+    });
+
+    const STORAGE_META_KEY = 'academyStudyStorageFolders';
+    const STORAGE_DB_NAME = 'academyStudyStorage';
+    const STORAGE_STORE = 'files';
+    let storageFolders = JSON.parse(localStorage.getItem(STORAGE_META_KEY) || '[]');
+    let storageFolderId = null;
+    let storageDbPromise;
+
+    function storageDb() {
+      if (storageDbPromise) return storageDbPromise;
+      storageDbPromise = new Promise((resolve, reject) => {
+        const request = indexedDB.open(STORAGE_DB_NAME, 1);
+        request.onupgradeneeded = () => request.result.createObjectStore(STORAGE_STORE, { keyPath: 'id' });
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      return storageDbPromise;
+    }
+    const storageSaveMeta = () => localStorage.setItem(STORAGE_META_KEY, JSON.stringify(storageFolders));
+    const storageFiles = async folderId => {
+      const db = await storageDb();
+      return new Promise((resolve, reject) => {
+        const request = db.transaction(STORAGE_STORE).objectStore(STORAGE_STORE).getAll();
+        request.onsuccess = () => resolve(request.result.filter(file => file.folderId === folderId));
+        request.onerror = () => reject(request.error);
+      });
+    };
+    const storagePutFile = async file => {
+      const db = await storageDb();
+      return new Promise((resolve, reject) => {
+        const request = db.transaction(STORAGE_STORE, 'readwrite').objectStore(STORAGE_STORE).put(file);
+        request.onsuccess = resolve;
+        request.onerror = () => reject(request.error);
+      });
+    };
+    const storageDeleteFile = async id => {
+      const db = await storageDb();
+      return new Promise((resolve, reject) => {
+        const request = db.transaction(STORAGE_STORE, 'readwrite').objectStore(STORAGE_STORE).delete(id);
+        request.onsuccess = resolve;
+        request.onerror = () => reject(request.error);
+      });
+    };
+    const storageFolderName = id => storageFolders.find(folder => folder.id === id)?.name || 'Root';
+    function storageFolderTree(parentId) { return storageFolders.filter(folder => folder.parentId === parentId); }
+    function storagePath(id) {
+      const path = [];
+      let current = id;
+      while (current) {
+        const folder = storageFolders.find(item => item.id === current);
+        if (!folder) break;
+        path.unshift(folder);
+        current = folder.parentId;
+      }
+      return path;
+    }
+    async function renderStorage() {
+      const breadcrumbs = $('storage-breadcrumbs');
+      const items = $('storage-items');
+      if (!breadcrumbs || !items) return;
+      const path = storagePath(storageFolderId);
+      breadcrumbs.innerHTML = `<button type="button" data-storage-path="" class="font-semibold text-slate-700 hover:underline">Root</button>${path.map(folder => `<span class="text-slate-400">›</span><button type="button" data-storage-path="${folder.id}" class="font-semibold text-slate-700 hover:underline">${escapeHtml(folder.name)}</button>`).join('')}`;
+      breadcrumbs.querySelectorAll('[data-storage-path]').forEach(button => button.addEventListener('click', () => { storageFolderId = button.dataset.storagePath || null; renderStorage(); }));
+      const folders = storageFolderTree(storageFolderId);
+      const files = await storageFiles(storageFolderId);
+      items.innerHTML = [...folders.map(folder => `<article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><button type="button" data-open-folder="${folder.id}" class="w-full text-left"><div class="text-2xl">▰</div><h3 class="font-semibold text-slate-800 mt-2 truncate">${escapeHtml(folder.name)}</h3><p class="text-xs text-slate-500 mt-1">Folder</p></button><div class="mt-3 flex gap-2"><button type="button" data-rename-folder="${folder.id}" class="text-xs font-semibold text-slate-600 hover:underline">Rename</button><button type="button" data-delete-folder="${folder.id}" class="text-xs font-semibold text-rust hover:underline">Delete</button></div></article>`), ...files.map(file => `<article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div class="text-2xl">▤</div><h3 class="font-semibold text-slate-800 mt-2 truncate" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</h3><p class="text-xs text-slate-500 mt-1">${escapeHtml(file.type || 'Document')} · ${(file.size / 1024).toFixed(1)} KB</p><div class="mt-3 flex gap-3"><button type="button" data-preview-file="${file.id}" class="text-xs font-semibold text-slate-700 hover:underline">Preview</button><button type="button" data-download-file="${file.id}" class="text-xs font-semibold text-slate-700 hover:underline">Download</button><button type="button" data-delete-file="${file.id}" class="text-xs font-semibold text-rust hover:underline">Delete</button></div></article>`)].join('');
+      $('storage-empty')?.classList.toggle('hidden', Boolean(folders.length || files.length));
+      items.querySelectorAll('[data-open-folder]').forEach(button => button.addEventListener('click', () => { storageFolderId = button.dataset.openFolder; renderStorage(); }));
+      items.querySelectorAll('[data-rename-folder]').forEach(button => button.addEventListener('click', () => { const folder = storageFolders.find(item => item.id === button.dataset.renameFolder); const name = prompt('Folder name', folder?.name || ''); if (folder && name?.trim()) { folder.name = name.trim(); storageSaveMeta(); renderStorage(); } }));
+      items.querySelectorAll('[data-delete-folder]').forEach(button => button.addEventListener('click', async () => { const id = button.dataset.deleteFolder; if (!confirm(`Delete “${storageFolderName(id)}” and everything inside it?`)) return; const ids = storageFolders.filter(folder => { let parent = folder.parentId; while (parent) { if (parent === id) return true; parent = storageFolders.find(item => item.id === parent)?.parentId; } return folder.id === id; }).map(folder => folder.id); const filesToDelete = (await storageFiles(null)).filter(file => ids.includes(file.folderId)); for (const file of filesToDelete) await storageDeleteFile(file.id); storageFolders = storageFolders.filter(folder => !ids.includes(folder.id)); storageSaveMeta(); if (ids.includes(storageFolderId)) storageFolderId = null; renderStorage(); }));
+      const allFiles = await storageFiles(null);
+      items.querySelectorAll('[data-preview-file], [data-download-file], [data-delete-file]').forEach(button => button.addEventListener('click', async () => { const file = allFiles.find(item => item.id === button.dataset.previewFile || item.id === button.dataset.downloadFile || item.id === button.dataset.deleteFile); if (!file) return; if (button.dataset.deleteFile) { if (confirm(`Delete “${file.name}”?`)) { await storageDeleteFile(file.id); renderStorage(); } return; } const url = URL.createObjectURL(file.blob); if (button.dataset.downloadFile) { const link = document.createElement('a'); link.href = url; link.download = file.name; link.click(); } else { window.open(url, '_blank', 'noopener'); } setTimeout(() => URL.revokeObjectURL(url), 60000); }));
+    }
+    $('storage-new-folder')?.addEventListener('click', () => { const name = prompt('New folder name'); if (name?.trim()) { storageFolders.push({ id: crypto.randomUUID(), parentId: storageFolderId, name: name.trim(), created: new Date().toISOString() }); storageSaveMeta(); renderStorage(); } });
+    $('storage-file-input')?.addEventListener('change', async event => { for (const file of [...event.target.files]) { await storagePutFile({ id: crypto.randomUUID(), folderId: storageFolderId, name: file.name, type: file.type, size: file.size, blob: file }); } event.target.value = ''; renderStorage(); });
+
+    const accountMode = new URLSearchParams(window.location.search).has('account') || window.location.hash === '#profile';
+    document.body.classList.toggle('public-home', !accountMode);
+    renderProfile();
+    render();
+    renderStorage();
+  </script>
 </body>
 </html>
