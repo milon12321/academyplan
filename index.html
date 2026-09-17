@@ -278,11 +278,12 @@
     .progress-overview-accordion[open] .progress-overview-chevron { transform:rotate(180deg); }
     .progress-overview-content { margin-top:.75rem; animation:progressOverviewOpen .3s ease both; }
     @keyframes progressOverviewOpen { from { opacity:0; transform:translateY(-.5rem); } to { opacity:1; transform:translateY(0); } }
-    @media (min-width:1024px) {
-      .study-dashboard-grid:has(.progress-overview-accordion[open]) { grid-template-columns:minmax(0,1.2fr) minmax(18rem,.8fr); align-items:stretch; }
-      .progress-overview-accordion[open] { display:flex; flex-direction:column; }
-      .progress-overview-accordion[open] .progress-overview-content { height:100%; }
-    }
+    /* Keep the progress overview below the study plan at every breakpoint. */
+    .study-dashboard-grid { grid-template-columns:minmax(0,1fr); }
+    .progress-overview-accordion,
+    .progress-overview-accordion[open] { width:100%; }
+    .progress-overview-accordion[open] { display:block; }
+    .progress-overview-accordion[open] .progress-overview-content { width:100%; height:auto; }
     @media (prefers-reduced-motion:reduce) {
       .progress-overview-content, .progress-overview-chevron, .progress-overview-toggle { animation:none; transition:none; }
     }
