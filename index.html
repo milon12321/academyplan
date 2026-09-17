@@ -8,10 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script src="script.js"></script>
   <!-- Firebase SDKs: replace the configuration values in firebaseConfig below. -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -203,6 +201,44 @@
     #progress-chart svg {
       max-width: none;
     }
+
+    /* Merged from styles.css */
+    #account-menu {
+      position: absolute;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      width: max-content;
+      min-width: 220px;
+      max-width: 280px;
+      overflow: hidden;
+      box-sizing: border-box;
+      white-space: nowrap;
+    }
+
+    #account-menu button,
+    #account-menu li {
+      display: block;
+      width: 100%;
+      text-align: left;
+      box-sizing: border-box;
+      white-space: nowrap;
+    }
+
+    .overflow-x-auto,
+    [data-responsive-table],
+    [data-responsive-grid] {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .title {
+      color: #5C6AC4;
+    }
   </style>
 </head>
 <body class="font-sans text-ink antialiased">
@@ -277,7 +313,7 @@
             </div>
             <div id="profile-menu-wrap" class="hidden relative shrink-0">
               <button id="account-menu-toggle" type="button" aria-label="Open profile options" aria-expanded="false" aria-controls="account-menu" class="w-9 h-9 rounded-full border border-line flex items-center justify-center text-lg hover:bg-forest/5">⋯</button>
-              <div id="account-menu" class="hidden absolute right-0 top-11 z-50 w-56 bg-white border border-line rounded-xl shadow-lg p-2">
+              <div id="account-menu" class="hidden absolute right-0 top-11 z-50 origin-top-right bg-white border border-line rounded-xl shadow-lg p-2">
                 <div class="border-b border-line px-3 py-2 mb-1">
                   <div class="text-xs text-ink/55">Academy ID</div>
                   <div id="menu-profile-id" class="font-mono text-sm font-semibold text-forest-dark mt-0.5"></div>
@@ -335,6 +371,7 @@
             <p class="text-xs text-ink/55 leading-relaxed">On your old browser: open your profile menu → <strong>Export account data</strong>. Then bring that downloaded JSON file to this browser and import it here.</p>
             <p id="login-status" class="hidden text-sm text-rust font-semibold" role="status" aria-live="polite"></p>
             <button id="show-create-account" type="button" class="text-sm text-forest font-semibold underline underline-offset-2">I don't have an Academy ID — create an account</button>
+            <p class="text-center text-sm text-ink/60">New here? <button id="show-signup-account" type="button" class="text-forest font-semibold underline underline-offset-2">Sign up</button></p>
           </form>
 
           <form id="profile-form" class="mt-6 grid sm:grid-cols-2 gap-3">
@@ -349,6 +386,7 @@
             <div class="sm:col-span-2"><label for="profile-picture" class="field-label">Profile picture (optional)</label><input id="profile-picture" name="picture" type="file" accept="image/*" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-paper"></div>
             <button type="submit" class="bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Save account</button>
             <button id="show-login-account" type="button" class="sm:col-span-2 text-sm text-forest font-semibold underline underline-offset-2">I already have an Academy ID</button>
+            <p class="sm:col-span-2 text-center text-sm text-ink/60">Already registered? <button id="show-signin-account" type="button" class="text-forest font-semibold underline underline-offset-2">Sign in</button></p>
           </form>
 
           <div class="profile-section-divider" aria-hidden="true"></div>
@@ -626,6 +664,84 @@
   <footer class="border-t border-line bg-paper py-8 text-center text-xs text-ink/60">&copy; 2026 Academic Planning Workspace. All rights reserved.</footer>
 
   <script>
+    // Merged helper logic from script.js. Defined before the application bootstrap
+    // so synchronous cache hydration can use it safely.
+    function academyIsLegacyPlanTitleFallback() { return false; }
+    if (typeof window.academyIsLegacyPlanTitle !== 'function') window.academyIsLegacyPlanTitle = academyIsLegacyPlanTitleFallback;
+
+    window.academyStopDeletionNavigation = function (event) {
+      if (!event) return;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    window.academyPlanHasContent = function (plan) {
+      return Boolean(plan && (
+        String(plan.title || '').trim() || Number(plan.duration) > 0 ||
+        (Array.isArray(plan.tasks) && plan.tasks.length) ||
+        (Array.isArray(plan.goals) && plan.goals.length)
+      ));
+    };
+
+    window.academyReadJSON = function (key, fallback) {
+      try {
+        const value = localStorage.getItem(key);
+        return value === null ? fallback : JSON.parse(value);
+      } catch (error) {
+        console.warn(`Ignoring invalid cached data for ${key}.`, error);
+        return fallback;
+      }
+    };
+
+    window.academyFormatPlanDate = function (value) {
+      const date = value instanceof Date ? value : new Date(value);
+      return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    };
+
+    window.academyDhakaNow = function () {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Dhaka', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+      }).formatToParts(new Date()).reduce((result, part) => {
+        if (part.type !== 'literal') result[part.type] = part.value;
+        return result;
+      }, {});
+      return { date: `${parts.year}-${parts.month}-${parts.day}`, time: `${parts.hour}:${parts.minute}` };
+    };
+
+    window.academyLocalDate = function (date = new Date()) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    };
+
+    window.academyCloudSet = function (reference, value) {
+      if (!reference || typeof reference.set !== 'function') return Promise.resolve(false);
+      try {
+        return Promise.resolve(reference.set(value)).then(() => true).catch(error => {
+          console.error('Firebase persistence failed:', error);
+          return false;
+        });
+      } catch (error) {
+        console.error('Firebase persistence failed:', error);
+        return Promise.resolve(false);
+      }
+    };
+
+    window.academyToggleAccountMode = function (mode) {
+      const loginForm = document.getElementById('login-form');
+      const profileForm = document.getElementById('profile-form');
+      const heading = document.getElementById('profile-heading');
+      const loginStatus = document.getElementById('login-status');
+      const profileSaved = document.getElementById('profile-saved');
+      const showLogin = mode === 'login';
+      if (!loginForm || !profileForm) return;
+      loginForm.classList.toggle('hidden', !showLogin);
+      profileForm.classList.toggle('hidden', showLogin);
+      if (heading) heading.textContent = showLogin ? 'Open your account' : 'Create your account';
+      if (loginStatus) loginStatus.classList.add('hidden');
+      if (profileSaved) profileSaved.classList.add('hidden');
+      document.getElementById(showLogin ? 'login-id' : 'profile-name')?.focus();
+    };
+
     const KEY = 'academyPollPlan';
     const PLANS_KEY = 'academySavedPlans';
 
@@ -645,11 +761,20 @@
     let cloudSyncReady = false;
     let cloudSaveTimer = null;
     let cloudLoadPromise = Promise.resolve();
-    if (firebaseConfigured && window.firebase) {
-      firebase.initializeApp(firebaseConfig);
-      window.academyAuth = firebase.auth();
-      window.academyDatabase = firebase.database();
-      window.academyAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.error);
+    if (firebaseConfigured && window.firebase && typeof firebase.initializeApp === 'function' && typeof firebase.auth === 'function' && typeof firebase.database === 'function') {
+      try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        window.academyAuth = firebase.auth();
+        window.academyDatabase = firebase.database();
+        window.academyAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => console.warn('Firebase auth persistence unavailable:', error));
+      } catch (error) {
+        console.warn('Firebase initialization unavailable; using local cache.', error);
+        window.academyAuth = null;
+        window.academyDatabase = null;
+      }
+    } else {
+      window.academyAuth = null;
+      window.academyDatabase = null;
     }
     function cloudUserPath() {
       if (!cloudUser || !window.academyDatabase) return null;
@@ -658,7 +783,7 @@
     }
     function cloudSnapshot() {
       const reportSettings = typeof DAILY_REPORT_KEY === 'string'
-        ? JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}')
+        ? readCachedJSON(DAILY_REPORT_KEY, {})
         : {};
       return {
         profile: state.profile,
@@ -673,8 +798,8 @@
     // the synchronous cache so the workspace can render before the network responds.
     function scheduleCloudReportSettingsSave() {
       if (!cloudSyncReady || !cloudUserPath() || typeof DAILY_REPORT_KEY !== 'string') return;
-      const reportSettings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
-      cloudUserPath().child('reportSettings').set(reportSettings)
+      const reportSettings = readCachedJSON(DAILY_REPORT_KEY, {});
+      window.academyCloudSet(cloudUserPath().child('reportSettings'), reportSettings)
         .catch(error => console.error('Cloud report settings save failed:', error));
     }
     function normalizeAcademyId(value) {
@@ -762,7 +887,7 @@
       const academyId = cloudUserAcademyId || user.academyId || state.profile?.id || user.uid;
       const snapshot = await window.academyDatabase.ref(`users/${academyId}`).once('value');
       const cloud = snapshot.val();
-      if (cloud?.plans?.length) {
+      if (Array.isArray(cloud?.plans) && cloud.plans.length) {
         state.plans = cloud.plans;
         state.plan = state.plans.find(plan => plan.id === cloud.activePlanId) || state.plans[0];
       } else if (state.plans.length) {
@@ -771,7 +896,7 @@
         cloudSyncReady = true;
         scheduleCloudSave();
       }
-      if (cloud?.trash) state.trash = cloud.trash;
+      if (Array.isArray(cloud?.trash)) state.trash = cloud.trash;
       if (cloud?.profile) state.profile = cloud.profile;
       if (cloud?.reportSettings && typeof DAILY_REPORT_KEY === 'string') {
         localStorage.setItem(DAILY_REPORT_KEY, JSON.stringify(cloud.reportSettings));
@@ -808,15 +933,21 @@
     const PROFILE_KEY = 'academyProfile';
     const SESSION_KEY = 'academyLoggedIn';
     const RING_CIRCUMFERENCE = 2 * Math.PI * 52;
-    const savedPlans = JSON.parse(localStorage.getItem(PLANS_KEY) || '[]');
-    const legacyPlan = JSON.parse(localStorage.getItem(KEY) || 'null');
+    const readCachedJSON = (key, fallback) => typeof window.academyReadJSON === 'function'
+      ? window.academyReadJSON(key, fallback)
+      : fallback;
+    const savedPlans = readCachedJSON(PLANS_KEY, []);
+    const legacyPlan = readCachedJSON(KEY, null);
     const legacyPlanHasContent = window.academyPlanHasContent(legacyPlan);
-    const storedPlans = savedPlans.length ? savedPlans : (legacyPlanHasContent ? [legacyPlan] : []);
+    const cachedPlans = Array.isArray(savedPlans) ? savedPlans : [];
+    const storedPlans = cachedPlans.length ? cachedPlans : (legacyPlanHasContent ? [legacyPlan] : []);
     const migratedPlans = storedPlans.map(plan => {
       if (window.academyIsLegacyPlanTitle?.(plan.title)) return { ...plan, title: '' };
       return plan;
     });
-    const state = { plans: migratedPlans, trash: JSON.parse(localStorage.getItem(TRASH_KEY) || '[]'), plan: null, profile: JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'), day: 0 };
+    const state = { plans: Array.isArray(migratedPlans) ? migratedPlans : [], trash: readCachedJSON(TRASH_KEY, []), plan: null, profile: readCachedJSON(SESSION_KEY, null), day: 0 };
+    if (!Array.isArray(state.trash)) state.trash = [];
+    if (state.profile && typeof state.profile !== 'object') state.profile = null;
     if (migratedPlans.some((plan, index) => plan !== storedPlans[index])) {
       localStorage.setItem(PLANS_KEY, JSON.stringify(migratedPlans));
       if (migratedPlans[0]) localStorage.setItem(KEY, JSON.stringify(migratedPlans[0]));
@@ -1235,7 +1366,9 @@
         $(listId).querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{state.plan.tasks.splice(Number(b.dataset.remove),1);save();render();}));
       });
     }
-    function escapeHtml(value) { return value.replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
     $('profile-form').addEventListener('submit', async e=>{
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
@@ -1276,20 +1409,22 @@
       renderProfile();
       render();
     });
-    $('show-create-account').addEventListener('click', () => {
-      $('login-form').classList.add('hidden');
-      $('profile-form').classList.remove('hidden');
-      $('profile-heading').textContent = 'Create your account';
-      $('login-status').classList.add('hidden');
-    });
-    $('show-login-account').addEventListener('click', () => {
-      $('profile-form').classList.add('hidden');
-      $('login-form').classList.remove('hidden');
-      $('profile-heading').textContent = 'Open your account';
-      $('profile-help').textContent = 'Enter your Academy ID to return to your saved profile and learning plan.';
-      $('login-status').classList.add('hidden');
-      $('login-id').focus();
-    });
+    function switchAccountView(mode) {
+      if (typeof window.academyToggleAccountMode === 'function') {
+        window.academyToggleAccountMode(mode);
+      } else {
+        const showLogin = mode === 'login';
+        $('login-form').classList.toggle('hidden', !showLogin);
+        $('profile-form').classList.toggle('hidden', showLogin);
+        $('profile-heading').textContent = showLogin ? 'Open your account' : 'Create your account';
+        $('login-status').classList.add('hidden');
+        (showLogin ? $('login-id') : $('profile-name')).focus();
+      }
+    }
+    $('show-create-account').addEventListener('click', () => switchAccountView('signup'));
+    $('show-signup-account').addEventListener('click', () => switchAccountView('signup'));
+    $('show-login-account').addEventListener('click', () => switchAccountView('login'));
+    $('show-signin-account').addEventListener('click', () => switchAccountView('login'));
     $('import-login-account').addEventListener('click', () => $('account-file').click());
     $('login-form').addEventListener('submit', async e => {
       e.preventDefault();
@@ -1450,7 +1585,8 @@
       $('account-menu-toggle').setAttribute('aria-expanded', String(!isOpen));
     });
     document.addEventListener('click', event => {
-      if (!$('profile-menu-wrap').contains(event.target)) {
+      const profileMenuWrap = $('profile-menu-wrap');
+      if (profileMenuWrap && !profileMenuWrap.contains(event.target)) {
         $('account-menu').classList.add('hidden');
         $('account-menu-toggle').setAttribute('aria-expanded', 'false');
       }
@@ -1624,7 +1760,7 @@
     }
     function clearReportRecipientError() {
       if (!isValidReportRecipient()) return;
-      const settings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+      const settings = readCachedJSON(DAILY_REPORT_KEY, {});
       $('report-send-status').textContent = settings.enabled ? 'Daily report is enabled for 10:00 PM.' : 'Daily reporting is off.';
       $('report-send-status').className = 'text-xs font-semibold text-slate-600';
     }
@@ -1692,7 +1828,7 @@
       });
     }
     function checkDailyReport() {
-      const settings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+      const settings = readCachedJSON(DAILY_REPORT_KEY, {});
       const now = new Date();
       const today = typeof window.academyLocalDate === 'function'
         ? window.academyLocalDate(now)
@@ -1703,7 +1839,7 @@
       dailyReportSendInFlight = true;
       sendProgressReport('Auto-scheduled daily report').then(sent => {
         if (!sent) return;
-        const latestSettings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+        const latestSettings = readCachedJSON(DAILY_REPORT_KEY, {});
         latestSettings.enabled = Boolean(latestSettings.enabled);
         latestSettings.lastSent = today;
         localStorage.setItem(DAILY_REPORT_KEY, JSON.stringify(latestSettings));
@@ -1720,7 +1856,7 @@
     });
     $('send-report').addEventListener('click', () => sendProgressReport());
     $('auto-daily-report').addEventListener('change', event => {
-      const previousSettings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+      const previousSettings = readCachedJSON(DAILY_REPORT_KEY, {});
       const settings = {
         enabled: Boolean(event.target.checked),
         lastSent: previousSettings.lastSent || ''
@@ -1739,13 +1875,20 @@
       scheduleCloudReportSettingsSave();
       if (settings.enabled) checkDailyReport();
     });
-    const dailyReportSettings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+    const dailyReportSettings = readCachedJSON(DAILY_REPORT_KEY, {});
     $('auto-daily-report').checked = Boolean(dailyReportSettings.enabled);
     $('report-send-status').textContent = dailyReportSettings.enabled ? 'Daily report is enabled for 10:00 PM.' : 'Daily reporting is off.';
     // Keep the scheduler lightweight while checking once per minute for the
     // 10:00 PM local-time send window.
     setInterval(checkDailyReport, 60000);
-    const menuToggle=$('menu-toggle');menuToggle.addEventListener('click',()=>{const open=menuToggle.getAttribute('aria-expanded')==='true';menuToggle.setAttribute('aria-expanded',String(!open));$('mobile-menu').classList.toggle('hidden');$('menu-icon-open').classList.toggle('hidden');$('menu-icon-close').classList.toggle('hidden');});
+    const menuToggle=$('menu-toggle');
+    menuToggle?.addEventListener('click',()=>{
+      const open=menuToggle.getAttribute('aria-expanded')==='true';
+      menuToggle.setAttribute('aria-expanded',String(!open));
+      $('mobile-menu')?.classList.toggle('hidden');
+      $('menu-icon-open')?.classList.toggle('hidden');
+      $('menu-icon-close')?.classList.toggle('hidden');
+    });
 
     const storageModal = $('study-storage');
     const storageOpenButtons = [$('storage-open'), $('storage-open-mobile')].filter(Boolean);
@@ -1755,7 +1898,14 @@
       $('storage-open')?.setAttribute('aria-expanded', 'true');
       $('storage-open-mobile')?.setAttribute('aria-expanded', 'true');
       document.body.classList.add('overflow-hidden');
-      renderStorage();
+      renderStorage().catch(error => {
+        console.error('Study storage could not be opened:', error);
+        const status = $('storage-status');
+        if (status) {
+          status.textContent = 'Browser file storage is unavailable in this session.';
+          status.classList.remove('hidden');
+        }
+      });
       $('storage-close')?.focus();
     }
     function closeStorageModal() {
@@ -1844,20 +1994,35 @@
       items.innerHTML = [...folders.map(folder => `<article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><button type="button" data-open-folder="${folder.id}" class="w-full text-left"><div class="text-2xl">▰</div><h3 class="font-semibold text-slate-800 mt-2 truncate">${escapeHtml(folder.name)}</h3><p class="text-xs text-slate-500 mt-1">Folder</p></button><div class="mt-3 flex gap-2"><button type="button" data-rename-folder="${folder.id}" class="text-xs font-semibold text-slate-600 hover:underline">Rename</button><button type="button" data-delete-folder="${folder.id}" class="text-xs font-semibold text-rust hover:underline">Delete</button></div></article>`), ...files.map(file => `<article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div class="text-2xl">▤</div><h3 class="font-semibold text-slate-800 mt-2 truncate" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</h3><p class="text-xs text-slate-500 mt-1">${escapeHtml(file.type || 'Document')} · ${(file.size / 1024).toFixed(1)} KB</p><div class="mt-3 flex gap-3"><button type="button" data-preview-file="${file.id}" class="text-xs font-semibold text-slate-700 hover:underline">Preview</button><button type="button" data-download-file="${file.id}" class="text-xs font-semibold text-slate-700 hover:underline">Download</button><button type="button" data-delete-file="${file.id}" class="text-xs font-semibold text-rust hover:underline">Delete</button></div></article>`)].join('');
       $('storage-empty')?.classList.toggle('hidden', Boolean(folders.length || files.length));
       items.querySelectorAll('[data-open-folder]').forEach(button => button.addEventListener('click', () => { storageFolderId = button.dataset.openFolder; renderStorage(); }));
-      items.querySelectorAll('[data-rename-folder]').forEach(button => button.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); const folder = storageFolders.find(item => item.id === button.dataset.renameFolder); const name = prompt('Folder name', folder?.name || ''); if (folder && name?.trim()) { folder.name = name.trim(); storageSaveMeta(); renderStorage(); } }));
-      items.querySelectorAll('[data-delete-folder]').forEach(button => button.addEventListener('click', async event => { event.preventDefault(); event.stopPropagation(); const id = button.dataset.deleteFolder; const ids = storageFolders.filter(folder => { let parent = folder.parentId; while (parent) { if (parent === id) return true; parent = storageFolders.find(item => item.id === parent)?.parentId; } return folder.id === id; }).map(folder => folder.id); const filesToDelete = (await storageFiles(null)).filter(file => ids.includes(file.folderId)); for (const file of filesToDelete) await storageDeleteFile(file.id); storageFolders = storageFolders.filter(folder => !ids.includes(folder.id)); storageSaveMeta(); if (ids.includes(storageFolderId)) storageFolderId = null; renderStorage(); }));
+      items.querySelectorAll('[data-rename-folder]').forEach(button => button.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); const folder = storageFolders.find(item => item.id === button.dataset.renameFolder); const name = prompt('Folder name', folder?.name || ''); if (folder && name?.trim()) { folder.name = name.trim(); storageSaveMeta(); renderStorage().catch(error => console.error('Folder rendering failed:', error)); } }));
+      items.querySelectorAll('[data-delete-folder]').forEach(button => button.addEventListener('click', async event => { event.preventDefault(); event.stopPropagation(); try { const id = button.dataset.deleteFolder; const ids = storageFolders.filter(folder => { let parent = folder.parentId; while (parent) { if (parent === id) return true; parent = storageFolders.find(item => item.id === parent)?.parentId; } return folder.id === id; }).map(folder => folder.id); const filesToDelete = (await storageFiles(null)).filter(file => ids.includes(file.folderId)); for (const file of filesToDelete) await storageDeleteFile(file.id); storageFolders = storageFolders.filter(folder => !ids.includes(folder.id)); storageSaveMeta(); if (ids.includes(storageFolderId)) storageFolderId = null; await renderStorage(); } catch (error) { console.error('Folder deletion failed:', error); } }));
       const allFiles = await storageFiles(null);
       items.querySelectorAll('[data-preview-file], [data-download-file], [data-delete-file]').forEach(button => button.addEventListener('click', async event => { event.preventDefault(); event.stopPropagation(); const file = allFiles.find(item => item.id === button.dataset.previewFile || item.id === button.dataset.downloadFile || item.id === button.dataset.deleteFile); if (!file) return; if (button.dataset.deleteFile) { await storageDeleteFile(file.id); renderStorage(); return; } const url = URL.createObjectURL(file.blob); if (button.dataset.downloadFile) { const link = document.createElement('a'); link.href = url; link.download = file.name; link.click(); } else { window.open(url, '_blank', 'noopener'); } setTimeout(() => URL.revokeObjectURL(url), 60000); }));
     }
-    $('storage-new-folder')?.addEventListener('click', () => { const name = prompt('New folder name'); if (name?.trim()) { storageFolders.push({ id: crypto.randomUUID(), parentId: storageFolderId, name: name.trim(), created: new Date().toISOString() }); storageSaveMeta(); renderStorage(); } });
-    $('storage-file-input')?.addEventListener('change', async event => { for (const file of [...event.target.files]) { await storagePutFile({ id: crypto.randomUUID(), folderId: storageFolderId, name: file.name, type: file.type, size: file.size, blob: file }); } event.target.value = ''; renderStorage(); });
+    $('storage-new-folder')?.addEventListener('click', () => { const name = prompt('New folder name'); if (name?.trim()) { storageFolders.push({ id: crypto.randomUUID(), parentId: storageFolderId, name: name.trim(), created: new Date().toISOString() }); storageSaveMeta(); renderStorage().catch(error => console.error('Folder rendering failed:', error)); } });
+    $('storage-file-input')?.addEventListener('change', async event => {
+      try {
+        for (const file of [...event.target.files]) {
+          await storagePutFile({ id: crypto.randomUUID(), folderId: storageFolderId, name: file.name, type: file.type, size: file.size, blob: file });
+        }
+        event.target.value = '';
+        await renderStorage();
+      } catch (error) {
+        console.error('Study file storage failed:', error);
+        const status = $('storage-status');
+        if (status) {
+          status.textContent = 'The selected files could not be stored in this browser.';
+          status.classList.remove('hidden');
+        }
+      }
+    });
 
     const accountMode = new URLSearchParams(window.location.search).has('account') || window.location.hash === '#profile';
     document.body.classList.toggle('public-home', !accountMode);
     bindCloudAuth();
     renderProfile();
     render();
-    renderStorage();
+    renderStorage().catch(error => console.error('Initial study storage load failed:', error));
 
     // Inlined from script.js
     function showTime() {
@@ -1868,6 +2033,110 @@
     setInterval(function () {
 	    showTime();
     }, 1000);
+
+    // Merged from script.js
+    function academyIsLegacyPlanTitleFallback() {
+      return false;
+    }
+
+    if (typeof window.academyIsLegacyPlanTitle !== 'function') {
+      window.academyIsLegacyPlanTitle = academyIsLegacyPlanTitleFallback;
+    }
+
+    // Keep destructive actions in the current view when buttons are nested in links or forms.
+    window.academyStopDeletionNavigation = function (event) {
+      if (!event) return;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    // Empty drafts should not be treated as saved plans during startup migration.
+    window.academyPlanHasContent = function (plan) {
+      return Boolean(plan && (
+        String(plan.title || '').trim() ||
+        Number(plan.duration) > 0 ||
+        (Array.isArray(plan.tasks) && plan.tasks.length) ||
+        (Array.isArray(plan.goals) && plan.goals.length)
+      ));
+    };
+
+    // Read cached JSON without allowing malformed browser data to break startup.
+    window.academyReadJSON = function (key, fallback) {
+      try {
+        const value = localStorage.getItem(key);
+        return value === null ? fallback : JSON.parse(value);
+      } catch (error) {
+        console.warn(`Ignoring invalid cached data for ${key}.`, error);
+        return fallback;
+      }
+    };
+
+    // Return current Bangladesh Standard Time values for HTML date/time inputs.
+    window.academyFormatPlanDate = function (value) {
+      const date = value instanceof Date ? value : new Date(value);
+      return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    };
+
+    window.academyDhakaNow = function () {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Dhaka',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23'
+      }).formatToParts(new Date()).reduce((result, part) => {
+        if (part.type !== 'literal') result[part.type] = part.value;
+        return result;
+      }, {});
+      return {
+        date: `${parts.year}-${parts.month}-${parts.day}`,
+        time: `${parts.hour}:${parts.minute}`
+      };
+    };
+
+    // Use the browser's local calendar date for once-per-day report tracking.
+    window.academyLocalDate = function (date = new Date()) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    // Fire-and-forget bridge used after Firebase is initialized.
+    window.academyCloudSet = function (reference, value) {
+      if (!reference || typeof reference.set !== 'function') return Promise.resolve(false);
+      try {
+        return Promise.resolve(reference.set(value))
+          .then(() => true)
+          .catch(error => {
+            console.error('Firebase persistence failed:', error);
+            return false;
+          });
+      } catch (error) {
+        console.error('Firebase persistence failed:', error);
+        return Promise.resolve(false);
+      }
+    };
+
+    // Switch between registration and existing-account views without reloading.
+    window.academyToggleAccountMode = function (mode) {
+      const loginForm = document.getElementById('login-form');
+      const profileForm = document.getElementById('profile-form');
+      const heading = document.getElementById('profile-heading');
+      const loginStatus = document.getElementById('login-status');
+      const profileSaved = document.getElementById('profile-saved');
+      const showLogin = mode === 'login';
+      if (!loginForm || !profileForm) return;
+      loginForm.classList.toggle('hidden', !showLogin);
+      profileForm.classList.toggle('hidden', showLogin);
+      if (heading) heading.textContent = showLogin ? 'Open your account' : 'Create your account';
+      if (loginStatus) loginStatus.classList.add('hidden');
+      if (profileSaved) profileSaved.classList.add('hidden');
+      const target = document.getElementById(showLogin ? 'login-id' : 'profile-name');
+      if (target) target.focus();
+    };
   </script>
 </body>
 </html>
