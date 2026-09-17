@@ -128,6 +128,10 @@
     #study-storage .storage-modal-panel #storage-close { color:#0F172A; background:#FFFFFF; border-color:#64748B; font-size:1.5rem; line-height:1; }
     #study-storage .storage-modal-panel #storage-close:hover { background:#E2E8F0; }
     body.public-home #profile, body.public-home #plan-workspace, body.public-home #member-welcome { display:none !important; }
+    body.public-home.workspace-entry #profile { display:block !important; }
+    body.public-home.workspace-entry #landing-hero { display:none; }
+    body.public-home:not(.workspace-entry) #profile { opacity:0; transform:translateY(12px); }
+    #profile { transition:opacity .35s ease, transform .35s ease; }
     body.logged-in #landing-hero { display:none; }
 
     /* Inlined from styles.css */
@@ -268,7 +272,7 @@
         <svg class="journal-in delay-1 mt-4 w-40 h-4" viewBox="0 0 200 20" fill="none" aria-hidden="true"><path d="M2 12 Q 50 -2, 100 12 T 198 10" stroke="#E8A33D" stroke-width="3" stroke-linecap="round"/></svg>
         <p class="journal-in delay-2 mt-5 text-paper/75 leading-relaxed max-w-xl">Organize your daily study routines, track course requirements, and maintain focus with an intuitive workspace designed for rigorous academic success.</p>
         <blockquote class="journal-in delay-2 mt-6 max-w-xl border-l-4 border-marigold pl-4 text-paper/90 leading-relaxed">“Whoever takes a path upon which he seeks knowledge, Allah will make the path to Paradise easy for him.” <cite class="block mt-2 text-sm text-paper/70 not-italic">— Sahih Muslim 2699</cite></blockquote>
-        <a href="?account#profile" class="journal-in delay-2 inline-flex mt-7 bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-6 py-3 rounded-full text-sm transition-colors">Enter My Workspace</a>
+        <a href="#profile" id="enter-workspace" class="journal-in delay-2 inline-flex mt-7 bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-6 py-3 rounded-full text-sm transition-colors">Enter Your Workspace</a>
       </div>
     </section>
 
@@ -365,7 +369,7 @@
           <form id="login-form" class="hidden mt-6 space-y-3">
             <p class="text-sm text-ink/70 leading-relaxed">Your Academy ID identifies your account, but this website currently saves account data in this browser only. To move your profile and plans to another browser, import the backup file you downloaded there.</p>
             <div><label for="login-id" class="field-label">Academy ID</label><input id="login-id" name="id" type="text" autocomplete="username" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm uppercase" placeholder="Example: AC-1234ABCD"></div>
-            <div><label for="login-password" class="field-label">Cloud password</label><input id="login-password" name="password" type="password" autocomplete="current-password" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your cloud password"></div>
+            <div><label for="login-password" class="field-label">Cloud password</label><input id="login-password" name="password" type="password" autocomplete="current-password" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your cloud password"><button id="open-recovery" type="button" class="mt-1 text-xs text-forest font-semibold underline underline-offset-2">Forgot Academy ID or Password?</button></div>
             <button type="submit" class="w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Open my Academy plan</button>
             <button id="import-login-account" type="button" class="w-full border border-forest text-forest-dark font-semibold py-3 rounded-full text-sm hover:bg-forest/5 transition-colors">Import account backup</button>
             <p class="text-xs text-ink/55 leading-relaxed">On your old browser: open your profile menu → <strong>Export account data</strong>. Then bring that downloaded JSON file to this browser and import it here.</p>
@@ -376,7 +380,7 @@
 
           <form id="profile-form" class="mt-6 grid sm:grid-cols-2 gap-3">
             <div><label for="profile-name" class="field-label">Full name</label><input id="profile-name" name="name" type="text" autocomplete="name" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your full name"></div>
-            <div><label for="profile-email" class="field-label">Email address</label><input id="profile-email" name="email" type="email" autocomplete="email" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
+            <div><label for="profile-email" class="field-label">Email address <span class="font-normal text-ink/50">(optional)</span></label><input id="profile-email" name="email" type="email" autocomplete="email" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
             <div><label for="profile-password" class="field-label">Cloud password</label><input id="profile-password" name="password" type="password" autocomplete="new-password" minlength="6" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="At least 6 characters"></div>
             <div><label for="profile-institution" class="field-label">Institution / university</label><input id="profile-institution" name="institution" type="text" autocomplete="organization" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your institution or university"></div>
             <div><label for="profile-department" class="field-label">Department</label><input id="profile-department" name="department" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your department"></div>
@@ -608,6 +612,30 @@
       </section>
     </div>
   </main>
+
+  <div id="recovery-modal" class="hidden fixed inset-0 z-[70] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="recovery-title">
+    <div class="min-h-full flex items-center justify-center">
+      <div class="w-full max-w-md bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
+        <div class="flex items-start justify-between gap-4">
+          <div><p class="eyebrow-dark text-base">Account recovery</p><h2 id="recovery-title" class="font-serif text-2xl text-forest-dark mt-0.5">Forgot your Academy ID or password?</h2></div>
+          <button id="close-recovery" type="button" aria-label="Close account recovery" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
+        </div>
+        <p class="mt-4 text-sm text-ink/70 leading-relaxed">Enter the email linked to your account. Recovery is handled locally in this browser; no email will be sent.</p>
+        <form id="recovery-form" class="mt-5 space-y-3">
+          <div><label for="recovery-email" class="field-label">Email address</label><input id="recovery-email" type="email" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
+          <button id="recovery-lookup" type="submit" class="w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm">Find my account</button>
+          <p id="recovery-status" class="hidden text-sm font-semibold" role="status" aria-live="polite"></p>
+          <div id="recovery-reset-panel" class="hidden rounded-xl border border-line bg-white p-4 space-y-3">
+            <p class="text-sm font-semibold text-forest-dark">Account found!</p>
+            <p class="text-sm text-ink/70">Academy ID: <strong id="recovery-academy-id" class="text-forest-dark"></strong></p>
+            <p class="text-sm font-semibold text-forest-dark">Reset your password below:</p>
+            <div><label for="recovery-new-password" class="field-label">New cloud password</label><input id="recovery-new-password" type="password" minlength="6" autocomplete="new-password" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="At least 6 characters"></div>
+            <button id="save-recovery-password" type="button" class="w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm">Save New Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <div id="report-preview" class="hidden fixed inset-0 z-[60] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="report-preview-title">
     <div class="min-h-full flex items-center justify-center">
@@ -1380,7 +1408,7 @@
       }) : Promise.resolve(state.profile?.picture || '');
       const cloudEmail = formData.get('email').trim();
       const cloudPassword = formData.get('password');
-      if (firebaseConfigured && window.academyAuth) {
+      if (firebaseConfigured && window.academyAuth && cloudEmail) {
         try {
           const credential = await window.academyAuth.createUserWithEmailAndPassword(cloudEmail, cloudPassword);
           cloudUser = credential.user;
@@ -1399,6 +1427,7 @@
         institution: formData.get('institution').trim(), department: formData.get('department').trim(),
         session: formData.get('session').trim(), year: formData.get('year'), semester: formData.get('semester'),
         cloudEmail,
+        password: cloudPassword,
         picture: await saveProfile
       };
       localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile));
@@ -1855,6 +1884,91 @@
       clearReportRecipientError();
     });
     $('send-report').addEventListener('click', () => sendProgressReport());
+    const recoveryModal = $('recovery-modal');
+    function closeRecoveryModal() { recoveryModal?.classList.add('hidden'); }
+    $('open-recovery')?.addEventListener('click', () => {
+      recoveryModal?.classList.remove('hidden');
+      resetRecoveryPanel();
+      $('recovery-email').value = $('profile-email').value || '';
+      $('recovery-email').focus();
+    });
+    $('close-recovery')?.addEventListener('click', closeRecoveryModal);
+    recoveryModal?.addEventListener('click', event => { if (event.target === recoveryModal) closeRecoveryModal(); });
+    function resetRecoveryPanel() {
+      $('recovery-status').className = 'hidden text-sm font-semibold';
+      $('recovery-status').textContent = '';
+      $('recovery-reset-panel').classList.add('hidden');
+      $('recovery-academy-id').textContent = '';
+      $('recovery-new-password').value = '';
+      $('recovery-new-password').removeAttribute('required');
+      $('recovery-lookup').classList.remove('hidden');
+    }
+
+    function findLocalRecoveryAccount(email) {
+      const normalizedEmail = email.trim().toLowerCase();
+      const profiles = [
+        readCachedJSON(PROFILE_KEY, null),
+        readCachedJSON(SESSION_KEY, null)
+      ].filter(Boolean);
+      const plans = readCachedJSON(PLANS_KEY, []);
+      const planProfiles = Array.isArray(plans)
+        ? plans.flatMap(plan => plan.profile ? [plan.profile] : [])
+        : [];
+      return [...profiles, ...planProfiles].find(profile =>
+        String(profile.email || profile.cloudEmail || '').trim().toLowerCase() === normalizedEmail
+      ) || null;
+    }
+
+    $('recovery-form')?.addEventListener('submit', event => {
+      event.preventDefault();
+      const email = $('recovery-email').value.trim();
+      const status = $('recovery-status');
+      const account = findLocalRecoveryAccount(email);
+
+      if (!account) {
+        $('recovery-reset-panel').classList.add('hidden');
+        status.textContent = 'No account found with this email address.';
+        status.className = 'text-sm font-semibold text-rust';
+        return;
+      }
+
+      $('recovery-academy-id').textContent = account.id || 'Not available';
+      $('recovery-new-password').setAttribute('required', 'required');
+      $('recovery-reset-panel').classList.remove('hidden');
+      $('recovery-lookup').classList.add('hidden');
+      status.textContent = 'Account found! Reset your password below:';
+      status.className = 'text-sm font-semibold text-forest';
+      $('recovery-new-password').focus();
+    });
+
+    $('save-recovery-password')?.addEventListener('click', () => {
+      const email = $('recovery-email').value.trim();
+      const newPassword = $('recovery-new-password').value;
+      const status = $('recovery-status');
+      const account = findLocalRecoveryAccount(email);
+
+      if (!account) {
+        status.textContent = 'No account found with this email address.';
+        status.className = 'text-sm font-semibold text-rust';
+        return;
+      }
+      if (newPassword.length < 6) {
+        status.textContent = 'Your new password must be at least 6 characters.';
+        status.className = 'text-sm font-semibold text-rust';
+        $('recovery-new-password').focus();
+        return;
+      }
+
+      const updatedProfile = { ...account, password: newPassword };
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(updatedProfile));
+      if (state.profile?.id === account.id) {
+        state.profile = updatedProfile;
+        localStorage.setItem(SESSION_KEY, JSON.stringify(updatedProfile));
+      }
+      status.textContent = `Password saved. You can sign in with Academy ID ${account.id}.`;
+      status.className = 'text-sm font-semibold text-forest';
+      $('recovery-new-password').value = '';
+    });
     $('auto-daily-report').addEventListener('change', event => {
       const previousSettings = readCachedJSON(DAILY_REPORT_KEY, {});
       const settings = {
@@ -2019,6 +2133,13 @@
 
     const accountMode = new URLSearchParams(window.location.search).has('account') || window.location.hash === '#profile';
     document.body.classList.toggle('public-home', !accountMode);
+    const enterWorkspace = $('enter-workspace');
+    enterWorkspace?.addEventListener('click', event => {
+      event.preventDefault();
+      document.body.classList.add('workspace-entry');
+      $('profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => (state.profile ? $('plan-workspace') : $('profile-name'))?.focus(), 350);
+    });
     bindCloudAuth();
     renderProfile();
     render();
