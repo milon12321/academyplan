@@ -8,8 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="script.js"></script>
+  <!-- Firebase SDKs: replace the configuration values in firebaseConfig below. -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script>
     tailwind.config = { theme: { extend: {
       colors: {
@@ -160,6 +166,43 @@
     .title {
       color: #5C6AC4;
     }
+
+    /* Prevent nested workspace content from widening the browser viewport. */
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+
+    main, header, footer, section, article, aside, nav, form,
+    #plan-workspace, #plan-workspace > section,
+    #plan-workspace .workspace-card,
+    .max-w-6xl {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    /* Tables and charts may be wide, but only their local wrapper can scroll. */
+    .overflow-x-auto,
+    #plan-workspace .overflow-x-auto,
+    #progress-chart {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    #progress-chart svg {
+      max-width: none;
+    }
   </style>
 </head>
 <body class="font-sans text-ink antialiased">
@@ -226,9 +269,11 @@
           <div class="flex items-start gap-4">
             <div id="profile-avatar" class="w-16 h-16 shrink-0 rounded-full bg-forest/10 text-forest flex items-center justify-center text-2xl font-serif font-semibold overflow-hidden ring-2 ring-marigold/40 ring-offset-2 ring-offset-white">👋</div>
             <div class="min-w-0 flex-1">
-              <p class="eyebrow-dark text-base">Your Academy profile</p>
               <h2 id="profile-heading" class="font-serif text-2xl text-forest-dark mt-0.5">Create your account</h2>
-              <p id="profile-help" class="text-sm text-ink/65 mt-2 leading-relaxed">Add your name, email, and an optional profile picture. Your account and plan will be remembered on this device.</p>
+              <div id="profile-contact" class="hidden mt-1">
+                <div id="displayName" class="profile-display-name"></div>
+                <div id="displayEmail" class="profile-display-email"></div>
+              </div>
             </div>
             <div id="profile-menu-wrap" class="hidden relative shrink-0">
               <button id="account-menu-toggle" type="button" aria-label="Open profile options" aria-expanded="false" aria-controls="account-menu" class="w-9 h-9 rounded-full border border-line flex items-center justify-center text-lg hover:bg-forest/5">⋯</button>
@@ -250,6 +295,13 @@
                     <div class="flex items-center justify-between gap-2">
                       <span class="text-xs text-ink/60">Your plans</span>
                       <span id="plan-count" class="text-[10px] text-ink/50"></span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 mt-2">
+                      <label class="flex items-center gap-2 text-xs font-semibold text-forest-dark cursor-pointer">
+                        <input id="select-all-plans" type="checkbox" class="w-4 h-4 accent-forest" aria-label="Select all visible plans">
+                        Select all visible
+                      </label>
+                      <button id="delete-selected-plans" type="button" class="hidden text-xs font-semibold text-rust hover:underline">Delete selected</button>
                     </div>
                     <label for="plan-search" class="sr-only">Search saved plans</label>
                     <input id="plan-search" type="search" class="w-full mt-2 px-3 py-2 border border-line rounded-lg text-xs" placeholder="Search plans...">
@@ -277,6 +329,7 @@
           <form id="login-form" class="hidden mt-6 space-y-3">
             <p class="text-sm text-ink/70 leading-relaxed">Your Academy ID identifies your account, but this website currently saves account data in this browser only. To move your profile and plans to another browser, import the backup file you downloaded there.</p>
             <div><label for="login-id" class="field-label">Academy ID</label><input id="login-id" name="id" type="text" autocomplete="username" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm uppercase" placeholder="Example: AC-1234ABCD"></div>
+            <div><label for="login-password" class="field-label">Cloud password</label><input id="login-password" name="password" type="password" autocomplete="current-password" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your cloud password"></div>
             <button type="submit" class="w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Open my Academy plan</button>
             <button id="import-login-account" type="button" class="w-full border border-forest text-forest-dark font-semibold py-3 rounded-full text-sm hover:bg-forest/5 transition-colors">Import account backup</button>
             <p class="text-xs text-ink/55 leading-relaxed">On your old browser: open your profile menu → <strong>Export account data</strong>. Then bring that downloaded JSON file to this browser and import it here.</p>
@@ -287,6 +340,7 @@
           <form id="profile-form" class="mt-6 grid sm:grid-cols-2 gap-3">
             <div><label for="profile-name" class="field-label">Full name</label><input id="profile-name" name="name" type="text" autocomplete="name" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your full name"></div>
             <div><label for="profile-email" class="field-label">Email address</label><input id="profile-email" name="email" type="email" autocomplete="email" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
+            <div><label for="profile-password" class="field-label">Cloud password</label><input id="profile-password" name="password" type="password" autocomplete="new-password" minlength="6" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="At least 6 characters"></div>
             <div><label for="profile-institution" class="field-label">Institution / university</label><input id="profile-institution" name="institution" type="text" autocomplete="organization" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your institution or university"></div>
             <div><label for="profile-department" class="field-label">Department</label><input id="profile-department" name="department" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your department"></div>
             <div><label for="profile-session" class="field-label">Session</label><input id="profile-session" name="session" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="2024–2025"></div>
@@ -297,6 +351,7 @@
             <button id="show-login-account" type="button" class="sm:col-span-2 text-sm text-forest font-semibold underline underline-offset-2">I already have an Academy ID</button>
           </form>
 
+          <div class="profile-section-divider" aria-hidden="true"></div>
           <div id="profile-details" class="hidden mt-6 grid sm:grid-cols-2 gap-3 text-sm"></div>
           <div id="profile-id" class="hidden" role="status"></div>
           <div id="profile-actions" class="hidden"></div>
@@ -304,6 +359,35 @@
         </div>
       </div>
     </section>
+
+    <div id="edit-profile-modal" class="hidden fixed inset-0 z-[60] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title">
+      <div class="min-h-full flex items-center justify-center">
+        <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="eyebrow-dark text-base">Account details</p>
+              <h2 id="edit-profile-title" class="font-serif text-2xl text-forest-dark mt-0.5">Edit Profile</h2>
+            </div>
+            <button id="close-edit-profile" type="button" aria-label="Close Edit Profile" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
+          </div>
+          <form id="edit-profile-form" class="mt-5 grid sm:grid-cols-2 gap-3">
+            <div><label for="edit-profile-name" class="field-label">Full name</label><input id="edit-profile-name" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+            <div><label for="edit-profile-email" class="field-label">Email address</label><input id="edit-profile-email" type="email" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+            <div><label for="edit-profile-academy-id" class="field-label">Academy ID</label><input id="edit-profile-academy-id" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm uppercase" placeholder="AC-1234ABCD"></div>
+            <div><label for="edit-profile-institution" class="field-label">University</label><input id="edit-profile-institution" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+            <div><label for="edit-profile-department" class="field-label">Department</label><input id="edit-profile-department" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+            <div><label for="edit-profile-session" class="field-label">Session</label><input id="edit-profile-session" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+            <div><label for="edit-profile-year" class="field-label">Year</label><select id="edit-profile-year" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select year</option><option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option><option>Graduate</option></select></div>
+            <div><label for="edit-profile-semester" class="field-label">Semester</label><select id="edit-profile-semester" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select semester</option><option>1st semester</option><option>2nd semester</option><option>3rd semester</option><option>4th semester</option><option>5th semester</option><option>6th semester</option><option>7th semester</option><option>8th semester</option></select></div>
+            <div class="sm:col-span-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-3">
+              <button id="cancel-edit-profile" type="button" class="border border-line hover:bg-forest/5 text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm">Cancel</button>
+              <button id="save-edit-profile" type="submit" class="bg-forest hover:bg-forest-dark text-paper font-semibold px-5 py-2.5 rounded-full text-sm">Save Changes</button>
+            </div>
+            <p id="edit-profile-status" class="hidden sm:col-span-2 text-sm font-semibold" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <div id="plan-workspace" class="hidden">
       <section class="pb-8 pt-2">
@@ -326,7 +410,7 @@
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <div><label for="plan-start-date" class="field-label text-slate-800">Start date</label><input id="plan-start-date" type="date" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
                   <div><label for="plan-start-time" class="field-label text-slate-800">Start time</label><input id="plan-start-time" type="time" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
-                  <div>                  <label for="plan-days" class="field-label text-slate-800">Plan days</label><input id="plan-days" type="number" value="0" min="0" max="365" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white" placeholder="0"></div>
+                  <div><label for="plan-days" class="field-label text-slate-800">Plan days</label><input id="plan-days" type="number" value="0" min="0" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white" placeholder="0"></div>
                   <div><label for="plan-end-date" class="field-label text-slate-800">End date</label><input id="plan-end-date" type="date" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
                 </div>
                 <p id="plan-schedule-summary" class="text-xs text-slate-500 mt-3">Choose a start date and duration to generate your schedule.</p>
@@ -335,9 +419,9 @@
               <div class="workspace-card mt-5 p-4">
                 <div class="flex items-start gap-3">
                   <div class="flex-1 min-w-0">
-                    <label for="global-goal-input" class="field-label text-forest">Your Weekly Direction</label>
+                    <label for="global-goal-input" class="field-label text-forest">Your Direction</label>
                     <div class="flex flex-col gap-2 sm:flex-row">
-                      <input id="global-goal-input" type="text" class="min-w-0 flex-1 px-4 py-3 border border-line rounded-xl text-sm" placeholder="Add one goal for the week...">
+                      <input id="global-goal-input" type="text" class="min-w-0 flex-1 px-4 py-3 border border-line rounded-xl text-sm" placeholder="Add one goal...">
                       <button id="add-global-goal" type="button" aria-label="Add weekly goal" class="shrink-0 bg-forest hover:bg-forest-dark text-paper px-4 py-3 rounded-xl text-xl leading-none transition-colors">+</button>
                     </div>
                     <div id="global-goal-list" class="mt-3 space-y-2"></div>
@@ -355,7 +439,7 @@
         </div>
       </section>
 
-      <section class="py-4 md:py-8">
+      <section id="daily-checklist-section" class="py-4 md:py-8">
       <div class="max-w-6xl mx-auto px-5 sm:px-8">
         <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-6 items-start">
           <div class="workspace-card p-5 sm:p-7">
@@ -457,6 +541,27 @@
             </div>
 
             <div id="day-summary" class="mt-7 space-y-3"></div>
+            <section class="mt-7 rounded-xl border border-[#E2E8F0] bg-white p-4 sm:p-5" aria-labelledby="progress-chart-title">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Progress trend</p>
+                  <h3 id="progress-chart-title" class="font-serif text-xl text-slate-900 mt-0.5">Daily completion rate</h3>
+                </div>
+                <span class="text-xs text-slate-500">Completed / scheduled</span>
+              </div>
+              <div id="progress-chart" class="mt-4 overflow-x-auto" role="img" aria-label="Daily task completion chart"></div>
+            </section>
+            <section class="mt-4 rounded-xl border border-[#E2E8F0] bg-white p-4 sm:p-5" aria-labelledby="progress-table-title">
+              <h3 id="progress-table-title" class="font-serif text-xl text-slate-900">Daily progress summary</h3>
+              <div class="mt-3 overflow-x-auto">
+                <table class="w-full min-w-[560px] text-left text-xs">
+                  <thead class="border-b border-slate-200 text-slate-500">
+                    <tr><th scope="col" class="px-3 py-2 font-semibold">Day</th><th scope="col" class="px-3 py-2 font-semibold">Plan date</th><th scope="col" class="px-3 py-2 font-semibold">Scheduled tasks</th><th scope="col" class="px-3 py-2 font-semibold">Completed</th><th scope="col" class="px-3 py-2 font-semibold">Completion</th></tr>
+                  </thead>
+                  <tbody id="progress-summary-table" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                </table>
+              </div>
+            </section>
             <div id="global-goals-preview" class="hidden mt-6 rounded-xl bg-slate-50 border border-[#E2E8F0] p-4 text-sm text-slate-700 whitespace-pre-wrap"></div>
             <p id="finish-note" class="hidden mt-5 rounded-xl bg-slate-100 text-slate-800 p-3 text-sm font-semibold"></p>
           </aside>
@@ -523,32 +628,224 @@
   <script>
     const KEY = 'academyPollPlan';
     const PLANS_KEY = 'academySavedPlans';
+
+    // Firebase cloud sync. Add your Firebase project's web configuration here.
+    const firebaseConfig = {
+      apiKey: 'AIzaSyCkNUR1dE4HZq-tv6th796Z_FnCjedXCKk',
+      authDomain: 'academic-workspace-7c7da.firebaseapp.com',
+      databaseURL: 'https://academic-workspace-7c7da-default-rtdb.firebaseio.com',
+      projectId: 'academic-workspace-7c7da',
+      storageBucket: 'academic-workspace-7c7da.firebasestorage.app',
+      messagingSenderId: '938365726856',
+      appId: '1:938365726856:web:63b6a2e69f6bb1affaaf3d'
+    };
+    const firebaseConfigured = Object.values(firebaseConfig).every(value => value && !String(value).startsWith('YOUR_'));
+    let cloudUser = null;
+    let cloudUserAcademyId = null;
+    let cloudSyncReady = false;
+    let cloudSaveTimer = null;
+    let cloudLoadPromise = Promise.resolve();
+    if (firebaseConfigured && window.firebase) {
+      firebase.initializeApp(firebaseConfig);
+      window.academyAuth = firebase.auth();
+      window.academyDatabase = firebase.database();
+      window.academyAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.error);
+    }
+    function cloudUserPath() {
+      if (!cloudUser || !window.academyDatabase) return null;
+      const academyId = state.profile?.id || cloudUser.academyId || cloudUser.uid;
+      return window.academyDatabase.ref(`users/${academyId}`);
+    }
+    function cloudSnapshot() {
+      const reportSettings = typeof DAILY_REPORT_KEY === 'string'
+        ? JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}')
+        : {};
+      return {
+        profile: state.profile,
+        plans: state.plans,
+        trash: state.trash,
+        activePlanId: state.plan?.id || null,
+        reportSettings
+      };
+    }
+
+    // Firebase is the durable store for authenticated users; localStorage remains
+    // the synchronous cache so the workspace can render before the network responds.
+    function scheduleCloudReportSettingsSave() {
+      if (!cloudSyncReady || !cloudUserPath() || typeof DAILY_REPORT_KEY !== 'string') return;
+      const reportSettings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+      cloudUserPath().child('reportSettings').set(reportSettings)
+        .catch(error => console.error('Cloud report settings save failed:', error));
+    }
+    function normalizeAcademyId(value) {
+      return value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+    }
+    function openEditProfileModal() {
+      if (!state.profile) return;
+      $('edit-profile-name').value = state.profile.fullName || state.profile.name || '';
+      $('edit-profile-email').value = state.profile.email || state.profile.cloudEmail || '';
+      $('edit-profile-academy-id').value = state.profile.id || '';
+      $('edit-profile-institution').value = state.profile.institution || '';
+      $('edit-profile-department').value = state.profile.department || '';
+      $('edit-profile-session').value = state.profile.session || '';
+      $('edit-profile-year').value = state.profile.year || '';
+      $('edit-profile-semester').value = state.profile.semester || '';
+      $('edit-profile-status').className = 'hidden sm:col-span-2 text-sm font-semibold';
+      $('edit-profile-modal').classList.remove('hidden');
+      $('edit-profile-name').focus();
+    }
+    function closeEditProfileModal() {
+      $('edit-profile-modal').classList.add('hidden');
+    }
+    function showEditProfileStatus(message, error = false) {
+      const status = $('edit-profile-status');
+      status.textContent = message;
+      status.className = `sm:col-span-2 text-sm font-semibold ${error ? 'text-rust' : 'text-forest'}`;
+    }
+    async function saveEditedProfile(event) {
+      event.preventDefault();
+      if (!state.profile) return;
+      const oldId = state.profile.id.toUpperCase();
+      const newId = normalizeAcademyId($('edit-profile-academy-id').value);
+      if (!/^AC-[A-Z0-9_-]{4,40}$/.test(newId)) {
+        showEditProfileStatus('Use an Academy ID starting with AC- and containing 4–40 letters, numbers, underscores, or hyphens.', true);
+        return;
+      }
+      const editedName = $('edit-profile-name').value.trim();
+      const editedEmail = $('edit-profile-email').value.trim();
+      const profile = { ...state.profile, id: newId, fullName: editedName, name: editedName, email: editedEmail, cloudEmail: state.profile.cloudEmail || editedEmail, institution: $('edit-profile-institution').value.trim(), department: $('edit-profile-department').value.trim(), session: $('edit-profile-session').value.trim(), year: $('edit-profile-year').value, semester: $('edit-profile-semester').value };
+      if (newId !== oldId && (!window.academyDatabase || !cloudUser)) {
+        showEditProfileStatus('Please sign in to Firebase before changing your Academy ID.', true);
+        return;
+      }
+      try {
+        if (newId !== oldId) {
+          const oldRef = window.academyDatabase.ref(`users/${oldId}`);
+          const newRef = window.academyDatabase.ref(`users/${newId}`);
+          const existing = await newRef.once('value');
+          if (existing.exists()) {
+            showEditProfileStatus('That Academy ID is already in use. Choose another ID.', true);
+            return;
+          }
+          await newRef.set({ ...cloudSnapshot(), profile, activePlanId: state.plan?.id || null });
+          await oldRef.remove();
+          cloudUserAcademyId = newId;
+        } else {
+          state.profile = profile;
+          scheduleCloudSave();
+        }
+        state.profile = profile;
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+        localStorage.setItem(SESSION_KEY, JSON.stringify(profile));
+        renderProfile();
+        closeEditProfileModal();
+        $('profile-saved').textContent = 'Your profile and Academy ID were updated successfully.';
+        $('profile-saved').classList.remove('hidden');
+      } catch (error) {
+        console.error('Profile update failed:', error);
+        showEditProfileStatus('The profile could not be updated. Your original account data is unchanged.', true);
+      }
+    }
+    async function findCloudAccountByAcademyId(academyId) {
+      if (!window.academyDatabase) return null;
+      const normalizedId = academyId.trim().toUpperCase();
+      const snapshot = await window.academyDatabase.ref(`users/${normalizedId}/profile`).once('value');
+      return snapshot.exists() ? snapshot.val() : null;
+    }
+    function scheduleCloudSave() {
+      if (!cloudSyncReady || !cloudUserPath()) return;
+      clearTimeout(cloudSaveTimer);
+      cloudSaveTimer = setTimeout(() => cloudUserPath().set(cloudSnapshot()).catch(error => console.error('Cloud save failed:', error)), 250);
+    }
+    async function loadCloudAccount(user) {
+      if (!window.academyDatabase) return;
+      const academyId = cloudUserAcademyId || user.academyId || state.profile?.id || user.uid;
+      const snapshot = await window.academyDatabase.ref(`users/${academyId}`).once('value');
+      const cloud = snapshot.val();
+      if (cloud?.plans?.length) {
+        state.plans = cloud.plans;
+        state.plan = state.plans.find(plan => plan.id === cloud.activePlanId) || state.plans[0];
+      } else if (state.plans.length) {
+        // Preserve the instant local cache while seeding a first cloud copy.
+        // This also makes migration from an existing device lossless.
+        cloudSyncReady = true;
+        scheduleCloudSave();
+      }
+      if (cloud?.trash) state.trash = cloud.trash;
+      if (cloud?.profile) state.profile = cloud.profile;
+      if (cloud?.reportSettings && typeof DAILY_REPORT_KEY === 'string') {
+        localStorage.setItem(DAILY_REPORT_KEY, JSON.stringify(cloud.reportSettings));
+        const reportToggle = $('auto-daily-report');
+        const reportStatus = $('report-send-status');
+        if (reportToggle) reportToggle.checked = Boolean(cloud.reportSettings.enabled);
+        if (reportStatus) reportStatus.textContent = cloud.reportSettings.enabled ? 'Daily report is enabled for 10:00 PM.' : 'Daily reporting is off.';
+      }
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile));
+      localStorage.setItem(SESSION_KEY, JSON.stringify(state.profile));
+      localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+      if (state.plan) localStorage.setItem(KEY, JSON.stringify(state.plan));
+      cloudSyncReady = true;
+      renderProfile();
+      if (state.profile) render();
+    }
+    function bindCloudAuth() {
+      if (!window.academyAuth) return;
+      window.academyAuth.onAuthStateChanged(async user => {
+        cloudUser = user;
+        cloudSyncReady = false;
+        if (!user) {
+          cloudUserAcademyId = null;
+          return;
+        }
+        cloudLoadPromise = loadCloudAccount(user).catch(error => console.error('Cloud load failed:', error));
+        await cloudLoadPromise;
+      });
+    }
     const TRASH_KEY = 'academyTrashPlans';
-    const DEFAULT_PLAN_TITLE = '';
-    const DEFAULT_PLAN_DURATION = 0;
+    const DEFAULT_PLAN_TITLE = window.academyPlanDefaults?.title ?? '';
+    const DEFAULT_PLAN_DURATION = window.academyPlanDefaults?.duration ?? 0;
     const TRASH_RETENTION_DAYS = 3;
     const PROFILE_KEY = 'academyProfile';
     const SESSION_KEY = 'academyLoggedIn';
     const RING_CIRCUMFERENCE = 2 * Math.PI * 52;
     const savedPlans = JSON.parse(localStorage.getItem(PLANS_KEY) || '[]');
     const legacyPlan = JSON.parse(localStorage.getItem(KEY) || 'null');
-    const state = { plans: savedPlans.length ? savedPlans : (legacyPlan ? [legacyPlan] : []), trash: JSON.parse(localStorage.getItem(TRASH_KEY) || '[]'), plan: null, profile: JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'), day: 0 };
+    const legacyPlanHasContent = window.academyPlanHasContent(legacyPlan);
+    const storedPlans = savedPlans.length ? savedPlans : (legacyPlanHasContent ? [legacyPlan] : []);
+    const migratedPlans = storedPlans.map(plan => {
+      if (window.academyIsLegacyPlanTitle?.(plan.title)) return { ...plan, title: '' };
+      return plan;
+    });
+    const state = { plans: migratedPlans, trash: JSON.parse(localStorage.getItem(TRASH_KEY) || '[]'), plan: null, profile: JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'), day: 0 };
+    if (migratedPlans.some((plan, index) => plan !== storedPlans[index])) {
+      localStorage.setItem(PLANS_KEY, JSON.stringify(migratedPlans));
+      if (migratedPlans[0]) localStorage.setItem(KEY, JSON.stringify(migratedPlans[0]));
+    }
     cleanTrash();
     function cleanTrash() {
       const cutoff = Date.now() - TRASH_RETENTION_DAYS * 24 * 60 * 60 * 1000;
       state.trash = state.trash.filter(item => new Date(item.deletedAt).getTime() > cutoff);
       localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+      scheduleCloudSave();
     }
     state.plan = state.plans[0] || null;
+    if (state.plan && window.academyIsLegacyPlanTitle?.(state.plan.title)) {
+      state.plan.title = '';
+      localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+      localStorage.setItem(KEY, JSON.stringify(state.plan));
+    }
     const $ = id => document.getElementById(id);
-    const save = () => {
-      if (!state.plan) return;
+    const save = (forceAdd = false) => {
+      if (!state.plan) return false;
       const index = state.plans.findIndex(plan => plan.id === state.plan.id);
+      if (index === -1 && !forceAdd) return false;
       if (index === -1) state.plans.unshift(state.plan); else state.plans[index] = state.plan;
       localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
       localStorage.setItem(KEY, JSON.stringify(state.plan));
+      scheduleCloudSave();
+      return true;
     };
-    const planLength = () => Math.min(365, Math.max(0, Number.isFinite(Number(state.plan?.duration)) ? Number(state.plan.duration) : DEFAULT_PLAN_DURATION));
+    const planLength = () => Math.max(0, Number.isFinite(Number(state.plan?.duration)) ? Number(state.plan.duration) : DEFAULT_PLAN_DURATION);
     const scheduleDate = (i, plan = state.plan) => {
       const start = new Date(`${plan?.startDate || new Date().toISOString().slice(0, 10)}T${plan?.startTime || '09:00'}`);
       start.setDate(start.getDate() + i);
@@ -571,17 +868,21 @@
       const now = new Date();
       return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     };
+    const dhakaNow = () => window.academyDhakaNow ? window.academyDhakaNow() : {
+      date: dateValue(new Date()),
+      time: currentTimeValue()
+    };
     const taskTimeMarkup = task => task.time ? ` <time class="ml-1 text-xs font-semibold text-slate-500">· ${escapeHtml(formatTime(task.time))}</time>` : '';
 
     function renderActivePlanSelector() {
       const selector = $('active-plan-selector');
       if (!selector) return;
       if (!state.plans.length) {
-        selector.innerHTML = '<option value="" selected>Select or create a plan...</option>';
+        selector.innerHTML = '<option value="" selected>No saved plans yet</option>';
         return;
       }
-      selector.innerHTML = state.plans.map(plan => `<option value="${plan.id}">${escapeHtml(plan.title || 'Untitled plan')}</option>`).join('');
-      selector.value = state.plan?.id || state.plans[0].id;
+      selector.innerHTML = '<option value="">Select a saved plan...</option>' + state.plans.map(plan => `<option value="${plan.id}">${escapeHtml(plan.title || 'Untitled plan')}</option>`).join('');
+      selector.value = state.plan?.id || '';
     }
 
     function renderProfile() {
@@ -594,22 +895,22 @@
       const hasProfile = Boolean(profile);
       const lastVisitTimestamp = Number(localStorage.getItem('lastVisitTimestamp') || 0);
       const isRecentVisit = hasProfile && lastVisitTimestamp > 0 && Date.now() - lastVisitTimestamp < 5400000;
-      const profileGreeting = isRecentVisit ? 'Workspace' : `Welcome back, ${profile?.name || 'Milon Sarkar'}`;
+      const profileGreeting = 'Student Profile';
       if (hasProfile && !isRecentVisit) localStorage.setItem('lastVisitTimestamp', String(Date.now()));
       $('plan-workspace').classList.toggle('hidden', !hasProfile);
       document.body.classList.toggle('logged-in', hasProfile && accountMode);
             $('login-form').classList.toggle('hidden', hasProfile);
       $('profile-id').classList.add('hidden');
       $('menu-profile-id').textContent = hasProfile ? profile.id : '';
-      $('profile-name').value = profile?.name || '';
-      $('profile-email').value = profile?.email || '';
+      $('profile-name').value = profile?.fullName || profile?.name || '';
+      $('profile-email').value = profile?.email || profile?.cloudEmail || '';
+      if (typeof updateProfileDisplay === 'function') updateProfileDisplay(profile);
       $('profile-institution').value = profile?.institution || '';
       $('profile-department').value = profile?.department || '';
       $('profile-session').value = profile?.session || '';
       $('profile-year').value = profile?.year || '';
       $('profile-semester').value = profile?.semester || '';
       $('profile-heading').textContent = hasProfile ? profileGreeting : 'Create your account';
-      $('profile-help').textContent = hasProfile ? 'Your profile is saved on this device. You can edit your details whenever you like.' : 'Add your personal and academic details to create your Academy profile.';
       const showLogin = !hasProfile && Boolean(localStorage.getItem(PROFILE_KEY));
       $('profile-form').classList.toggle('hidden', hasProfile || showLogin);
       $('login-form').classList.toggle('hidden', hasProfile || !showLogin);
@@ -625,7 +926,7 @@
         ].map(([label, value]) => `<div class="rounded-xl bg-paper border border-line p-3"><div class="text-xs text-ink/55">${label}</div><div class="font-semibold text-forest-dark mt-1">${escapeHtml(value || 'Not provided')}</div></div>`).join('');
       }
       const avatar = $('profile-avatar');
-      avatar.innerHTML = profile?.picture ? `<img src="${profile.picture}" alt="${escapeHtml(profile.name)}" class="avatar-image w-full h-full">` : escapeHtml((profile?.name || '👋').charAt(0).toUpperCase());
+      avatar.innerHTML = profile?.picture ? `<img src="${profile.picture}" alt="${escapeHtml(profile.fullName || profile.name || 'Profile picture')}" class="avatar-image w-full h-full">` : escapeHtml((profile?.fullName || profile?.name || '👋').charAt(0).toUpperCase());
       $('profile-menu-wrap').classList.toggle('hidden', !hasProfile);
       if (!hasProfile) {
         $('account-menu').classList.add('hidden');
@@ -635,16 +936,17 @@
 
     function ensurePlan() {
       if (!state.plan) {
-        state.plan = { id: crypto.randomUUID(), title: DEFAULT_PLAN_TITLE, created: new Date().toISOString(), duration: DEFAULT_PLAN_DURATION, startDate: dateValue(new Date()), startTime: '09:00', goals: [], tasks: [], notes: [] };
-        state.plans.unshift(state.plan);
+        const now = dhakaNow();
+        state.plan = { id: crypto.randomUUID(), title: DEFAULT_PLAN_TITLE, created: new Date().toISOString(), duration: DEFAULT_PLAN_DURATION, startDate: now.date, startTime: now.time, goals: [], tasks: [], notes: [] };
       }
       state.plan.id = state.plan.id || crypto.randomUUID();
       state.plan.title = typeof state.plan.title === 'string' ? state.plan.title : '';
-      state.plan.duration = Math.min(365, Math.max(0, Number.isFinite(Number(state.plan.duration)) ? Number(state.plan.duration) : 0));
-      state.plan.startDate = state.plan.startDate || dateValue(new Date(state.plan.created || Date.now()));
-      state.plan.startTime = state.plan.startTime || '09:00';
+      state.plan.duration = Math.max(0, Number.isFinite(Number(state.plan.duration)) ? Number(state.plan.duration) : 0);
+      const now = dhakaNow();
+      state.plan.startDate = state.plan.startDate || now.date;
+      state.plan.startTime = state.plan.startTime || now.time;
       const length = planLength();
-      state.plan.endDate = length ? dateValue(scheduleDate(length - 1, state.plan)) : '';
+      state.plan.endDate = length ? dateValue(scheduleDate(length, state.plan)) : dateValue(scheduleDate(0, state.plan));
       state.plan.notes = Array.from({length}, (_, i) => state.plan.notes?.[i] || '');
       if (typeof state.plan.goals === 'string') {
         state.plan.goals = state.plan.goals.split('\n').map(text => text.trim()).filter(Boolean).map(text => ({ id: crypto.randomUUID(), text, done: Array(planLength()).fill(false) }));
@@ -667,35 +969,80 @@
     }
     function renderGoalList() {
       const goals = state.plan?.goals || [];
-      $('global-goal-list').innerHTML = goals.length ? goals.map(goal => `<div class="flex items-center gap-2 rounded-xl border border-line bg-white px-3 py-2"><span class="flex-1 min-w-0 text-sm text-forest-dark">${escapeHtml(goal.text)}${goal.time ? ` <time class="ml-1 text-xs font-semibold text-slate-500">· ${escapeHtml(formatTime(goal.time))}</time>` : ''}</span><button type="button" data-remove-goal="${goal.id}" aria-label="Delete goal" class="shrink-0 text-ink/35 hover:text-rust text-lg">×</button></div>`).join('') : '<p class="text-xs text-ink/50">No weekly goals added yet.</p>';
+      $('global-goal-list').innerHTML = goals.length ? goals.map(goal => `<div class="flex items-center gap-2 rounded-xl border border-line bg-white px-3 py-2"><span class="flex-1 min-w-0 text-sm text-forest-dark">${escapeHtml(goal.text)}${goal.time ? ` <time class="ml-1 text-xs font-semibold text-slate-500">· ${escapeHtml(formatTime(goal.time))}</time>` : ''}</span><button type="button" data-remove-goal="${goal.id}" aria-label="Delete goal" class="shrink-0 text-ink/35 hover:text-rust text-lg">×</button></div>`).join('') : '<p class="text-xs text-ink/50">No goals added yet.</p>';
       $('global-goal-list').querySelectorAll('[data-remove-goal]').forEach(button => button.addEventListener('click', () => {
         state.plan.goals = state.plan.goals.filter(goal => goal.id !== button.dataset.removeGoal);
         save();
         render();
       }));
     }
+    const selectedPlanIds = new Set();
+    function updatePlanSelectionControls() {
+      const visibleIds = [...$('plan-list').querySelectorAll('[data-select-plan]')].map(input => input.value);
+      const selectedVisible = visibleIds.filter(id => selectedPlanIds.has(id));
+      const selectAll = $('select-all-plans');
+      const deleteSelected = $('delete-selected-plans');
+      if (selectAll) {
+        selectAll.checked = visibleIds.length > 0 && selectedVisible.length === visibleIds.length;
+        selectAll.indeterminate = selectedVisible.length > 0 && selectedVisible.length < visibleIds.length;
+      }
+      if (deleteSelected) {
+        deleteSelected.classList.toggle('hidden', selectedPlanIds.size === 0);
+        deleteSelected.textContent = `Delete selected (${selectedPlanIds.size})`;
+      }
+    }
+    function keepSavedPlansMenuOpen() {
+      $('account-menu').classList.remove('hidden');
+      $('account-menu-toggle').setAttribute('aria-expanded', 'true');
+      $('saved-plans-panel').classList.remove('hidden');
+      $('saved-plans-toggle').setAttribute('aria-expanded', 'true');
+      $('saved-plans-toggle').querySelector('span:last-child').textContent = '▾';
+      requestAnimationFrame(() => $('plan-list').scrollIntoView({ block: 'nearest' }));
+    }
+    function movePlansToTrash(ids) {
+      const plansToDelete = state.plans.filter(plan => ids.includes(plan.id));
+      if (!plansToDelete.length) return;
+      state.plans = state.plans.filter(plan => !ids.includes(plan.id));
+      state.trash.unshift(...plansToDelete.map(plan => ({ plan, deletedAt: new Date().toISOString() })));
+      selectedPlanIds.clear();
+      if (state.plan && ids.includes(state.plan.id)) state.plan = state.plans[0] || null;
+      localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+      localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+      if (state.plan) localStorage.setItem(KEY, JSON.stringify(state.plan)); else localStorage.removeItem(KEY);
+      scheduleCloudSave();
+      state.day = 0;
+      render();
+      keepSavedPlansMenuOpen();
+    }
     function renderPlanList() {
       cleanTrash();
       const query = $('plan-search').value.trim().toLowerCase();
-      const matches = state.plans.filter(plan => plan.title.toLowerCase().includes(query));
+      const matches = state.plans.filter(plan => (plan.title || '').toLowerCase().includes(query));
       $('plan-count').textContent = `${state.plans.length} plan${state.plans.length === 1 ? '' : 's'}`;
-      $('plan-list').innerHTML = matches.length ? matches.map(plan => `<div class="flex items-center gap-2"><button type="button" data-plan-id="${plan.id}" class="min-w-0 flex-1 text-left px-3 py-2.5 rounded-xl border transition-colors ${plan.id === state.plan.id ? 'border-forest bg-forest/5' : 'border-line hover:bg-forest/5'}"><span class="block text-sm font-semibold text-forest-dark truncate">${escapeHtml(plan.title)}</span><span class="block text-xs text-ink/55 mt-0.5">Created ${new Date(plan.created).toLocaleDateString()}</span></button><button type="button" data-delete-plan="${plan.id}" aria-label="Move ${escapeHtml(plan.title)} to trash" class="shrink-0 w-10 h-10 rounded-xl border border-line text-rust hover:bg-rust/5 text-lg transition-colors">×</button></div>`).join('') : '<p class="text-xs text-ink/55 py-2">No matching plans found.</p>';
+      if (!state.plans.length) {
+        $('plan-list').innerHTML = '<p class="text-xs text-ink/55 py-2">No plans created yet.</p>';
+        updatePlanSelectionControls();
+        renderTrashMenu();
+        return;
+      }
+      $('plan-list').innerHTML = matches.length ? matches.map(plan => `<div class="flex items-center gap-2"><input type="checkbox" data-select-plan value="${plan.id}" ${selectedPlanIds.has(plan.id) ? 'checked' : ''} aria-label="Select ${escapeHtml(plan.title || 'Untitled plan')}" class="w-4 h-4 shrink-0 accent-forest"><button type="button" data-plan-id="${plan.id}" class="min-w-0 flex-1 text-left px-3 py-2.5 rounded-xl border transition-colors ${plan.id === state.plan?.id ? 'border-forest bg-forest/5' : 'border-line hover:bg-forest/5'}"><span class="block text-sm font-semibold text-forest-dark truncate">${escapeHtml(plan.title || 'Untitled plan')}</span><span class="block text-xs text-ink/55 mt-0.5">Created ${new Date(plan.created).toLocaleDateString()}</span></button><button type="button" data-delete-plan="${plan.id}" aria-label="Move ${escapeHtml(plan.title || 'Untitled plan')} to trash" class="shrink-0 w-10 h-10 rounded-xl border border-line text-rust hover:bg-rust/5 text-lg transition-colors">×</button></div>`).join('') : '<p class="text-xs text-ink/55 py-2">No matching plans found.</p>';
       $('plan-list').querySelectorAll('[data-plan-id]').forEach(button => button.addEventListener('click', () => openSavedPlanPreview(button.dataset.planId)));
       renderTrashMenu();
-      $('plan-list').querySelectorAll('[data-delete-plan]').forEach(button => button.addEventListener('click', () => {
+      $('plan-list').querySelectorAll('[data-delete-plan]').forEach(button => button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
         const plan = state.plans.find(item => item.id === button.dataset.deletePlan);
-        if (!plan || !confirm(`Move “${plan.title}” to Trash? It will be permanently deleted after ${TRASH_RETENTION_DAYS} days.`)) return;
-        state.plans = state.plans.filter(item => item.id !== plan.id);
-        state.trash.unshift({ plan, deletedAt: new Date().toISOString() });
-        if (state.plan?.id === plan.id) state.plan = state.plans[0] || null;
-        localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
-        localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
-        if (state.plan) localStorage.setItem(KEY, JSON.stringify(state.plan));
-        else localStorage.removeItem(KEY);
-        state.day = 0;
-        render();
-        $('plan-status').textContent = 'Plan deleted.';
+        if (!plan) return;
+        movePlansToTrash([plan.id]);
+        $('plan-status').textContent = 'Plan moved to Trash.';
       }));
+      $('plan-list').querySelectorAll('[data-select-plan]').forEach(input => input.addEventListener('change', () => {
+        if (input.checked) selectedPlanIds.add(input.value); else selectedPlanIds.delete(input.value);
+        updatePlanSelectionControls();
+      }));
+      $('select-all-plans').checked = matches.length > 0 && matches.every(plan => selectedPlanIds.has(plan.id));
+      $('select-all-plans').indeterminate = matches.some(plan => selectedPlanIds.has(plan.id)) && !$('select-all-plans').checked;
+      updatePlanSelectionControls();
     }
     let previewPlanId = null;
     function openSavedPlanPreview(id) {
@@ -704,7 +1051,7 @@
       previewPlanId = id;
       $('saved-plan-preview-title').textContent = plan.title;
       $('saved-plan-preview-date').textContent = `Created ${new Date(plan.created).toLocaleDateString()} · Read-only preview`;
-      $('saved-plan-preview-content').innerHTML = Array.from({length: Math.min(365, Math.max(0, Number(plan.duration) || 0))}, (_, day) => {
+      $('saved-plan-preview-content').innerHTML = Array.from({length: Math.max(0, Number(plan.duration) || 0)}, (_, day) => {
         const tasks = (plan.tasks || []).filter(task => task.days?.[day]);
         const note = plan.notes?.[day] || '';
         return `<section class="border border-line rounded-xl p-4"><h3 class="font-serif text-lg text-forest-dark">${dayLabel(day, plan)}</h3><ul class="mt-2 space-y-1 text-sm">${tasks.length ? tasks.map(task => `<li class="flex gap-2"><span class="text-marigold-dark">${task.done?.[day] ? '✓' : '○'}</span><span>${escapeHtml(task.text)}${taskTimeMarkup(task)}</span></li>`).join('') : '<li class="text-ink/50">No tasks</li>'}</ul>${note ? `<p class="mt-3 pt-3 border-t border-line text-sm text-ink/70"><strong>Note:</strong> ${escapeHtml(note)}</p>` : ''}</section>`;
@@ -725,7 +1072,7 @@
       const plan = item.plan;
       $('trash-preview-title').textContent = plan.title;
       $('trash-preview-date').textContent = `Deleted ${new Date(item.deletedAt).toLocaleDateString()} · Read-only preview`;
-      const days = Array.from({length: Math.min(365, Math.max(0, Number(plan.duration) || 0))}, (_, day) => {
+      const days = Array.from({length: Math.max(0, Number(plan.duration) || 0)}, (_, day) => {
         const tasks = (plan.tasks || []).filter(task => task.days?.[day]);
         const note = plan.notes?.[day] || '';
         return `<section class="border border-line rounded-xl p-4"><h3 class="font-serif text-lg text-forest-dark">${dayLabel(day, plan)}</h3><ul class="mt-2 space-y-1 text-sm">${tasks.length ? tasks.map(task => `<li class="flex gap-2"><span class="text-marigold-dark">${task.done?.[day] ? '✓' : '○'}</span><span>${escapeHtml(task.text)}${taskTimeMarkup(task)}</span></li>`).join('') : '<li class="text-ink/50">No tasks</li>'}</ul>${note ? `<p class="mt-3 pt-3 border-t border-line text-sm text-ink/70"><strong>Note:</strong> ${escapeHtml(note)}</p>` : ''}</section>`;
@@ -747,9 +1094,11 @@
         return;
       }
       trashMenu.classList.remove('hidden');
-      trashList.innerHTML = state.trash.map(item => `<div class="flex items-center gap-2"><button type="button" data-preview-plan="${item.plan.id}" class="min-w-0 flex-1 text-left"><span class="block text-xs font-semibold text-forest-dark truncate hover:underline">${escapeHtml(item.plan.title)}</span><span class="block text-[10px] text-ink/50">Deleted ${new Date(item.deletedAt).toLocaleDateString()} · View plan</span></button><button type="button" data-restore-plan="${item.plan.id}" class="shrink-0 px-2 py-1 rounded-lg border border-forest text-forest-dark hover:bg-forest/5 text-[10px] font-semibold">Restore</button></div>`).join('');
+      trashList.innerHTML = state.trash.map(item => `<div class="flex items-center gap-2"><button type="button" data-preview-plan="${item.plan.id}" class="min-w-0 flex-1 text-left"><span class="block text-xs font-semibold text-forest-dark truncate hover:underline">${escapeHtml(item.plan.title || 'Untitled plan')}</span><span class="block text-[10px] text-ink/50">Deleted ${new Date(item.deletedAt).toLocaleDateString()} · View plan</span></button><button type="button" data-restore-plan="${item.plan.id}" class="shrink-0 px-2 py-1 rounded-lg border border-forest text-forest-dark hover:bg-forest/5 text-[10px] font-semibold">Restore</button><button type="button" data-delete-permanently="${item.plan.id}" aria-label="Delete ${escapeHtml(item.plan.title || 'Untitled plan')} permanently" title="Delete permanently" class="shrink-0 w-8 h-8 rounded-lg border border-rust text-rust hover:bg-rust/5 text-sm font-semibold">×</button></div>`).join('');
       trashList.querySelectorAll('[data-preview-plan]').forEach(button => button.addEventListener('click', () => openTrashPreview(button.dataset.previewPlan)));
-      trashList.querySelectorAll('[data-restore-plan]').forEach(button => button.addEventListener('click', () => {
+      trashList.querySelectorAll('[data-restore-plan]').forEach(button => button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
         const index = state.trash.findIndex(item => item.plan.id === button.dataset.restorePlan);
         if (index === -1) return;
         const [item] = state.trash.splice(index, 1);
@@ -757,9 +1106,23 @@
         state.plan = item.plan;
         localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
         localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+        scheduleCloudSave();
         state.day = 0;
         render();
+        keepSavedPlansMenuOpen();
         $('plan-status').textContent = 'Plan restored from Trash.';
+      }));
+      trashList.querySelectorAll('[data-delete-permanently]').forEach(button => button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const index = state.trash.findIndex(item => item.plan.id === button.dataset.deletePermanently);
+        if (index === -1) return;
+        state.trash.splice(index, 1);
+        localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+        scheduleCloudSave();
+        renderTrashMenu();
+        keepSavedPlansMenuOpen();
+        $('plan-status').textContent = 'Plan permanently deleted.';
       }));
     }
     function renderReport() {
@@ -774,18 +1137,61 @@
       $('close-report').focus();
     }
     function closeReport() { $('report-preview').classList.add('hidden'); }
+    function updateDailyChecklistVisibility() {
+      const checklist = $('daily-checklist-section');
+      if (!checklist) return;
+      const days = Math.max(0, Number(state.plan?.duration) || 0);
+      checklist.classList.toggle('hidden', days === 0);
+      checklist.setAttribute('aria-hidden', String(days === 0));
+    }
+    function renderProgressVisuals(scores) {
+      const chart = $('progress-chart');
+      const table = $('progress-summary-table');
+      if (!chart || !table) return;
+      const width = Math.max(640, scores.length * 92);
+      const height = 220;
+      const chartTop = 22;
+      const chartBottom = 178;
+      const chartHeight = chartBottom - chartTop;
+      const points = scores.map((score, index) => {
+        const x = scores.length === 1 ? width / 2 : 42 + index * ((width - 64) / (scores.length - 1));
+        const y = chartBottom - (score.rate / 100) * chartHeight;
+        return { ...score, x, y };
+      });
+      const line = points.map(point => `${point.x},${point.y}`).join(' ');
+      const area = points.length ? `${points[0].x},${chartBottom} ${line} ${points[points.length - 1].x},${chartBottom}` : '';
+      chart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" class="w-full min-w-[640px] h-56" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="progress-area-gradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#3B82F6" stop-opacity=".24"/><stop offset="100%" stop-color="#3B82F6" stop-opacity=".02"/></linearGradient></defs><line x1="32" y1="${chartTop}" x2="${width - 22}" y2="${chartTop}" stroke="#E2E8F0"/><line x1="32" y1="${(chartTop + chartBottom) / 2}" x2="${width - 22}" y2="${(chartTop + chartBottom) / 2}" stroke="#E2E8F0"/><line x1="32" y1="${chartBottom}" x2="${width - 22}" y2="${chartBottom}" stroke="#CBD5E1"/><text x="4" y="${chartTop + 4}" font-size="10" fill="#64748B">100%</text><text x="10" y="${(chartTop + chartBottom) / 2 + 4}" font-size="10" fill="#64748B">50%</text><text x="20" y="${chartBottom + 4}" font-size="10" fill="#64748B">0%</text>${area ? `<polygon points="${area}" fill="url(#progress-area-gradient)"/><polyline points="${line}" fill="none" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${points.map(point => `<circle cx="${point.x}" cy="${point.y}" r="5" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="2"><title>${escapeHtml(point.label)}: ${point.done}/${point.total} (${point.rate}%)</title></circle><text x="${point.x}" y="${height - 10}" text-anchor="middle" font-size="10" fill="#475569">${escapeHtml(point.shortLabel)}</text>`).join('')}` : ''}</svg>`;
+      table.innerHTML = scores.map(score => `<tr><th scope="row" class="px-3 py-2.5 font-semibold text-slate-900">${escapeHtml(score.label)}</th><td class="px-3 py-2.5">${escapeHtml(score.date)}</td><td class="px-3 py-2.5">${score.total}</td><td class="px-3 py-2.5">${score.done}</td><td class="px-3 py-2.5 font-semibold">${score.rate}%</td></tr>`).join('');
+    }
+
     function render() {
+      if (!state.plan) {
+        const now = dhakaNow();
+        renderActivePlanSelector();
+        $('plan-name').value = '';
+        $('plan-days').value = '0';
+        $('plan-start-date').value = now.date;
+        $('plan-start-time').value = now.time;
+        $('plan-end-date').value = now.date;
+        $('plan-schedule-summary').textContent = 'Create and save a plan to generate your schedule.';
+        $('global-goal-list').innerHTML = '<p class="text-xs text-ink/50">No goals added yet.</p>';
+        updateDailyChecklistVisibility();
+        $('daily-checklist-section').classList.add('hidden');
+        return;
+      }
       ensurePlan();
+      updateDailyChecklistVisibility();
+      if (typeof window.academyIsLegacyPlanTitle === 'function' && window.academyIsLegacyPlanTitle(state.plan.title)) state.plan.title = '';
       renderActivePlanSelector();
-      $('plan-name').value = state.plan.title || DEFAULT_PLAN_TITLE;
-      $('plan-name').placeholder = 'Type your plan name...';
+      $('plan-name').value = state.plan.title || '';
+      $('plan-name').placeholder = window.academyPlanDefaults?.titlePlaceholder || 'Add your plan name...';
       $('plan-days').min = '0';
-      $('plan-days').max = '365';
+      $('plan-days').removeAttribute('max');
       $('plan-days').value = String(planLength());
       $('plan-start-date').value = state.plan.startDate;
       $('plan-start-time').value = state.plan.startTime;
       const endDate = planLength() ? scheduleDate(planLength() - 1) : null;
-      state.plan.endDate = state.plan.endDate || (endDate ? dateValue(endDate) : '');
+      state.plan.endDate = state.plan.endDate || (endDate ? dateValue(scheduleDate(planLength(), state.plan)) : dateValue(scheduleDate(0, state.plan)));
       $('plan-end-date').value = state.plan.endDate;
       $('plan-schedule-summary').textContent = planLength() ? `${planLength()} days · ${scheduleDate(0).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })} to ${scheduleDate(planLength() - 1).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })}` : '0 days · No scheduled study days yet.';
       renderGoalList();
@@ -819,8 +1225,9 @@
       $('total-done').textContent=totals; $('total-rate').textContent=`${rate}%`;
       const ring = $('progress-ring-arc');
       ring.style.strokeDashoffset = String(RING_CIRCUMFERENCE - (rate/100)*RING_CIRCUMFERENCE);
-      const scores = Array.from({length:planLength()},(_,i)=>({done:state.plan.tasks.filter(t=>t.days[i]&&t.done[i]).length,total:state.plan.tasks.filter(t=>t.days[i]).length})); const best=scores.reduce((a,s,i)=>s.total && s.done/s.total > a.rate ? {rate:s.done/s.total,day:i+1}:a,{rate:0,day:null}); $('best-day').textContent=best.day?best.day:'—';
-      $('day-summary').innerHTML = scores.map((s,i)=>{ const rate=s.total?Math.round(s.done/s.total*100):0; const status=rate===100&&s.total?'Complete':s.done?'Active':'Pending'; const statusClass=rate===100&&s.total?'report-status-complete':s.done?'report-status-active':'report-status-pending'; const barClass=rate===100&&s.total?'report-bar-complete':s.done?'report-bar-active':'report-bar-pending'; return `<div class="report-day-card"><div class="flex items-center justify-between gap-2 text-xs mb-2"><span class="font-semibold text-slate-900">${dayLabel(i)}</span><span class="report-status-badge ${statusClass}">${status}</span></div><div class="flex justify-between text-[11px] text-slate-600 mb-1"><span>${s.done}/${s.total} complete</span><span>${rate}%</span></div><div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="progress-fill h-full rounded-full ${barClass}" style="width:${rate}%"></div></div></div>`; }).join('');
+      const scores = Array.from({length:planLength()},(_,i)=>{ const dayTasks=state.plan.tasks.filter(t=>t.days[i]); const done=dayTasks.filter(t=>t.done[i]).length; const total=dayTasks.length; const date=scheduleDate(i); return { done, total, rate:total?Math.round(done/total*100):0, label:`Day ${i+1}`, shortLabel:`D${i+1}`, date:date.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})}; }); const best=scores.reduce((a,s,i)=>s.total && s.done/s.total > a.rate ? {rate:s.done/s.total,day:i+1}:a,{rate:0,day:null}); $('best-day').textContent=best.day?best.day:'—';
+      renderProgressVisuals(scores);
+      $('day-summary').innerHTML = scores.map((s,i)=>{ const rate=s.rate; const status=rate===100&&s.total?'Complete':s.done?'Active':'Pending'; const statusClass=rate===100&&s.total?'report-status-complete':s.done?'report-status-active':'report-status-pending'; const barClass=rate===100&&s.total?'report-bar-complete':s.done?'report-bar-active':'report-bar-pending'; return `<div class="report-day-card"><div class="flex items-center justify-between gap-2 text-xs mb-2"><span class="font-semibold text-slate-900">${dayLabel(i)}</span><span class="report-status-badge ${statusClass}">${status}</span></div><div class="flex justify-between text-[11px] text-slate-600 mb-1"><span>${s.done}/${s.total} complete</span><span>${rate}%</span></div><div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="progress-fill h-full rounded-full ${barClass}" style="width:${rate}%"></div></div></div>`; }).join('');
       const complete = possible > 0 && totals === possible; $('finish-note').classList.toggle('hidden',!complete); $('finish-note').textContent = complete ? '🎉 Excellent! You completed every task across this plan.' : '';
       $('day-tabs').querySelectorAll('[data-day]').forEach(b=>b.addEventListener('click',()=>{state.day=Number(b.dataset.day);render();}));
       ['planned-task-list', 'added-task-list'].forEach(listId => {
@@ -838,15 +1245,34 @@
         reader.onload = () => resolve(reader.result);
         reader.readAsDataURL(picture);
       }) : Promise.resolve(state.profile?.picture || '');
+      const cloudEmail = formData.get('email').trim();
+      const cloudPassword = formData.get('password');
+      if (firebaseConfigured && window.academyAuth) {
+        try {
+          const credential = await window.academyAuth.createUserWithEmailAndPassword(cloudEmail, cloudPassword);
+          cloudUser = credential.user;
+          cloudUserAcademyId = state.profile?.id || null;
+        } catch (error) {
+          $('profile-saved').textContent = error.code === 'auth/email-already-in-use' ? 'This email already has a cloud account. Use “I already have an Academy ID” to sign in.' : error.message;
+          $('profile-saved').classList.remove('hidden');
+          return;
+        }
+      }
       state.profile = {
-        id: state.profile?.id || `AC-${crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()}`,
-        name: formData.get('name').trim(), email: formData.get('email').trim(),
+        id: state.profile?.id || `AC-${crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()}`, 
+        fullName: formData.get('name').trim(),
+        name: formData.get('name').trim(),
+        email: formData.get('email').trim(),
         institution: formData.get('institution').trim(), department: formData.get('department').trim(),
         session: formData.get('session').trim(), year: formData.get('year'), semester: formData.get('semester'),
+        cloudEmail,
         picture: await saveProfile
       };
       localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile));
       localStorage.setItem(SESSION_KEY, JSON.stringify(state.profile));
+      cloudUserAcademyId = state.profile.id;
+      cloudSyncReady = Boolean(cloudUser);
+      scheduleCloudSave();
       renderProfile();
       render();
     });
@@ -854,7 +1280,6 @@
       $('login-form').classList.add('hidden');
       $('profile-form').classList.remove('hidden');
       $('profile-heading').textContent = 'Create your account';
-      $('profile-help').textContent = 'Add your personal and academic details to create your Academy profile.';
       $('login-status').classList.add('hidden');
     });
     $('show-login-account').addEventListener('click', () => {
@@ -866,9 +1291,29 @@
       $('login-id').focus();
     });
     $('import-login-account').addEventListener('click', () => $('account-file').click());
-    $('login-form').addEventListener('submit', e => {
+    $('login-form').addEventListener('submit', async e => {
       e.preventDefault();
       const enteredId = $('login-id').value.trim().toUpperCase();
+      const loginPassword = $('login-password').value;
+      if (firebaseConfigured && window.academyAuth && window.academyDatabase) {
+        try {
+          const cloudProfile = await findCloudAccountByAcademyId(enteredId);
+          if (!cloudProfile?.cloudEmail && !cloudProfile?.email) throw new Error('That Academy ID was not found in the cloud.');
+          const email = cloudProfile.cloudEmail || cloudProfile.email;
+          cloudUserAcademyId = enteredId;
+          await window.academyAuth.signInWithEmailAndPassword(email, loginPassword);
+          await cloudLoadPromise;
+          $('login-status').classList.add('hidden');
+          $('login-form').reset();
+          renderProfile();
+          render();
+          return;
+        } catch (error) {
+          $('login-status').textContent = error.message || 'Cloud sign-in failed.';
+          $('login-status').classList.remove('hidden');
+          return;
+        }
+      }
       const savedProfile = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
       if (savedProfile?.id === enteredId) {
         state.profile = savedProfile;
@@ -884,12 +1329,13 @@
       }
     });
 
-    $('edit-profile').addEventListener('click', () => {
-      $('profile-form').classList.remove('hidden');
-      $('profile-details').classList.add('hidden');
-      $('profile-actions').classList.add('hidden');
-      $('profile-help').textContent = 'Update your account information below, then save your changes.';
+    $('edit-profile').addEventListener('click', openEditProfileModal);
+    $('close-edit-profile').addEventListener('click', closeEditProfileModal);
+    $('cancel-edit-profile').addEventListener('click', closeEditProfileModal);
+    $('edit-profile-modal').addEventListener('click', event => {
+      if (event.target === $('edit-profile-modal')) closeEditProfileModal();
     });
+    $('edit-profile-form').addEventListener('submit', saveEditedProfile);
     $('change-picture').addEventListener('click', () => $('profile-picture-change').click());
     $('export-account').addEventListener('click', () => {
       ensurePlan();
@@ -962,6 +1408,7 @@
       state.plan = item.plan;
       localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
       localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+      scheduleCloudSave();
       state.day = 0;
       closeTrashPreview();
       render();
@@ -982,6 +1429,10 @@
     });
     function logout() {
       // Keep the profile and plan saved so the user can return with the Academy ID.
+      if (window.academyAuth && cloudUser) window.academyAuth.signOut().catch(console.error);
+      cloudUser = null;
+      cloudUserAcademyId = null;
+      cloudSyncReady = false;
       state.profile = null;
       localStorage.removeItem(SESSION_KEY);
       $('profile-form').reset();
@@ -1049,22 +1500,22 @@
     function updatePlanSchedule() {
       ensurePlan();
       const rawDuration = Number($('plan-days').value);
-      const duration = Math.min(365, Math.max(0, Number.isFinite(rawDuration) ? rawDuration : 0));
+      const duration = Math.max(0, Number.isFinite(rawDuration) ? rawDuration : 0);
       state.plan.duration = duration;
       state.plan.startDate = $('plan-start-date').value || dateValue(new Date());
       state.plan.startTime = $('plan-start-time').value || '09:00';
-      state.plan.endDate = duration ? dateValue(scheduleDate(duration - 1, state.plan)) : '';
+      state.plan.endDate = dateValue(scheduleDate(duration, state.plan));
       const length = duration;
       state.plan.notes = Array.from({length}, (_, i) => state.plan.notes?.[i] || '');
       state.plan.goals = (state.plan.goals || []).map(goal => ({...goal, done: Array.from({length}, (_, i) => Boolean(goal.done?.[i]))}));
       state.plan.tasks = (state.plan.tasks || []).map(task => ({...task, days: Array.from({length}, (_, i) => Boolean(task.days?.[i])), done: Array.from({length}, (_, i) => Boolean(task.done?.[i]))}));
       state.plan.tasks = state.plan.tasks.filter(task => task.source !== 'goal');
       state.plan.goals.forEach(goal => state.plan.tasks.unshift({id:`goal-${goal.id}`, goalId:goal.id, text:goal.text, source:'goal', days:Array(length).fill(true), done:goal.done}));
-      state.day = Math.min(state.day, length - 1);
+      state.day = length > 0 ? Math.min(state.day, length - 1) : 0;
       save();
       render();
     }
-    ['plan-start-date', 'plan-start-time', 'plan-duration'].forEach(id => {
+    ['plan-start-date', 'plan-start-time', 'plan-days'].forEach(id => {
       const field = $(id);
       if (!field) return;
       field.addEventListener('input', updatePlanSchedule);
@@ -1076,7 +1527,7 @@
       if (!chosen) return;
       const start = new Date(`${state.plan.startDate}T00:00:00`);
       const end = new Date(`${chosen}T00:00:00`);
-      const duration = Math.min(365, Math.max(0, Math.round((end - start) / 86400000) + 1));
+      const duration = Math.max(0, Math.round((end - start) / 86400000));
       state.plan.endDate = chosen;
       state.plan.duration = duration;
       $('plan-days').value = duration;
@@ -1088,30 +1539,34 @@
     $('save-day').addEventListener('click',()=>{ensurePlan();state.plan.notes[state.day]=$('day-note').value.trim();save();$('plan-status').textContent=`${dayLabel(state.day)} update saved.`;});
     $('plan-name').addEventListener('input',()=>{
       ensurePlan();
-      state.plan.title=$('plan-name').value.trim()||'My Academic Plan';
+      state.plan.title=$('plan-name').value.trim();
       save();
       renderActivePlanSelector();
       $('plan-status').textContent='Your plan is saved automatically on this device.';
     });
     $('save-plan').addEventListener('click',()=>{
       ensurePlan();
-      state.plan.title=$('plan-name').value.trim()||'My Academic Plan';
-      save();
+      const title = $('plan-name').value.trim();
+      const duration = Number($('plan-days').value);
+      if (!title || !Number.isFinite(duration) || duration < 1) {
+        $('plan-status').textContent = 'Enter a plan name and at least 1 plan day before saving.';
+        return;
+      }
+      state.plan.title = title;
+      state.plan.duration = duration;
+      save(true);
       $('plan-name').value=state.plan.title;
       $('plan-status').textContent='Your plan has been saved.';
     });
     function createNewPlan() {
-      ensurePlan();
-      save();
-              state.plan={id:crypto.randomUUID(),title:'',created:new Date().toISOString(),duration:0,startDate:dateValue(new Date()),startTime:'09:00',goals:[],tasks:[],notes:[]};
+      const now = dhakaNow();
+      state.plan={id:crypto.randomUUID(),title:DEFAULT_PLAN_TITLE,created:new Date().toISOString(),duration:DEFAULT_PLAN_DURATION,startDate:now.date,startTime:now.time,goals:[],tasks:[],notes:[]};
         $('plan-name').value = '';
         $('plan-name').placeholder = 'Type your plan name...';
         $('plan-days').min = '0';
-        $('plan-days').max = '365';
+        $('plan-days').removeAttribute('max');
         $('plan-days').value = '0';
-      state.plans.unshift(state.plan);
       state.day=0;
-      save();
       render();
       $('plan-status').textContent='A new plan is ready. Your previous plans remain saved.';
     }
@@ -1123,6 +1578,7 @@
       if (!selected) return;
       state.plan = selected;
       state.day = 0;
+      scheduleCloudSave();
       render();
       $('plan-status').textContent = 'Active plan switched.';
     });
@@ -1136,9 +1592,23 @@
     }
     $('saved-plans-toggle').addEventListener('click', () => toggleMenuPanel('saved-plans-toggle', 'saved-plans-panel'));
     $('restore-plans-toggle').addEventListener('click', () => toggleMenuPanel('restore-plans-toggle', 'restore-plans-panel'));
+    $('select-all-plans').addEventListener('change', event => {
+      $('plan-list').querySelectorAll('[data-select-plan]').forEach(input => {
+        input.checked = event.target.checked;
+        if (event.target.checked) selectedPlanIds.add(input.value); else selectedPlanIds.delete(input.value);
+      });
+      updatePlanSelectionControls();
+    });
+    $('delete-selected-plans').addEventListener('click', () => {
+      const ids = [...selectedPlanIds];
+      if (!ids.length) return;
+      movePlansToTrash(ids);
+      $('plan-status').textContent = `${ids.length} plan${ids.length === 1 ? '' : 's'} moved to Trash.`;
+    });
     $('plan-search').addEventListener('input', renderPlanList);
     const DAILY_REPORT_KEY = 'academyDailyReportSettings';
     const DEFAULT_REPORT_RECIPIENT = 'milonsarkar1231@gmail.com';
+    let dailyReportSendInFlight = false;
     function reportText() {
       ensurePlan();
       const lines = Array.from({length:planLength()}, (_, i) => `${dayLabel(i)}: ${state.plan.tasks.filter(t=>t.days[i]).map(t=>`${t.done[i]?'✓':'○'} ${t.text}${t.time ? ` · ${formatTime(t.time)}` : ''}`).join(', ') || 'No tasks'}\nNote: ${state.plan.notes[i] || 'No note'}`);
@@ -1204,6 +1674,9 @@
           sentAt: new Date().toISOString()
         };
         localStorage.setItem('academyLastReport', JSON.stringify(delivery));
+        if (cloudSyncReady && cloudUserPath()) {
+          cloudUserPath().child('lastReport').set(delivery).catch(error => console.error('Cloud report history save failed:', error));
+        }
         showReportToast(`Report sent successfully to ${recipient}`);
         return true;
       }).catch(error => {
@@ -1221,12 +1694,23 @@
     function checkDailyReport() {
       const settings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
       const now = new Date();
-      const today = dateValue(now);
-      if (!settings.enabled || now.getHours() !== 22 || now.getMinutes() !== 0 || settings.lastSent === today) return;
-      sendProgressReport('Daily report').then(sent => {
+      const today = typeof window.academyLocalDate === 'function'
+        ? window.academyLocalDate(now)
+        : dateValue(now);
+      // Check throughout the 10 PM hour so a page opened a few seconds late
+      // does not miss the scheduled send. lastSent prevents duplicate emails.
+      if (!settings.enabled || now.getHours() !== 22 || settings.lastSent === today || dailyReportSendInFlight) return;
+      dailyReportSendInFlight = true;
+      sendProgressReport('Auto-scheduled daily report').then(sent => {
         if (!sent) return;
-        settings.lastSent = today;
-        localStorage.setItem(DAILY_REPORT_KEY, JSON.stringify(settings));
+        const latestSettings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+        latestSettings.enabled = Boolean(latestSettings.enabled);
+        latestSettings.lastSent = today;
+        localStorage.setItem(DAILY_REPORT_KEY, JSON.stringify(latestSettings));
+        scheduleCloudReportSettingsSave();
+        showReportToast('Auto-scheduled daily report dispatched successfully.');
+      }).finally(() => {
+        dailyReportSendInFlight = false;
       });
     }
     $('report-recipient').value = localStorage.getItem('academyReportRecipient') || DEFAULT_REPORT_RECIPIENT;
@@ -1236,22 +1720,31 @@
     });
     $('send-report').addEventListener('click', () => sendProgressReport());
     $('auto-daily-report').addEventListener('change', event => {
-      const settings = { enabled:event.target.checked, lastSent:JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}').lastSent || '' };
-      if (event.target.checked && !isValidReportRecipient()) {
+      const previousSettings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+      const settings = {
+        enabled: Boolean(event.target.checked),
+        lastSent: previousSettings.lastSent || ''
+      };
+      if (settings.enabled && !isValidReportRecipient()) {
         showReportToast('Enter a valid recipient email address.', true);
         event.target.checked = false;
         settings.enabled = false;
       } else {
-        $('report-send-status').textContent = event.target.checked ? 'Daily report is enabled for 10:00 PM.' : 'Daily reporting is off.';
+        $('report-send-status').textContent = settings.enabled
+          ? 'Daily report is enabled for 10:00 PM.'
+          : 'Daily reporting is off.';
         $('report-send-status').className = 'text-xs font-semibold text-slate-600';
       }
       localStorage.setItem(DAILY_REPORT_KEY, JSON.stringify(settings));
-      if (event.target.checked) checkDailyReport();
+      scheduleCloudReportSettingsSave();
+      if (settings.enabled) checkDailyReport();
     });
     const dailyReportSettings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
     $('auto-daily-report').checked = Boolean(dailyReportSettings.enabled);
     $('report-send-status').textContent = dailyReportSettings.enabled ? 'Daily report is enabled for 10:00 PM.' : 'Daily reporting is off.';
-    setInterval(checkDailyReport, 30000);
+    // Keep the scheduler lightweight while checking once per minute for the
+    // 10:00 PM local-time send window.
+    setInterval(checkDailyReport, 60000);
     const menuToggle=$('menu-toggle');menuToggle.addEventListener('click',()=>{const open=menuToggle.getAttribute('aria-expanded')==='true';menuToggle.setAttribute('aria-expanded',String(!open));$('mobile-menu').classList.toggle('hidden');$('menu-icon-open').classList.toggle('hidden');$('menu-icon-close').classList.toggle('hidden');});
 
     const storageModal = $('study-storage');
@@ -1351,16 +1844,17 @@
       items.innerHTML = [...folders.map(folder => `<article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><button type="button" data-open-folder="${folder.id}" class="w-full text-left"><div class="text-2xl">▰</div><h3 class="font-semibold text-slate-800 mt-2 truncate">${escapeHtml(folder.name)}</h3><p class="text-xs text-slate-500 mt-1">Folder</p></button><div class="mt-3 flex gap-2"><button type="button" data-rename-folder="${folder.id}" class="text-xs font-semibold text-slate-600 hover:underline">Rename</button><button type="button" data-delete-folder="${folder.id}" class="text-xs font-semibold text-rust hover:underline">Delete</button></div></article>`), ...files.map(file => `<article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div class="text-2xl">▤</div><h3 class="font-semibold text-slate-800 mt-2 truncate" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</h3><p class="text-xs text-slate-500 mt-1">${escapeHtml(file.type || 'Document')} · ${(file.size / 1024).toFixed(1)} KB</p><div class="mt-3 flex gap-3"><button type="button" data-preview-file="${file.id}" class="text-xs font-semibold text-slate-700 hover:underline">Preview</button><button type="button" data-download-file="${file.id}" class="text-xs font-semibold text-slate-700 hover:underline">Download</button><button type="button" data-delete-file="${file.id}" class="text-xs font-semibold text-rust hover:underline">Delete</button></div></article>`)].join('');
       $('storage-empty')?.classList.toggle('hidden', Boolean(folders.length || files.length));
       items.querySelectorAll('[data-open-folder]').forEach(button => button.addEventListener('click', () => { storageFolderId = button.dataset.openFolder; renderStorage(); }));
-      items.querySelectorAll('[data-rename-folder]').forEach(button => button.addEventListener('click', () => { const folder = storageFolders.find(item => item.id === button.dataset.renameFolder); const name = prompt('Folder name', folder?.name || ''); if (folder && name?.trim()) { folder.name = name.trim(); storageSaveMeta(); renderStorage(); } }));
-      items.querySelectorAll('[data-delete-folder]').forEach(button => button.addEventListener('click', async () => { const id = button.dataset.deleteFolder; if (!confirm(`Delete “${storageFolderName(id)}” and everything inside it?`)) return; const ids = storageFolders.filter(folder => { let parent = folder.parentId; while (parent) { if (parent === id) return true; parent = storageFolders.find(item => item.id === parent)?.parentId; } return folder.id === id; }).map(folder => folder.id); const filesToDelete = (await storageFiles(null)).filter(file => ids.includes(file.folderId)); for (const file of filesToDelete) await storageDeleteFile(file.id); storageFolders = storageFolders.filter(folder => !ids.includes(folder.id)); storageSaveMeta(); if (ids.includes(storageFolderId)) storageFolderId = null; renderStorage(); }));
+      items.querySelectorAll('[data-rename-folder]').forEach(button => button.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); const folder = storageFolders.find(item => item.id === button.dataset.renameFolder); const name = prompt('Folder name', folder?.name || ''); if (folder && name?.trim()) { folder.name = name.trim(); storageSaveMeta(); renderStorage(); } }));
+      items.querySelectorAll('[data-delete-folder]').forEach(button => button.addEventListener('click', async event => { event.preventDefault(); event.stopPropagation(); const id = button.dataset.deleteFolder; const ids = storageFolders.filter(folder => { let parent = folder.parentId; while (parent) { if (parent === id) return true; parent = storageFolders.find(item => item.id === parent)?.parentId; } return folder.id === id; }).map(folder => folder.id); const filesToDelete = (await storageFiles(null)).filter(file => ids.includes(file.folderId)); for (const file of filesToDelete) await storageDeleteFile(file.id); storageFolders = storageFolders.filter(folder => !ids.includes(folder.id)); storageSaveMeta(); if (ids.includes(storageFolderId)) storageFolderId = null; renderStorage(); }));
       const allFiles = await storageFiles(null);
-      items.querySelectorAll('[data-preview-file], [data-download-file], [data-delete-file]').forEach(button => button.addEventListener('click', async () => { const file = allFiles.find(item => item.id === button.dataset.previewFile || item.id === button.dataset.downloadFile || item.id === button.dataset.deleteFile); if (!file) return; if (button.dataset.deleteFile) { if (confirm(`Delete “${file.name}”?`)) { await storageDeleteFile(file.id); renderStorage(); } return; } const url = URL.createObjectURL(file.blob); if (button.dataset.downloadFile) { const link = document.createElement('a'); link.href = url; link.download = file.name; link.click(); } else { window.open(url, '_blank', 'noopener'); } setTimeout(() => URL.revokeObjectURL(url), 60000); }));
+      items.querySelectorAll('[data-preview-file], [data-download-file], [data-delete-file]').forEach(button => button.addEventListener('click', async event => { event.preventDefault(); event.stopPropagation(); const file = allFiles.find(item => item.id === button.dataset.previewFile || item.id === button.dataset.downloadFile || item.id === button.dataset.deleteFile); if (!file) return; if (button.dataset.deleteFile) { await storageDeleteFile(file.id); renderStorage(); return; } const url = URL.createObjectURL(file.blob); if (button.dataset.downloadFile) { const link = document.createElement('a'); link.href = url; link.download = file.name; link.click(); } else { window.open(url, '_blank', 'noopener'); } setTimeout(() => URL.revokeObjectURL(url), 60000); }));
     }
     $('storage-new-folder')?.addEventListener('click', () => { const name = prompt('New folder name'); if (name?.trim()) { storageFolders.push({ id: crypto.randomUUID(), parentId: storageFolderId, name: name.trim(), created: new Date().toISOString() }); storageSaveMeta(); renderStorage(); } });
     $('storage-file-input')?.addEventListener('change', async event => { for (const file of [...event.target.files]) { await storagePutFile({ id: crypto.randomUUID(), folderId: storageFolderId, name: file.name, type: file.type, size: file.size, blob: file }); } event.target.value = ''; renderStorage(); });
 
     const accountMode = new URLSearchParams(window.location.search).has('account') || window.location.hash === '#profile';
     document.body.classList.toggle('public-home', !accountMode);
+    bindCloudAuth();
     renderProfile();
     render();
     renderStorage();
