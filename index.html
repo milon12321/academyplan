@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
     tailwind.config = { theme: { extend: {
       colors: {
@@ -124,13 +125,47 @@
     #study-storage .storage-modal-panel #storage-close:hover { background:#E2E8F0; }
     body.public-home #profile, body.public-home #plan-workspace, body.public-home #member-welcome { display:none !important; }
     body.logged-in #landing-hero { display:none; }
-    body.logged-in #member-welcome { display:block; }
+
+    /* Inlined from styles.css */
+    /* Keep the public landing view at the viewport height so the footer rests at the bottom. */
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body.public-home {
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.public-home main {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.public-home #landing-hero {
+      flex: 1 0 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.public-home #landing-hero > div {
+      flex: 1 0 auto;
+    }
+
+    .title {
+      color: #5C6AC4;
+    }
   </style>
 </head>
 <body class="font-sans text-ink antialiased">
   <header class="sticky top-0 z-40 bg-paper/90 backdrop-blur border-b border-line">
     <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-      <a href="index.html?account#profile" class="flex items-center gap-3" aria-label="Open study workspace">
+      <a href="index.html" class="flex items-center gap-3" aria-label="Return to public home">
         <span class="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center text-lg">▦</span>
         <span class="font-serif text-lg font-semibold leading-none text-slate-800">Study Workspace</span>
       </a>
@@ -149,22 +184,12 @@
   <main>
     <section id="landing-hero" class="grain-forest text-paper">
       <div class="max-w-6xl mx-auto px-5 sm:px-8 pt-16 pb-20 md:pt-24 md:pb-24">
-        <p class="eyebrow journal-in text-lg">A calmer way to learn English</p>
-        <h1 class="journal-in delay-1 font-serif text-4xl sm:text-5xl font-semibold mt-3 max-w-2xl leading-[1.1]">Build stronger sentences, one connector at a time.</h1>
+        <p class="eyebrow journal-in text-lg">Seek knowledge from the cradle to the grave</p>
+        <h1 class="journal-in delay-1 font-serif text-4xl sm:text-5xl font-semibold mt-3 max-w-2xl leading-[1.1]">Master your academic routine, one focused plan at a time.</h1>
         <svg class="journal-in delay-1 mt-4 w-40 h-4" viewBox="0 0 200 20" fill="none" aria-hidden="true"><path d="M2 12 Q 50 -2, 100 12 T 198 10" stroke="#E8A33D" stroke-width="3" stroke-linecap="round"/></svg>
-        <p class="journal-in delay-2 mt-5 text-paper/75 leading-relaxed max-w-xl">Explore 200 useful English sentence connectors and follow a focused seven-day plan with tasks, notes, and progress saved in your browser.</p>
-        <a href="index.html?account#profile" class="journal-in delay-2 inline-flex mt-7 bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-6 py-3 rounded-full text-sm transition-colors">Open my Academy</a>
-      </div>
-    </section>
-
-    <section id="member-welcome" class="hidden grain-forest text-paper">
-      <div class="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-14">
-        <div class="max-w-3xl mx-auto text-center">
-          <p class="eyebrow text-base">Your learning space</p>
-          <h1 id="member-welcome-heading" class="font-serif text-3xl sm:text-4xl font-semibold mt-2">Welcome back</h1>
-          <p class="mt-3 text-paper/70 leading-relaxed">Your seven-day English plan is ready. Continue with today’s tasks, notes, and progress.</p>
-          <a href="#plan-workspace" class="inline-flex mt-6 bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm transition-colors">Continue learning</a>
-        </div>
+        <p class="journal-in delay-2 mt-5 text-paper/75 leading-relaxed max-w-xl">Organize your daily study routines, track course requirements, and maintain focus with an intuitive workspace designed for rigorous academic success.</p>
+        <blockquote class="journal-in delay-2 mt-6 max-w-xl border-l-4 border-marigold pl-4 text-paper/90 leading-relaxed">“Whoever takes a path upon which he seeks knowledge, Allah will make the path to Paradise easy for him.” <cite class="block mt-2 text-sm text-paper/70 not-italic">— Sahih Muslim 2699</cite></blockquote>
+        <a href="?account#profile" class="journal-in delay-2 inline-flex mt-7 bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold px-6 py-3 rounded-full text-sm transition-colors">Enter My Workspace</a>
       </div>
     </section>
 
@@ -287,21 +312,21 @@
               <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between rounded-xl border border-[#E2E8F0] bg-white p-4 shadow-sm">
                 <div class="min-w-0 flex-1">
                   <label for="active-plan-selector" class="field-label text-slate-800">Saved Plans</label>
-                  <select id="active-plan-selector" class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white focus:border-slate-400" aria-label="Select active plan"></select>
+                  <select id="active-plan-selector" class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white focus:border-slate-400" aria-label="Select active plan"><option value="" selected>Select or create a plan...</option></select>
                 </div>
                 <button id="new-plan-top" type="button" class="w-full sm:w-auto border border-[#CBD5E1] hover:bg-slate-50 text-slate-800 font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors">New Plan</button>
               </div>
 
               <div class="mt-5">
-                <label for="plan-title" class="field-label text-slate-800">Plan name</label>
-                <input id="plan-title" type="text" class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm font-serif text-lg text-slate-800 bg-white placeholder:text-slate-400 focus:border-slate-400" placeholder="My 7-day English plan">
+                <label for="plan-name" class="field-label text-slate-800">Plan name</label>
+                <input id="plan-name" type="text" value="" placeholder="Type your plan name..." class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm font-serif text-lg text-slate-800 bg-white placeholder:text-slate-400 focus:border-slate-400">
               </div>
 
               <div class="workspace-card mt-5 p-4">
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <div><label for="plan-start-date" class="field-label text-slate-800">Start date</label><input id="plan-start-date" type="date" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
                   <div><label for="plan-start-time" class="field-label text-slate-800">Start time</label><input id="plan-start-time" type="time" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
-                  <div><label for="plan-duration" class="field-label text-slate-800">Plan days</label><input id="plan-duration" type="number" min="1" max="365" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white" placeholder="7"></div>
+                  <div>                  <label for="plan-days" class="field-label text-slate-800">Plan days</label><input id="plan-days" type="number" value="0" min="0" max="365" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white" placeholder="0"></div>
                   <div><label for="plan-end-date" class="field-label text-slate-800">End date</label><input id="plan-end-date" type="date" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
                 </div>
                 <p id="plan-schedule-summary" class="text-xs text-slate-500 mt-3">Choose a start date and duration to generate your schedule.</p>
@@ -493,12 +518,14 @@
     </div>
   </div>
 
-  <footer class="border-t border-line bg-paper py-8 text-center text-xs text-ink/60">&copy; 2026 200 English Sentence Connectors. All rights reserved.</footer>
+  <footer class="border-t border-line bg-paper py-8 text-center text-xs text-ink/60">&copy; 2026 Academic Planning Workspace. All rights reserved.</footer>
 
   <script>
     const KEY = 'academyPollPlan';
     const PLANS_KEY = 'academySavedPlans';
     const TRASH_KEY = 'academyTrashPlans';
+    const DEFAULT_PLAN_TITLE = '';
+    const DEFAULT_PLAN_DURATION = 0;
     const TRASH_RETENTION_DAYS = 3;
     const PROFILE_KEY = 'academyProfile';
     const SESSION_KEY = 'academyLoggedIn';
@@ -521,7 +548,7 @@
       localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
       localStorage.setItem(KEY, JSON.stringify(state.plan));
     };
-    const planLength = () => Math.max(1, Number(state.plan?.duration) || 7);
+    const planLength = () => Math.min(365, Math.max(0, Number.isFinite(Number(state.plan?.duration)) ? Number(state.plan.duration) : DEFAULT_PLAN_DURATION));
     const scheduleDate = (i, plan = state.plan) => {
       const start = new Date(`${plan?.startDate || new Date().toISOString().slice(0, 10)}T${plan?.startTime || '09:00'}`);
       start.setDate(start.getDate() + i);
@@ -548,7 +575,11 @@
 
     function renderActivePlanSelector() {
       const selector = $('active-plan-selector');
-      if (!selector || !state.plans.length) return;
+      if (!selector) return;
+      if (!state.plans.length) {
+        selector.innerHTML = '<option value="" selected>Select or create a plan...</option>';
+        return;
+      }
       selector.innerHTML = state.plans.map(plan => `<option value="${plan.id}">${escapeHtml(plan.title || 'Untitled plan')}</option>`).join('');
       selector.value = state.plan?.id || state.plans[0].id;
     }
@@ -561,10 +592,13 @@
         localStorage.setItem(SESSION_KEY, JSON.stringify(profile));
       }
       const hasProfile = Boolean(profile);
+      const lastVisitTimestamp = Number(localStorage.getItem('lastVisitTimestamp') || 0);
+      const isRecentVisit = hasProfile && lastVisitTimestamp > 0 && Date.now() - lastVisitTimestamp < 5400000;
+      const profileGreeting = isRecentVisit ? 'Workspace' : `Welcome back, ${profile?.name || 'Milon Sarkar'}`;
+      if (hasProfile && !isRecentVisit) localStorage.setItem('lastVisitTimestamp', String(Date.now()));
       $('plan-workspace').classList.toggle('hidden', !hasProfile);
       document.body.classList.toggle('logged-in', hasProfile && accountMode);
-      $('member-welcome-heading').textContent = hasProfile ? `Welcome back, ${profile.name}` : 'Welcome back';
-      $('login-form').classList.toggle('hidden', hasProfile);
+            $('login-form').classList.toggle('hidden', hasProfile);
       $('profile-id').classList.add('hidden');
       $('menu-profile-id').textContent = hasProfile ? profile.id : '';
       $('profile-name').value = profile?.name || '';
@@ -574,7 +608,7 @@
       $('profile-session').value = profile?.session || '';
       $('profile-year').value = profile?.year || '';
       $('profile-semester').value = profile?.semester || '';
-      $('profile-heading').textContent = hasProfile ? `Welcome back, ${profile.name}` : 'Create your account';
+      $('profile-heading').textContent = hasProfile ? profileGreeting : 'Create your account';
       $('profile-help').textContent = hasProfile ? 'Your profile is saved on this device. You can edit your details whenever you like.' : 'Add your personal and academic details to create your Academy profile.';
       const showLogin = !hasProfile && Boolean(localStorage.getItem(PROFILE_KEY));
       $('profile-form').classList.toggle('hidden', hasProfile || showLogin);
@@ -601,15 +635,16 @@
 
     function ensurePlan() {
       if (!state.plan) {
-        state.plan = { id: crypto.randomUUID(), title: 'My plan', created: new Date().toISOString(), duration: 7, startDate: dateValue(new Date()), startTime: '09:00', goals: [], tasks: [], notes: Array(7).fill('') };
+        state.plan = { id: crypto.randomUUID(), title: DEFAULT_PLAN_TITLE, created: new Date().toISOString(), duration: DEFAULT_PLAN_DURATION, startDate: dateValue(new Date()), startTime: '09:00', goals: [], tasks: [], notes: [] };
         state.plans.unshift(state.plan);
       }
       state.plan.id = state.plan.id || crypto.randomUUID();
-      state.plan.duration = Math.max(1, Number(state.plan.duration) || Math.max(7, state.plan.notes?.length || 7));
+      state.plan.title = typeof state.plan.title === 'string' ? state.plan.title : '';
+      state.plan.duration = Math.min(365, Math.max(0, Number.isFinite(Number(state.plan.duration)) ? Number(state.plan.duration) : 0));
       state.plan.startDate = state.plan.startDate || dateValue(new Date(state.plan.created || Date.now()));
       state.plan.startTime = state.plan.startTime || '09:00';
-      state.plan.endDate = state.plan.endDate || dateValue(scheduleDate(planLength() - 1, state.plan));
       const length = planLength();
+      state.plan.endDate = length ? dateValue(scheduleDate(length - 1, state.plan)) : '';
       state.plan.notes = Array.from({length}, (_, i) => state.plan.notes?.[i] || '');
       if (typeof state.plan.goals === 'string') {
         state.plan.goals = state.plan.goals.split('\n').map(text => text.trim()).filter(Boolean).map(text => ({ id: crypto.randomUUID(), text, done: Array(planLength()).fill(false) }));
@@ -669,7 +704,7 @@
       previewPlanId = id;
       $('saved-plan-preview-title').textContent = plan.title;
       $('saved-plan-preview-date').textContent = `Created ${new Date(plan.created).toLocaleDateString()} · Read-only preview`;
-      $('saved-plan-preview-content').innerHTML = Array.from({length: plan.duration || 7}, (_, day) => {
+      $('saved-plan-preview-content').innerHTML = Array.from({length: Math.min(365, Math.max(0, Number(plan.duration) || 0))}, (_, day) => {
         const tasks = (plan.tasks || []).filter(task => task.days?.[day]);
         const note = plan.notes?.[day] || '';
         return `<section class="border border-line rounded-xl p-4"><h3 class="font-serif text-lg text-forest-dark">${dayLabel(day, plan)}</h3><ul class="mt-2 space-y-1 text-sm">${tasks.length ? tasks.map(task => `<li class="flex gap-2"><span class="text-marigold-dark">${task.done?.[day] ? '✓' : '○'}</span><span>${escapeHtml(task.text)}${taskTimeMarkup(task)}</span></li>`).join('') : '<li class="text-ink/50">No tasks</li>'}</ul>${note ? `<p class="mt-3 pt-3 border-t border-line text-sm text-ink/70"><strong>Note:</strong> ${escapeHtml(note)}</p>` : ''}</section>`;
@@ -690,7 +725,7 @@
       const plan = item.plan;
       $('trash-preview-title').textContent = plan.title;
       $('trash-preview-date').textContent = `Deleted ${new Date(item.deletedAt).toLocaleDateString()} · Read-only preview`;
-      const days = Array.from({length: plan.duration || 7}, (_, day) => {
+      const days = Array.from({length: Math.min(365, Math.max(0, Number(plan.duration) || 0))}, (_, day) => {
         const tasks = (plan.tasks || []).filter(task => task.days?.[day]);
         const note = plan.notes?.[day] || '';
         return `<section class="border border-line rounded-xl p-4"><h3 class="font-serif text-lg text-forest-dark">${dayLabel(day, plan)}</h3><ul class="mt-2 space-y-1 text-sm">${tasks.length ? tasks.map(task => `<li class="flex gap-2"><span class="text-marigold-dark">${task.done?.[day] ? '✓' : '○'}</span><span>${escapeHtml(task.text)}${taskTimeMarkup(task)}</span></li>`).join('') : '<li class="text-ink/50">No tasks</li>'}</ul>${note ? `<p class="mt-3 pt-3 border-t border-line text-sm text-ink/70"><strong>Note:</strong> ${escapeHtml(note)}</p>` : ''}</section>`;
@@ -742,14 +777,17 @@
     function render() {
       ensurePlan();
       renderActivePlanSelector();
-      $('plan-title').value = state.plan.title;
+      $('plan-name').value = state.plan.title || DEFAULT_PLAN_TITLE;
+      $('plan-name').placeholder = 'Type your plan name...';
+      $('plan-days').min = '0';
+      $('plan-days').max = '365';
+      $('plan-days').value = String(planLength());
       $('plan-start-date').value = state.plan.startDate;
       $('plan-start-time').value = state.plan.startTime;
-      $('plan-duration').value = planLength();
-      const endDate = scheduleDate(planLength() - 1);
-      state.plan.endDate = state.plan.endDate || dateValue(endDate);
+      const endDate = planLength() ? scheduleDate(planLength() - 1) : null;
+      state.plan.endDate = state.plan.endDate || (endDate ? dateValue(endDate) : '');
       $('plan-end-date').value = state.plan.endDate;
-      $('plan-schedule-summary').textContent = `${planLength()} days · ${scheduleDate(0).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })} to ${scheduleDate(planLength() - 1).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })}`;
+      $('plan-schedule-summary').textContent = planLength() ? `${planLength()} days · ${scheduleDate(0).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })} to ${scheduleDate(planLength() - 1).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })}` : '0 days · No scheduled study days yet.';
       renderGoalList();
       renderPlanList();
       $('day-heading').textContent = dayLabel(state.day); $('day-note').value = state.plan.notes[state.day] || '';
@@ -981,7 +1019,7 @@
       if(!text)return;
       const planned = $('task-kind').value === 'planned';
       const days = planned ? Array.from($('planned-day-options').querySelectorAll('input:checked')).map(input => Number(input.value)) : [state.day];
-      if (planned && !days.length) return;
+      if (!planLength() || (planned && !days.length)) return;
       const assignedDays = Array(planLength()).fill(false);
       days.forEach(day => assignedDays[day] = true);
       state.plan.tasks.push({text, time:currentTimeValue(), source:planned?'planned':'added',days:assignedDays,done:Array(planLength()).fill(false)});
@@ -1010,11 +1048,12 @@
     });
     function updatePlanSchedule() {
       ensurePlan();
-      const duration = Math.min(365, Math.max(1, Number($('plan-duration').value) || 7));
+      const rawDuration = Number($('plan-days').value);
+      const duration = Math.min(365, Math.max(0, Number.isFinite(rawDuration) ? rawDuration : 0));
       state.plan.duration = duration;
       state.plan.startDate = $('plan-start-date').value || dateValue(new Date());
       state.plan.startTime = $('plan-start-time').value || '09:00';
-      state.plan.endDate = dateValue(scheduleDate(duration - 1, state.plan));
+      state.plan.endDate = duration ? dateValue(scheduleDate(duration - 1, state.plan)) : '';
       const length = duration;
       state.plan.notes = Array.from({length}, (_, i) => state.plan.notes?.[i] || '');
       state.plan.goals = (state.plan.goals || []).map(goal => ({...goal, done: Array.from({length}, (_, i) => Boolean(goal.done?.[i]))}));
@@ -1037,34 +1076,39 @@
       if (!chosen) return;
       const start = new Date(`${state.plan.startDate}T00:00:00`);
       const end = new Date(`${chosen}T00:00:00`);
-      const duration = Math.min(365, Math.max(1, Math.round((end - start) / 86400000) + 1));
+      const duration = Math.min(365, Math.max(0, Math.round((end - start) / 86400000) + 1));
       state.plan.endDate = chosen;
       state.plan.duration = duration;
-      $('plan-duration').value = duration;
+      $('plan-days').value = duration;
       updatePlanSchedule();
     });
     $('view-report').addEventListener('click', renderReport);
     $('close-report').addEventListener('click', closeReport);
     $('report-preview').addEventListener('click', event => { if (event.target === $('report-preview')) closeReport(); });
     $('save-day').addEventListener('click',()=>{ensurePlan();state.plan.notes[state.day]=$('day-note').value.trim();save();$('plan-status').textContent=`${dayLabel(state.day)} update saved.`;});
-    $('plan-title').addEventListener('input',()=>{
+    $('plan-name').addEventListener('input',()=>{
       ensurePlan();
-      state.plan.title=$('plan-title').value.trim()||'My 7-day plan';
+      state.plan.title=$('plan-name').value.trim()||'My Academic Plan';
       save();
       renderActivePlanSelector();
       $('plan-status').textContent='Your plan is saved automatically on this device.';
     });
     $('save-plan').addEventListener('click',()=>{
       ensurePlan();
-      state.plan.title=$('plan-title').value.trim()||'My 7-day plan';
+      state.plan.title=$('plan-name').value.trim()||'My Academic Plan';
       save();
-      $('plan-title').value=state.plan.title;
+      $('plan-name').value=state.plan.title;
       $('plan-status').textContent='Your plan has been saved.';
     });
     function createNewPlan() {
       ensurePlan();
       save();
-      state.plan={id:crypto.randomUUID(),title:'My plan',created:new Date().toISOString(),duration:7,startDate:dateValue(new Date()),startTime:'09:00',goals:[],tasks:[],notes:Array(7).fill('')};
+              state.plan={id:crypto.randomUUID(),title:'',created:new Date().toISOString(),duration:0,startDate:dateValue(new Date()),startTime:'09:00',goals:[],tasks:[],notes:[]};
+        $('plan-name').value = '';
+        $('plan-name').placeholder = 'Type your plan name...';
+        $('plan-days').min = '0';
+        $('plan-days').max = '365';
+        $('plan-days').value = '0';
       state.plans.unshift(state.plan);
       state.day=0;
       save();
@@ -1095,16 +1139,24 @@
     $('plan-search').addEventListener('input', renderPlanList);
     const DAILY_REPORT_KEY = 'academyDailyReportSettings';
     const DEFAULT_REPORT_RECIPIENT = 'milonsarkar1231@gmail.com';
-    const REPORT_API_URL = ''; // Set this to your EmailJS/Formspree endpoint for background delivery.
     function reportText() {
       ensurePlan();
       const lines = Array.from({length:planLength()}, (_, i) => `${dayLabel(i)}: ${state.plan.tasks.filter(t=>t.days[i]).map(t=>`${t.done[i]?'✓':'○'} ${t.text}${t.time ? ` · ${formatTime(t.time)}` : ''}`).join(', ') || 'No tasks'}\nNote: ${state.plan.notes[i] || 'No note'}`);
-      const total = state.plan.tasks.reduce((n,t)=>n+t.done.filter(Boolean).length,0);
-      const possible = state.plan.tasks.reduce((n,t)=>n+t.days.filter(Boolean).length,0);
+      const total = state.plan.tasks.reduce((n,t) => n + t.done.filter(Boolean).length, 0);
+      const possible = state.plan.tasks.reduce((n,t) => n + t.days.filter(Boolean).length, 0);
       return `Plan: ${state.plan.title}\nProgress: ${total}/${possible} tasks (${possible ? Math.round(total/possible*100) : 0}%)\n\n${lines.join('\n\n')}`;
     }
     function reportRecipient() {
       return $('report-recipient').value.trim();
+    }
+    function isValidReportRecipient() {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(reportRecipient());
+    }
+    function clearReportRecipientError() {
+      if (!isValidReportRecipient()) return;
+      const settings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
+      $('report-send-status').textContent = settings.enabled ? 'Daily report is enabled for 10:00 PM.' : 'Daily reporting is off.';
+      $('report-send-status').className = 'text-xs font-semibold text-slate-600';
     }
     function showReportToast(message, isError = false) {
       const status = $('report-send-status');
@@ -1113,35 +1165,58 @@
       status.setAttribute('role', 'status');
       status.setAttribute('aria-live', 'polite');
     }
+    const EMAILJS_PUBLIC_KEY = 'Vru1YbadW3XkDTa-U';
+    const EMAILJS_SERVICE_ID = 'service_9k0epmg';
+    const EMAILJS_TEMPLATE_ID = 'template_gp4jk7k';
+
     async function sendProgressReport(reason = 'Report sent') {
-      const recipient = reportRecipient();
-      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(recipient)) {
+      const reportEmailInput = $('report-email') || $('report-recipient');
+      const recipient = reportEmailInput?.value.trim() || '';
+      const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient);
+      if (!isValidEmail) {
         showReportToast('Enter a valid recipient email address.', true);
-        $('report-recipient').focus();
+        reportEmailInput?.focus();
         return false;
       }
-      if (!REPORT_API_URL) {
-        showReportToast('Configure REPORT_API_URL to enable background email delivery.', true);
-        return false;
-      }
-      const subject = `${state.plan?.title || 'Study plan'} — progress report`;
+
       const button = $('send-report');
-      if (button) { button.disabled = true; button.textContent = 'Sending…'; }
-      try {
-        const response = await fetch(REPORT_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ to: recipient, email: recipient, subject, message: reportText(), report: reportText(), reason })
-        });
-        if (!response.ok) throw new Error(`Email service returned ${response.status}`);
-        showReportToast(`Report successfully sent to ${recipient}!`);
-        return true;
-      } catch (error) {
-        showReportToast('The report could not be sent. Check the email service configuration.', true);
-        return false;
-      } finally {
-        if (button) { button.disabled = false; button.textContent = '✉ Send report'; }
+      const summary = reportText();
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'Sending…';
+        button.setAttribute('aria-busy', 'true');
       }
+
+      return Promise.resolve().then(() => {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+        return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          to_email: reportEmailInput.value.trim(),
+          user_name: 'Milon Sarkar',
+          report_summary: summary
+        });
+      }).then(() => {
+        // Keep a local copy of the successfully submitted report.
+        const delivery = {
+          recipient,
+          reason,
+          subject: `${state.plan?.title || 'Study plan'} — progress report`,
+          message: summary,
+          sentAt: new Date().toISOString()
+        };
+        localStorage.setItem('academyLastReport', JSON.stringify(delivery));
+        showReportToast(`Report sent successfully to ${recipient}`);
+        return true;
+      }).catch(error => {
+        console.error('EmailJS report delivery failed:', error);
+        showReportToast('The report could not be sent. Please try again.', true);
+        return false;
+      }).finally(() => {
+        if (button) {
+          button.disabled = false;
+          button.textContent = '✉ Send report';
+          button.removeAttribute('aria-busy');
+        }
+      });
     }
     function checkDailyReport() {
       const settings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
@@ -1155,12 +1230,22 @@
       });
     }
     $('report-recipient').value = localStorage.getItem('academyReportRecipient') || DEFAULT_REPORT_RECIPIENT;
-    $('report-recipient').addEventListener('input', event => localStorage.setItem('academyReportRecipient', event.target.value));
+    $('report-recipient').addEventListener('input', event => {
+      localStorage.setItem('academyReportRecipient', event.target.value);
+      clearReportRecipientError();
+    });
     $('send-report').addEventListener('click', () => sendProgressReport());
     $('auto-daily-report').addEventListener('change', event => {
       const settings = { enabled:event.target.checked, lastSent:JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}').lastSent || '' };
+      if (event.target.checked && !isValidReportRecipient()) {
+        showReportToast('Enter a valid recipient email address.', true);
+        event.target.checked = false;
+        settings.enabled = false;
+      } else {
+        $('report-send-status').textContent = event.target.checked ? 'Daily report is enabled for 10:00 PM.' : 'Daily reporting is off.';
+        $('report-send-status').className = 'text-xs font-semibold text-slate-600';
+      }
       localStorage.setItem(DAILY_REPORT_KEY, JSON.stringify(settings));
-      $('report-send-status').textContent = event.target.checked ? 'Daily report is enabled for 10:00 PM.' : 'Daily reporting is off.';
       if (event.target.checked) checkDailyReport();
     });
     const dailyReportSettings = JSON.parse(localStorage.getItem(DAILY_REPORT_KEY) || '{}');
@@ -1279,6 +1364,16 @@
     renderProfile();
     render();
     renderStorage();
+
+    // Inlined from script.js
+    function showTime() {
+	    const el = document.getElementById('currentTime');
+	    if (el) el.innerHTML = new Date().toUTCString();
+    }
+    showTime();
+    setInterval(function () {
+	    showTime();
+    }, 1000);
   </script>
 </body>
 </html>
