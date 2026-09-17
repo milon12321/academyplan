@@ -1,141 +1,256 @@
-/* Production mode: Firebase Authentication is required for account features. */
-const IS_DEV_MODE = false;
-window.IS_DEV_MODE = IS_DEV_MODE;
+/* Fixed mobile navigation drawer: it floats above the page without shifting layout. */
+#mobile-menu {
+  position: fixed;
+  top: 4.5rem;
+  right: 1rem;
+  z-index: 1000;
+  width: 260px;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 5.5rem);
+  overflow-y: auto;
+  border: 1px solid #DED5BE;
+  border-radius: 1rem;
+  box-shadow: 0 20px 45px rgba(15, 42, 32, .22);
+  transform-origin: top right;
+  transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
+}
 
-/* Keep a small local diagnostic buffer for the authorized owner view only. */
-const OWNER_ERROR_LOG_KEY = 'academyOwnerErrorLogs';
-function recordOwnerError(type, message, source = '') {
-  try {
-    const logs = JSON.parse(localStorage.getItem(OWNER_ERROR_LOG_KEY) || '[]');
-    logs.unshift({ type, message: String(message || 'Unknown error'), source: String(source || ''), timestamp: new Date().toISOString() });
-    localStorage.setItem(OWNER_ERROR_LOG_KEY, JSON.stringify(logs.slice(0, 50)));
-  } catch (_) {
-    // Diagnostics must never interrupt the application.
+/* No backdrop is used: the homepage remains visually unchanged behind the drawer. */
+#mobile-menu-backdrop {
+  display: none !important;
+}
+
+#mobile-menu.hidden {
+  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-.5rem) scale(.98);
+}
+
+#mobile-menu:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+@media (max-width: 640px) {
+  #mobile-menu {
+    top: 4.25rem;
+    right: .75rem;
+    width: 260px;
+    max-width: calc(100vw - 1.5rem);
   }
 }
-window.addEventListener('error', event => {
-  recordOwnerError('JavaScript error', event.message, `${event.filename || ''}:${event.lineno || ''}`);
-});
-window.addEventListener('unhandledrejection', event => {
-  const reason = event.reason instanceof Error ? event.reason.message : event.reason;
-  recordOwnerError('Unhandled promise rejection', reason);
-});
 
-/* Shared mobile navigation behavior for pages that load this file. */
-(function initMobileMenu() {
-  const menuToggle = document.getElementById('menu-toggle');
-  const mobileMenu = document.getElementById('mobile-menu');
-  if (!menuToggle || !mobileMenu || menuToggle.dataset.menuBound === 'true') return;
-  menuToggle.dataset.menuBound = 'true';
-
-  const closeMenu = () => {
-    if (menuToggle.getAttribute('aria-expanded') !== 'true') return;
-    menuToggle.setAttribute('aria-expanded', 'false');
-    menuToggle.setAttribute('aria-label', 'Open menu');
-    mobileMenu.classList.add('hidden');
-    // The drawer never changes body spacing, overflow, or scrollbar settings.
-  };
-  const openMenu = () => {
-    menuToggle.setAttribute('aria-expanded', 'true');
-    menuToggle.setAttribute('aria-label', 'Close menu');
-    mobileMenu.classList.remove('hidden');
-  };
-
-  menuToggle.addEventListener('click', () => {
-    if (menuToggle.getAttribute('aria-expanded') === 'true') closeMenu();
-    else openMenu();
-  });
-  document.addEventListener('click', event => {
-    if (menuToggle.getAttribute('aria-expanded') !== 'true') return;
-    if (!mobileMenu.contains(event.target) && !menuToggle.contains(event.target)) closeMenu();
-  });
-  mobileMenu.querySelectorAll('a, button').forEach(item => item.addEventListener('click', closeMenu));
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') closeMenu();
-  });
-})();
-
-/* Keep the report accordion closed initially and expose its state to assistive
-   technology while preserving native <details> keyboard behavior. */
-document.addEventListener('DOMContentLoaded', () => {
-  const overview = document.getElementById('progress-overview-panel');
-  const toggle = overview?.querySelector('summary');
-  if (!overview || !toggle) return;
-
-  overview.open = false;
-  toggle.setAttribute('aria-expanded', 'false');
-  overview.addEventListener('toggle', () => {
-    toggle.setAttribute('aria-expanded', String(overview.open));
-  });
-});
-
-function showTime() {
-  const element = document.getElementById('currentTime');
-  if (element) element.innerHTML = new Date().toUTCString();
+@media (min-width: 768px) {
+  #mobile-menu,
+  #mobile-menu-backdrop {
+    display: none !important;
+  }
 }
-showTime();
-setInterval(showTime, 1000);
 
-/* Keep the three-dot account menu as a click-controlled floating overlay. */
-document.addEventListener('DOMContentLoaded', () => {
-  const menuButton = document.getElementById('account-menu-toggle');
-  const menu = document.getElementById('account-menu');
-  const menuWrap = document.getElementById('profile-menu-wrap');
-  if (!menuButton || !menu || !menuWrap || menuButton.dataset.dotMenuBound === 'true') return;
-  menuButton.dataset.dotMenuBound = 'true';
-  menu.classList.add('hidden');
-  menuButton.setAttribute('aria-expanded', 'false');
+.title {
+  color: #5C6AC4;
+}
 
-  const closeMenu = () => {
-    menu.classList.add('hidden');
-    menuButton.setAttribute('aria-expanded', 'false');
-  };
+.site-footer {
+  border-top: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  color: #64748B;
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.6;
+}
 
-  menuButton.addEventListener('click', event => {
-    event.stopPropagation();
-    const open = menu.classList.toggle('hidden') === false;
-    menuButton.setAttribute('aria-expanded', String(open));
-  });
+.site-footer p {
+  margin: 0;
+}
 
-  menu.addEventListener('click', event => event.stopPropagation());
-  document.addEventListener('click', event => {
-    if (!menuWrap.contains(event.target)) closeMenu();
-  });
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') closeMenu();
-  });
-});
+.footer-copyright {
+  margin-bottom: 4px !important;
+}
 
-/* Shared view navigation for pages that use the drawer without stacking sections. */
-(function initWorkspaceViews() {
-  const body = document.body;
-  const drawer = document.getElementById('mobile-menu');
-  const toggle = document.getElementById('menu-toggle');
-  if (!body) return;
+.footer-separator {
+  display: inline-block;
+  margin: 0 .45rem;
+  color: #94A3B8;
+}
 
-  const closeDrawer = () => {
-    if (!drawer || !toggle) return;
-    drawer.classList.add('hidden');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-label', 'Open menu');
-  };
+.footer-contact {
+  display: inline-block;
+}
 
-  const setView = view => {
-    ['home', 'account', 'storage', 'owner'].forEach(name => body.classList.toggle(`view-${name}`, name === view));
-    body.classList.toggle('public-home', view === 'home');
-    body.classList.toggle('workspace-entry', view === 'account');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    closeDrawer();
-  };
+.footer-contact-link {
+  color: #64748B;
+  text-decoration: underline;
+  text-decoration-color: #CBD5E1;
+  text-underline-offset: 3px;
+  transition: color .2s ease, text-decoration-color .2s ease;
+}
 
-  document.getElementById('account-nav-link')?.addEventListener('click', event => {
-    event.preventDefault();
-    setView('account');
-  });
-  document.getElementById('workspace-logo')?.addEventListener('click', event => {
-    event.preventDefault();
-    setView('home');
-    history.replaceState(null, '', 'index.html');
-  });
-  document.getElementById('storage-open-mobile')?.addEventListener('click', () => setView('storage'));
-})();
+.footer-contact-link:hover,
+.footer-contact-link:focus-visible {
+  color: #1B4332;
+  text-decoration-color: #E8A33D;
+}
+
+/* Three-dot account options are a hidden floating overlay by default. */
+#account-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  min-width: 220px;
+  max-width: 280px;
+  margin-top: .5rem;
+  overflow: hidden;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+#account-menu.hidden {
+  display: none !important;
+  visibility: hidden;
+}
+
+#account-menu:not(.hidden) {
+  visibility: visible;
+}
+
+/* Owner diagnostics are a floating, owner-only modal and never affect page layout. */
+#owner-health-modal { display: none; }
+#owner-health-modal:not(.hidden) { display: block; }
+#owner-health-modal .owner-health-panel { color: #0F172A; }
+#owner-health-modal .owner-health-panel h2,
+#owner-health-modal .owner-health-panel h3,
+#owner-health-modal .owner-health-panel p,
+#owner-health-modal .owner-health-panel span,
+#owner-health-modal .owner-health-panel div,
+#owner-health-modal .owner-health-panel button { max-width: 100%; }
+
+/* Dedicated navigation views prevent homepage sections from stacking vertically. */
+body.view-account #landing-hero,
+body.view-account #study-storage,
+body.view-account #owner-dashboard,
+body.view-storage #landing-hero,
+body.view-storage #profile,
+body.view-storage #plan-workspace,
+body.view-storage #owner-dashboard,
+body.view-owner #landing-hero,
+body.view-owner #study-storage,
+body.view-owner #profile,
+body.view-owner #plan-workspace {
+  display: none !important;
+}
+
+body.view-account #profile {
+  display: block !important;
+}
+
+body.view-owner #owner-dashboard {
+  display: block !important;
+}
+
+/* Owner Dashboard is a dedicated destination, never a section below the home page. */
+body.view-owner #landing-hero,
+body.view-owner #profile,
+body.view-owner #plan-workspace,
+body.view-owner #study-storage {
+  display: none !important;
+}
+
+body.view-storage #study-storage {
+  display: block !important;
+}
+
+body.view-home #profile,
+body.view-home #study-storage {
+  display: none !important;
+}
+
+body.view-home #landing-hero {
+  display: flex !important;
+}
+
+/* The study dashboard starts as a focused single-column plan. The report is
+   opt-in so a closed overview never leaves an empty grid column. */
+.study-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.study-plan-panel {
+  min-width: 0;
+}
+
+.progress-overview-accordion {
+  min-width: 0;
+}
+
+.progress-overview-accordion > summary {
+  list-style: none;
+}
+
+.progress-overview-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.progress-overview-toggle {
+  transition: background-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.progress-overview-toggle:hover {
+  background: #F8FAFC;
+}
+
+.progress-overview-chevron {
+  transition: transform .3s ease;
+}
+
+.progress-overview-accordion[open] .progress-overview-chevron {
+  transform: rotate(180deg);
+}
+
+.progress-overview-content {
+  margin-top: .75rem;
+  animation: progressOverviewOpen .3s ease both;
+}
+
+@keyframes progressOverviewOpen {
+  from { opacity: 0; transform: translateY(-.5rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.study-dashboard-grid {
+  grid-template-columns: 1fr;
+}
+
+.progress-overview-accordion,
+.progress-overview-accordion[open] {
+  width: 100%;
+}
+
+.progress-overview-accordion[open] {
+  display: block;
+}
+
+.progress-overview-accordion[open] .progress-overview-content {
+  width: 100%;
+  height: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-overview-content,
+  .progress-overview-chevron,
+  .progress-overview-toggle {
+    animation: none;
+    transition: none;
+  }
+}
