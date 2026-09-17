@@ -8,11 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <!-- Firebase SDKs: replace the configuration values in firebaseConfig below. -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script>
     tailwind.config = { theme: { extend: {
@@ -134,6 +137,23 @@
     #profile { transition:opacity .35s ease, transform .35s ease; }
     body.logged-in #landing-hero { display:none; }
 
+    /* Menu destinations are presented as dedicated views, not stacked homepage sections. */
+    body.view-account #landing-hero,
+    body.view-account #study-storage,
+    body.view-account #owner-dashboard,
+    body.view-storage #landing-hero,
+    body.view-storage #profile,
+    body.view-storage #owner-dashboard,
+    body.view-owner #landing-hero,
+    body.view-owner #study-storage,
+    body.view-owner #profile { display:none !important; }
+    body.view-owner #owner-dashboard { display:block !important; }
+    body.view-account #profile { display:block !important; }
+    body.view-storage #study-storage { display:block !important; }
+    body.view-home #profile,
+    body.view-home #study-storage { display:none !important; }
+    body.view-home #landing-hero { display:flex !important; }
+
     /* Inlined from styles.css */
     /* Keep the public landing view at the viewport height so the footer rests at the bottom. */
     html,
@@ -207,19 +227,98 @@
     }
 
     /* Merged from styles.css */
+    #mobile-menu {
+      position: fixed;
+      top: 4.5rem;
+      right: 1rem;
+      z-index: 1000;
+      width: 260px;
+      max-width: calc(100vw - 2rem);
+      max-height: calc(100vh - 5.5rem);
+      overflow-y: auto;
+      border: 1px solid #DED5BE;
+      border-radius: 1rem;
+      box-shadow: 0 20px 45px rgba(15,42,32,.22);
+      transform-origin: top right;
+      transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
+    }
+
+    /* No backdrop is used: the homepage remains visually unchanged behind the drawer. */
+    #mobile-menu-backdrop { display: none !important; }
+
+    #mobile-menu.hidden {
+      display: block !important;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-.5rem) scale(.98);
+    }
+
+    #mobile-menu:not(.hidden) {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    @media (max-width:640px) {
+      #mobile-menu { top: 4.25rem; right: .75rem; width: 260px; max-width: calc(100vw - 1.5rem); }
+    }
+    @media (min-width:768px) {
+      #mobile-menu, #mobile-menu-backdrop { display:none !important; }
+    }
+
+    /* Focused single-column dashboard with an opt-in progress overview. */
+    .study-dashboard-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:1.5rem; align-items:stretch; }
+    .study-plan-panel, .progress-overview-accordion { min-width:0; }
+    .progress-overview-accordion > summary { list-style:none; }
+    .progress-overview-accordion > summary::-webkit-details-marker { display:none; }
+    .progress-overview-toggle { transition:background-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+    .progress-overview-toggle:hover { background:#F8FAFC; }
+    .progress-overview-chevron { transition:transform .3s ease; }
+    .progress-overview-accordion[open] .progress-overview-chevron { transform:rotate(180deg); }
+    .progress-overview-content { margin-top:.75rem; animation:progressOverviewOpen .3s ease both; }
+    @keyframes progressOverviewOpen { from { opacity:0; transform:translateY(-.5rem); } to { opacity:1; transform:translateY(0); } }
+    @media (min-width:1024px) {
+      .study-dashboard-grid:has(.progress-overview-accordion[open]) { grid-template-columns:minmax(0,1.2fr) minmax(18rem,.8fr); align-items:stretch; }
+      .progress-overview-accordion[open] { display:flex; flex-direction:column; }
+      .progress-overview-accordion[open] .progress-overview-content { height:100%; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      .progress-overview-content, .progress-overview-chevron, .progress-overview-toggle { animation:none; transition:none; }
+    }
+
     #account-menu {
       position: absolute;
+      top: 100%;
       right: 0;
-      z-index: 50;
+      z-index: 1000;
       display: flex;
       flex-direction: column;
       width: max-content;
       min-width: 220px;
       max-width: 280px;
+      margin-top: .5rem;
       overflow: hidden;
       box-sizing: border-box;
       white-space: nowrap;
     }
+
+    /* Floating account options remain hidden until the three-dot button opens them. */
+    #account-menu.hidden {
+      display: none !important;
+      visibility: hidden;
+    }
+
+    #account-menu:not(.hidden) {
+      visibility: visible;
+    }
+
+    /* Owner diagnostics modal stays owner-only and does not affect page layout. */
+    #owner-health-modal { display:none; }
+    #owner-health-modal:not(.hidden) { display:block; }
+    #owner-health-modal .owner-health-panel { color:#0F172A; }
+
+    .google-mark { display:inline-grid; place-items:center; width:1.35rem; height:1.35rem; border-radius:50%; color:#4285F4; font-weight:800; font-family:Arial,sans-serif; }
 
     #account-menu button,
     #account-menu li {
@@ -248,22 +347,23 @@
 <body class="font-sans text-ink antialiased">
   <header class="sticky top-0 z-40 bg-paper/90 backdrop-blur border-b border-line">
     <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3" aria-label="Return to public home">
+      <a href="index.html" id="workspace-logo" class="flex items-center gap-3" aria-label="Return to public home">
         <span class="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center text-lg">▦</span>
         <span class="font-serif text-lg font-semibold leading-none text-slate-800">Study Workspace</span>
       </a>
-      <div class="flex items-center gap-3 text-sm">
-        <button id="storage-open" type="button" class="rounded-full border border-slate-300 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100" aria-haspopup="dialog" aria-controls="study-storage" aria-expanded="false">📁 Study Storage</button>
-        <a href="index.html?account#profile" class="rounded-full border border-slate-300 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-100">Account</a>
-      </div>
       <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" class="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-line">
         <svg id="menu-icon-open" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
         <svg id="menu-icon-close" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
-    <div id="mobile-menu" class="hidden md:hidden border-t border-line bg-paper px-5 py-4 space-y-3"><button id="storage-open-mobile" type="button" class="block text-left text-sm py-1 font-semibold">📁 Study Storage</button><a href="index.html?account#profile" class="block text-sm py-1">Account</a><button id="mobile-logout" type="button" class="hidden text-left text-sm py-1 text-rust font-semibold">Log out</button></div>
+    <div id="mobile-menu" class="hidden md:hidden border-t border-line bg-paper px-5 py-4 space-y-3" aria-label="Main navigation">
+      <button id="storage-open-mobile" type="button" class="block w-full text-left text-sm py-1 font-semibold">📁 Study Storage</button>
+      <a id="account-nav-link" href="#profile" class="block text-sm py-1">Account</a>
+      <button id="owner-nav-link" type="button" class="hidden block w-full text-left text-sm py-1 font-semibold">Owner Dashboard</button>
+      <button id="privacy-open" type="button" class="block w-full text-left text-sm py-1">Privacy Notice</button>
+      <button id="mobile-logout" type="button" class="hidden w-full text-left text-sm py-1 text-rust font-semibold">Log out</button>
+    </div>
   </header>
-
   <main>
     <section id="landing-hero" class="grain-forest text-paper">
       <div class="max-w-6xl mx-auto px-5 sm:px-8 pt-16 pb-20 md:pt-24 md:pb-24">
@@ -303,6 +403,46 @@
       </div>
     </section>
 
+
+    <section id="owner-dashboard" class="hidden bg-slate-50 py-10 md:py-12" aria-labelledby="owner-dashboard-title">
+      <div class="max-w-6xl mx-auto px-5 sm:px-8">
+        <div class="workspace-card p-5 sm:p-7">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="eyebrow-dark text-base">Restricted administration</p>
+              <h2 id="owner-dashboard-title" class="workspace-heading font-serif text-3xl mt-0.5">Owner Dashboard</h2>
+              <p class="mt-2 text-sm text-slate-600 max-w-2xl">View only website data that users submitted and consented to share. Passwords, private Gmail content, and unrelated activity are never available here.</p>
+            </div>
+            <span id="owner-access-badge" class="hidden rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Authorized</span>
+          </div>
+          <div id="owner-dashboard-status" class="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600" role="status" aria-live="polite">Checking administrator access…</div>
+          <div id="owner-dashboard-content" class="hidden mt-5">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <label class="flex-1"><span class="field-label text-slate-800">Search users</span><input id="owner-user-search" type="search" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm" placeholder="Search by name or email"></label>
+              <button id="owner-refresh-users" type="button" class="rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-900">Refresh</button>
+            </div>
+            <div id="owner-user-list" class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
+            <div class="mt-4 flex items-center justify-between"><button id="owner-previous-page" type="button" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">Previous</button><span id="owner-page-label" class="text-xs text-slate-500"></span><button id="owner-next-page" type="button" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">Next</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="owner-health-modal" class="hidden fixed inset-0 z-[70] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="owner-health-title">
+      <div class="min-h-full flex items-center justify-center">
+        <div class="owner-health-panel w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
+          <div class="flex items-start justify-between gap-4">
+            <div><p class="eyebrow-dark text-base">Restricted diagnostics</p><h2 id="owner-health-title" class="font-serif text-2xl text-forest-dark mt-0.5">Owner System Health</h2></div>
+            <button id="owner-health-close" type="button" aria-label="Close system health" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
+          </div>
+          <div id="owner-health-status" class="mt-5 rounded-xl border border-line bg-white p-4 text-sm" role="status" aria-live="polite">Checking Firebase connection…</div>
+          <div class="mt-5 flex items-center justify-between gap-3"><h3 class="font-serif text-xl text-forest-dark">Recent error logs</h3><button id="owner-clear-logs" type="button" class="rounded-lg border border-rust px-3 py-2 text-xs font-semibold text-rust hover:bg-rust/5">Clear logs</button></div>
+          <div id="owner-error-log-list" class="mt-3 space-y-2"></div>
+          <p id="owner-error-log-empty" class="hidden mt-3 rounded-xl border border-dashed border-line p-5 text-center text-sm text-ink/60">No client-side errors have been recorded on this device.</p>
+        </div>
+      </div>
+    </div>
+
     <section id="profile" class="bg-paper py-10 md:py-12">
       <div class="max-w-6xl mx-auto px-5 sm:px-8">
         <div id="account-card" class="max-w-2xl mx-auto bg-white rounded-2xl border border-line shadow-sm p-5 sm:p-7">
@@ -319,7 +459,7 @@
               <button id="account-menu-toggle" type="button" aria-label="Open profile options" aria-expanded="false" aria-controls="account-menu" class="w-9 h-9 rounded-full border border-line flex items-center justify-center text-lg hover:bg-forest/5">⋯</button>
               <div id="account-menu" class="hidden absolute right-0 top-11 z-50 origin-top-right bg-white border border-line rounded-xl shadow-lg p-2">
                 <div class="border-b border-line px-3 py-2 mb-1">
-                  <div class="text-xs text-ink/55">Academy ID</div>
+                  <div class="text-xs text-ink/55">Google account UID</div>
                   <div id="menu-profile-id" class="font-mono text-sm font-semibold text-forest-dark mt-0.5"></div>
                 </div>
                 <button id="edit-profile" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Edit profile</button>
@@ -367,30 +507,25 @@
           </div>
 
           <form id="login-form" class="hidden mt-6 space-y-3">
-            <p class="text-sm text-ink/70 leading-relaxed">Your Academy ID identifies your account, but this website currently saves account data in this browser only. To move your profile and plans to another browser, import the backup file you downloaded there.</p>
-            <div><label for="login-id" class="field-label">Academy ID</label><input id="login-id" name="id" type="text" autocomplete="username" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm uppercase" placeholder="Example: AC-1234ABCD"></div>
-            <div><label for="login-password" class="field-label">Cloud password</label><input id="login-password" name="password" type="password" autocomplete="current-password" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your cloud password"><button id="open-recovery" type="button" class="mt-1 text-xs text-forest font-semibold underline underline-offset-2">Forgot Academy ID or Password?</button></div>
-            <button type="submit" class="w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Open my Academy plan</button>
+            <p class="text-sm text-ink/70 leading-relaxed">Sign in securely with your Google account. Your study plans are saved to your authenticated Google account and can be completed with the academic details below.</p>
+            <button id="google-login" type="button" class="google-sign-in w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-800 font-semibold py-3 rounded-full text-sm shadow-sm hover:bg-slate-50 transition-colors"><span class="google-mark" aria-hidden="true">G</span> Sign in with Google</button>
             <button id="import-login-account" type="button" class="w-full border border-forest text-forest-dark font-semibold py-3 rounded-full text-sm hover:bg-forest/5 transition-colors">Import account backup</button>
-            <p class="text-xs text-ink/55 leading-relaxed">On your old browser: open your profile menu → <strong>Export account data</strong>. Then bring that downloaded JSON file to this browser and import it here.</p>
             <p id="login-status" class="hidden text-sm text-rust font-semibold" role="status" aria-live="polite"></p>
-            <button id="show-create-account" type="button" class="text-sm text-forest font-semibold underline underline-offset-2">I don't have an Academy ID — create an account</button>
-            <p class="text-center text-sm text-ink/60">New here? <button id="show-signup-account" type="button" class="text-forest font-semibold underline underline-offset-2">Sign up</button></p>
+            <p class="text-center text-sm text-ink/60">Use your Google account to access your workspace.</p>
           </form>
 
           <form id="profile-form" class="mt-6 grid sm:grid-cols-2 gap-3">
             <div><label for="profile-name" class="field-label">Full name</label><input id="profile-name" name="name" type="text" autocomplete="name" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your full name"></div>
             <div><label for="profile-email" class="field-label">Email address <span class="font-normal text-ink/50">(optional)</span></label><input id="profile-email" name="email" type="email" autocomplete="email" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
-            <div><label for="profile-password" class="field-label">Cloud password</label><input id="profile-password" name="password" type="password" autocomplete="new-password" minlength="6" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="At least 6 characters"></div>
             <div><label for="profile-institution" class="field-label">Institution / university</label><input id="profile-institution" name="institution" type="text" autocomplete="organization" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your institution or university"></div>
             <div><label for="profile-department" class="field-label">Department</label><input id="profile-department" name="department" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your department"></div>
             <div><label for="profile-session" class="field-label">Session</label><input id="profile-session" name="session" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="2024–2025"></div>
             <div><label for="profile-year" class="field-label">Year</label><select id="profile-year" name="year" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select year</option><option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option><option>Graduate</option></select></div>
             <div><label for="profile-semester" class="field-label">Semester</label><select id="profile-semester" name="semester" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select semester</option><option>1st semester</option><option>2nd semester</option><option>3rd semester</option><option>4th semester</option><option>5th semester</option><option>6th semester</option><option>7th semester</option><option>8th semester</option></select></div>
             <div class="sm:col-span-2"><label for="profile-picture" class="field-label">Profile picture (optional)</label><input id="profile-picture" name="picture" type="file" accept="image/*" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-paper"></div>
-            <button type="submit" class="bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Save account</button>
-            <button id="show-login-account" type="button" class="sm:col-span-2 text-sm text-forest font-semibold underline underline-offset-2">I already have an Academy ID</button>
-            <p class="sm:col-span-2 text-center text-sm text-ink/60">Already registered? <button id="show-signin-account" type="button" class="text-forest font-semibold underline underline-offset-2">Sign in</button></p>
+            <button id="google-signup" type="button" class="sm:col-span-2 google-sign-in w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-800 font-semibold py-3 rounded-full text-sm shadow-sm hover:bg-slate-50 transition-colors"><span class="google-mark" aria-hidden="true">G</span> Continue with Google</button>
+            <button type="submit" class="sm:col-span-2 bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Save academic profile</button>
+            <p class="sm:col-span-2 text-center text-sm text-ink/60">Your Google account identifies your workspace; no separate password is required.</p>
           </form>
 
           <div class="profile-section-divider" aria-hidden="true"></div>
@@ -415,7 +550,6 @@
           <form id="edit-profile-form" class="mt-5 grid sm:grid-cols-2 gap-3">
             <div><label for="edit-profile-name" class="field-label">Full name</label><input id="edit-profile-name" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
             <div><label for="edit-profile-email" class="field-label">Email address</label><input id="edit-profile-email" type="email" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
-            <div><label for="edit-profile-academy-id" class="field-label">Academy ID</label><input id="edit-profile-academy-id" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm uppercase" placeholder="AC-1234ABCD"></div>
             <div><label for="edit-profile-institution" class="field-label">University</label><input id="edit-profile-institution" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
             <div><label for="edit-profile-department" class="field-label">Department</label><input id="edit-profile-department" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
             <div><label for="edit-profile-session" class="field-label">Session</label><input id="edit-profile-session" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
@@ -483,8 +617,8 @@
 
       <section id="daily-checklist-section" class="py-4 md:py-8">
       <div class="max-w-6xl mx-auto px-5 sm:px-8">
-        <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-6 items-start">
-          <div class="workspace-card p-5 sm:p-7">
+        <div class="study-dashboard-grid">
+          <div class="workspace-card study-plan-panel p-5 sm:p-7">
             <div class="flex items-center justify-between gap-3">
               <div>
                 <p class="eyebrow-dark text-base">Daily checklist</p>
@@ -546,7 +680,17 @@
             <label for="day-note" class="field-label mt-6">Today's note</label><textarea id="day-note" rows="3" class="w-full px-4 py-3 border border-line rounded-xl text-sm resize-y" placeholder="What did you learn, finish, or discover today?"></textarea><button id="save-day" type="button" class="mt-3 w-full bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold py-3 rounded-full text-sm transition-colors">Save today's update</button>
           </div>
 
-          <aside class="workspace-card results-card p-5 sm:p-7">
+          <details id="progress-overview-panel" class="progress-overview-accordion">
+            <summary class="workspace-card progress-overview-toggle list-none cursor-pointer p-4 sm:p-5" aria-label="View Progress Overview">
+              <span class="flex items-center justify-between gap-3">
+                <span>
+                  <span class="eyebrow text-base">Your results</span>
+                  <span class="workspace-heading block font-serif text-2xl mt-0.5">📊 View Progress Overview</span>
+                </span>
+                <span class="progress-overview-chevron text-slate-500" aria-hidden="true">⌄</span>
+              </span>
+            </summary>
+            <aside class="workspace-card results-card progress-overview-content p-5 sm:p-7">
             <div class="flex items-center justify-between gap-3">
               <div>
                 <p class="eyebrow text-base">Your results</p>
@@ -606,18 +750,39 @@
             </section>
             <div id="global-goals-preview" class="hidden mt-6 rounded-xl bg-slate-50 border border-[#E2E8F0] p-4 text-sm text-slate-700 whitespace-pre-wrap"></div>
             <p id="finish-note" class="hidden mt-5 rounded-xl bg-slate-100 text-slate-800 p-3 text-sm font-semibold"></p>
-          </aside>
+            </aside>
+          </details>
         </div>
       </div>
       </section>
     </div>
   </main>
 
+  <div id="privacy-modal" class="hidden fixed inset-0 z-[60] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
+    <div class="min-h-full flex items-center justify-center">
+      <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="eyebrow-dark text-base">Privacy & transparency</p>
+            <h2 id="privacy-modal-title" class="font-serif text-2xl text-forest-dark mt-0.5">Privacy Notice</h2>
+          </div>
+          <button id="privacy-close" type="button" aria-label="Close Privacy Notice" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
+        </div>
+        <div class="mt-4 space-y-3 text-sm leading-relaxed text-slate-700">
+          <p>We collect only information you submit to this website or that is needed to operate your account, such as your Firebase user ID, display name, email address when provided, account timestamps, study-plan metadata, and your study content.</p>
+          <p>An authorized owner may access this website data only to operate, support, secure, and improve the service. Administrative access is restricted by Firebase authentication and server-side administrator authorization. Access may be recorded in an audit log.</p>
+          <p>The owner cannot see your Gmail password, private Gmail contents, Google Drive files, private activity outside this website, or data you did not submit here. Data is retained while needed to provide the service and may be deleted on a valid request, subject to legal or security retention requirements.</p>
+          <p>Google sign-in does not share your password with this site. For export, deletion, or privacy questions, contact the site owner at <a class="font-semibold underline" href="mailto:milonsarkar1231@gmail.com">milonsarkar1231@gmail.com</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="recovery-modal" class="hidden fixed inset-0 z-[70] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="recovery-title">
     <div class="min-h-full flex items-center justify-center">
       <div class="w-full max-w-md bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
         <div class="flex items-start justify-between gap-4">
-          <div><p class="eyebrow-dark text-base">Account recovery</p><h2 id="recovery-title" class="font-serif text-2xl text-forest-dark mt-0.5">Forgot your Academy ID or password?</h2></div>
+          <div><p class="eyebrow-dark text-base">Account recovery</p><h2 id="recovery-title" class="font-serif text-2xl text-forest-dark mt-0.5">Forgot your Google account or password?</h2></div>
           <button id="close-recovery" type="button" aria-label="Close account recovery" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
         </div>
         <p class="mt-4 text-sm text-ink/70 leading-relaxed">Enter the email linked to your account. Recovery is handled locally in this browser; no email will be sent.</p>
@@ -627,7 +792,7 @@
           <p id="recovery-status" class="hidden text-sm font-semibold" role="status" aria-live="polite"></p>
           <div id="recovery-reset-panel" class="hidden rounded-xl border border-line bg-white p-4 space-y-3">
             <p class="text-sm font-semibold text-forest-dark">Account found!</p>
-            <p class="text-sm text-ink/70">Academy ID: <strong id="recovery-academy-id" class="text-forest-dark"></strong></p>
+            <p class="text-sm text-ink/70">Google account: <strong id="recovery-academy-id" class="text-forest-dark"></strong></p>
             <p class="text-sm font-semibold text-forest-dark">Reset your password below:</p>
             <div><label for="recovery-new-password" class="field-label">New cloud password</label><input id="recovery-new-password" type="password" minlength="6" autocomplete="new-password" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="At least 6 characters"></div>
             <button id="save-recovery-password" type="button" class="w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm">Save New Password</button>
@@ -689,7 +854,11 @@
     </div>
   </div>
 
-  <footer class="border-t border-line bg-paper py-8 text-center text-xs text-ink/60">&copy; 2026 Academic Planning Workspace. All rights reserved.</footer>
+  <footer class="site-footer" aria-label="Website footer">
+    <p class="footer-copyright">&copy; 2026 Academic Planning Workspace. All rights reserved.</p>
+    <span class="footer-separator" aria-hidden="true">•</span>
+    <p class="footer-contact">Contact Owner: <a class="footer-contact-link" href="mailto:milonsarkar1231@gmail.com">milonsarkar1231@gmail.com</a></p>
+  </footer>
 
   <script>
     // Merged helper logic from script.js. Defined before the application bootstrap
@@ -772,6 +941,15 @@
 
     const KEY = 'academyPollPlan';
     const PLANS_KEY = 'academySavedPlans';
+    // Production accounts are provided only by Firebase Authentication.
+    window.IS_DEV_MODE = false;
+
+    // Optional convenience allowlist for showing the owner entry after verified sign-in.
+    // This is not a security boundary; the trusted OWNER_API_ENDPOINT must still
+    // verify an admin custom claim or server-side allowlist before returning data.
+    // Convenience navigation allowlist. The backend must still verify the
+    // Firebase admin claim before exposing any user data.
+    window.OWNER_ADMIN_EMAIL = window.OWNER_ADMIN_EMAIL || 'milonsarkar1231@gmail.com';
 
     // Firebase cloud sync. Add your Firebase project's web configuration here.
     const firebaseConfig = {
@@ -806,8 +984,8 @@
     }
     function cloudUserPath() {
       if (!cloudUser || !window.academyDatabase) return null;
-      const academyId = state.profile?.id || cloudUser.academyId || cloudUser.uid;
-      return window.academyDatabase.ref(`users/${academyId}`);
+      // Firebase UID is the canonical account key; Google profile data is not.
+      return window.academyDatabase.ref(`users/${cloudUser.uid}`);
     }
     function cloudSnapshot() {
       const reportSettings = typeof DAILY_REPORT_KEY === 'string'
@@ -837,7 +1015,6 @@
       if (!state.profile) return;
       $('edit-profile-name').value = state.profile.fullName || state.profile.name || '';
       $('edit-profile-email').value = state.profile.email || state.profile.cloudEmail || '';
-      $('edit-profile-academy-id').value = state.profile.id || '';
       $('edit-profile-institution').value = state.profile.institution || '';
       $('edit-profile-department').value = state.profile.department || '';
       $('edit-profile-session').value = state.profile.session || '';
@@ -858,41 +1035,17 @@
     async function saveEditedProfile(event) {
       event.preventDefault();
       if (!state.profile) return;
-      const oldId = state.profile.id.toUpperCase();
-      const newId = normalizeAcademyId($('edit-profile-academy-id').value);
-      if (!/^AC-[A-Z0-9_-]{4,40}$/.test(newId)) {
-        showEditProfileStatus('Use an Academy ID starting with AC- and containing 4–40 letters, numbers, underscores, or hyphens.', true);
-        return;
-      }
       const editedName = $('edit-profile-name').value.trim();
       const editedEmail = $('edit-profile-email').value.trim();
-      const profile = { ...state.profile, id: newId, fullName: editedName, name: editedName, email: editedEmail, cloudEmail: state.profile.cloudEmail || editedEmail, institution: $('edit-profile-institution').value.trim(), department: $('edit-profile-department').value.trim(), session: $('edit-profile-session').value.trim(), year: $('edit-profile-year').value, semester: $('edit-profile-semester').value };
-      if (newId !== oldId && (!window.academyDatabase || !cloudUser)) {
-        showEditProfileStatus('Please sign in to Firebase before changing your Academy ID.', true);
-        return;
-      }
+      const profile = { ...state.profile, id: cloudUser?.uid || state.profile.id, uid: cloudUser?.uid || state.profile.uid, fullName: editedName, name: editedName, email: editedEmail, cloudEmail: state.profile.cloudEmail || editedEmail, institution: $('edit-profile-institution').value.trim(), department: $('edit-profile-department').value.trim(), session: $('edit-profile-session').value.trim(), year: $('edit-profile-year').value, semester: $('edit-profile-semester').value };
       try {
-        if (newId !== oldId) {
-          const oldRef = window.academyDatabase.ref(`users/${oldId}`);
-          const newRef = window.academyDatabase.ref(`users/${newId}`);
-          const existing = await newRef.once('value');
-          if (existing.exists()) {
-            showEditProfileStatus('That Academy ID is already in use. Choose another ID.', true);
-            return;
-          }
-          await newRef.set({ ...cloudSnapshot(), profile, activePlanId: state.plan?.id || null });
-          await oldRef.remove();
-          cloudUserAcademyId = newId;
-        } else {
-          state.profile = profile;
-          scheduleCloudSave();
-        }
         state.profile = profile;
+        scheduleCloudSave();
         localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
         localStorage.setItem(SESSION_KEY, JSON.stringify(profile));
         renderProfile();
         closeEditProfileModal();
-        $('profile-saved').textContent = 'Your profile and Academy ID were updated successfully.';
+        $('profile-saved').textContent = 'Your profile and Google account were updated successfully.';
         $('profile-saved').classList.remove('hidden');
       } catch (error) {
         console.error('Profile update failed:', error);
@@ -912,7 +1065,7 @@
     }
     async function loadCloudAccount(user) {
       if (!window.academyDatabase) return;
-      const academyId = cloudUserAcademyId || user.academyId || state.profile?.id || user.uid;
+      const academyId = user.uid;
       const snapshot = await window.academyDatabase.ref(`users/${academyId}`).once('value');
       const cloud = snapshot.val();
       if (Array.isArray(cloud?.plans) && cloud.plans.length) {
@@ -925,7 +1078,10 @@
         scheduleCloudSave();
       }
       if (Array.isArray(cloud?.trash)) state.trash = cloud.trash;
-      if (cloud?.profile) state.profile = cloud.profile;
+      if (cloud?.profile) state.profile = { ...cloud.profile, uid: user.uid, id: user.uid };
+      else if (!state.profile || state.profile.uid !== user.uid) {
+        state.profile = { uid: user.uid, id: user.uid, fullName: user.displayName || '', name: user.displayName || '', email: user.email || '', cloudEmail: user.email || '', picture: user.photoURL || '' };
+      }
       if (cloud?.reportSettings && typeof DAILY_REPORT_KEY === 'string') {
         localStorage.setItem(DAILY_REPORT_KEY, JSON.stringify(cloud.reportSettings));
         const reportToggle = $('auto-daily-report');
@@ -942,10 +1098,20 @@
       if (state.profile) render();
     }
     function bindCloudAuth() {
-      if (!window.academyAuth) return;
+      if (window.IS_DEV_MODE || !window.academyAuth) return;
       window.academyAuth.onAuthStateChanged(async user => {
         cloudUser = user;
+        cloudUserAcademyId = user?.uid || null;
         cloudSyncReady = false;
+        if (user) {
+          try {
+            const tokenResult = await user.getIdTokenResult(true);
+            cloudUser.isOwner = tokenResult.claims.admin === true || tokenResult.claims.owner === true;
+          } catch (error) {
+            cloudUser.isOwner = false;
+            console.warn('Administrator claim could not be read:', error);
+          }
+        }
         if (!user) {
           cloudUserAcademyId = null;
           return;
@@ -994,6 +1160,18 @@
       localStorage.setItem(KEY, JSON.stringify(state.plan));
     }
     const $ = id => document.getElementById(id);
+    // Hash passwords with SHA-256 before they ever touch localStorage or the
+    // cloud database. Plain-text passwords were previously stored directly on
+    // the profile object (and synced to Firebase), which is unsafe even for a
+    // hobby project. Firebase Authentication still handles real credential
+    // verification for cloud accounts; this hash is only used to verify the
+    // password locally when Firebase isn't configured.
+    async     function hashSecret(value) {
+      const bytes = new TextEncoder().encode(String(value ?? ''));
+      const digest = await crypto.subtle.digest('SHA-256', bytes);
+      return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
     const save = (forceAdd = false) => {
       if (!state.plan) return false;
       const index = state.plans.findIndex(plan => plan.id === state.plan.id);
@@ -1046,12 +1224,22 @@
 
     function renderProfile() {
       const profile = state.profile;
-      if (profile && !profile.id) {
-        profile.id = `AC-${crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()}`;
+      if (profile && !profile.id && cloudUser) {
+        profile.id = cloudUser.uid;
+        profile.uid = cloudUser.uid;
         localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
         localStorage.setItem(SESSION_KEY, JSON.stringify(profile));
       }
-      const hasProfile = Boolean(profile);
+      const hasProfile = Boolean(profile && cloudUser && profile.uid === cloudUser.uid);
+      const ownerLink = $('owner-nav-link');
+      const configuredOwnerEmail = String(window.OWNER_ADMIN_EMAIL || '').trim().toLowerCase();
+      // Showing the entry is only a navigation convenience. The owner API must
+      // independently verify the Firebase token and administrator authorization.
+      const canShowOwner = Boolean(cloudUser && (
+        cloudUser.isOwner === true ||
+        (configuredOwnerEmail && String(cloudUser.email || '').toLowerCase() === configuredOwnerEmail)
+      ));
+      ownerLink?.classList.toggle('hidden', !canShowOwner);
       const lastVisitTimestamp = Number(localStorage.getItem('lastVisitTimestamp') || 0);
       const isRecentVisit = hasProfile && lastVisitTimestamp > 0 && Date.now() - lastVisitTimestamp < 5400000;
       const profileGreeting = 'Student Profile';
@@ -1061,16 +1249,16 @@
             $('login-form').classList.toggle('hidden', hasProfile);
       $('profile-id').classList.add('hidden');
       $('menu-profile-id').textContent = hasProfile ? profile.id : '';
-      $('profile-name').value = profile?.fullName || profile?.name || '';
-      $('profile-email').value = profile?.email || profile?.cloudEmail || '';
+      $('profile-name').value = profile?.fullName || profile?.name || cloudUser?.displayName || '';
+      $('profile-email').value = profile?.email || profile?.cloudEmail || cloudUser?.email || '';
       if (typeof updateProfileDisplay === 'function') updateProfileDisplay(profile);
       $('profile-institution').value = profile?.institution || '';
       $('profile-department').value = profile?.department || '';
       $('profile-session').value = profile?.session || '';
       $('profile-year').value = profile?.year || '';
       $('profile-semester').value = profile?.semester || '';
-      $('profile-heading').textContent = hasProfile ? profileGreeting : 'Create your account';
-      const showLogin = !hasProfile && Boolean(localStorage.getItem(PROFILE_KEY));
+      $('profile-heading').textContent = hasProfile ? profileGreeting : (cloudUser ? 'Complete your academic profile' : 'Sign in to your workspace');
+      const showLogin = !hasProfile && !cloudUser;
       $('profile-form').classList.toggle('hidden', hasProfile || showLogin);
       $('login-form').classList.toggle('hidden', hasProfile || !showLogin);
       $('profile-details').classList.toggle('hidden', !hasProfile);
@@ -1406,29 +1594,21 @@
         reader.onload = () => resolve(reader.result);
         reader.readAsDataURL(picture);
       }) : Promise.resolve(state.profile?.picture || '');
-      const cloudEmail = formData.get('email').trim();
-      const cloudPassword = formData.get('password');
-      if (firebaseConfigured && window.academyAuth && cloudEmail) {
-        try {
-          const credential = await window.academyAuth.createUserWithEmailAndPassword(cloudEmail, cloudPassword);
-          cloudUser = credential.user;
-          cloudUserAcademyId = state.profile?.id || null;
-        } catch (error) {
-          $('profile-saved').textContent = error.code === 'auth/email-already-in-use' ? 'This email already has a cloud account. Use “I already have an Academy ID” to sign in.' : error.message;
-          $('profile-saved').classList.remove('hidden');
-          return;
-        }
+      if (!cloudUser) {
+        $('profile-saved').textContent = 'Sign in with Google before saving your academic profile.';
+        $('profile-saved').classList.remove('hidden');
+        return;
       }
       state.profile = {
-        id: state.profile?.id || `AC-${crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()}`, 
-        fullName: formData.get('name').trim(),
+        id: cloudUser.uid,
+        uid: cloudUser.uid,
+        fullName: formData.get('name').trim() || cloudUser.displayName || '',
         name: formData.get('name').trim(),
-        email: formData.get('email').trim(),
+        email: formData.get('email').trim() || cloudUser.email || '',
         institution: formData.get('institution').trim(), department: formData.get('department').trim(),
         session: formData.get('session').trim(), year: formData.get('year'), semester: formData.get('semester'),
-        cloudEmail,
-        password: cloudPassword,
-        picture: await saveProfile
+        cloudEmail: cloudUser.email || '',
+        picture: await saveProfile || cloudUser.photoURL || ''
       };
       localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile));
       localStorage.setItem(SESSION_KEY, JSON.stringify(state.profile));
@@ -1450,48 +1630,23 @@
         (showLogin ? $('login-id') : $('profile-name')).focus();
       }
     }
-    $('show-create-account').addEventListener('click', () => switchAccountView('signup'));
-    $('show-signup-account').addEventListener('click', () => switchAccountView('signup'));
-    $('show-login-account').addEventListener('click', () => switchAccountView('login'));
-    $('show-signin-account').addEventListener('click', () => switchAccountView('login'));
-    $('import-login-account').addEventListener('click', () => $('account-file').click());
-    $('login-form').addEventListener('submit', async e => {
-      e.preventDefault();
-      const enteredId = $('login-id').value.trim().toUpperCase();
-      const loginPassword = $('login-password').value;
-      if (firebaseConfigured && window.academyAuth && window.academyDatabase) {
-        try {
-          const cloudProfile = await findCloudAccountByAcademyId(enteredId);
-          if (!cloudProfile?.cloudEmail && !cloudProfile?.email) throw new Error('That Academy ID was not found in the cloud.');
-          const email = cloudProfile.cloudEmail || cloudProfile.email;
-          cloudUserAcademyId = enteredId;
-          await window.academyAuth.signInWithEmailAndPassword(email, loginPassword);
-          await cloudLoadPromise;
-          $('login-status').classList.add('hidden');
-          $('login-form').reset();
-          renderProfile();
-          render();
-          return;
-        } catch (error) {
-          $('login-status').textContent = error.message || 'Cloud sign-in failed.';
-          $('login-status').classList.remove('hidden');
-          return;
-        }
+    $('import-login-account')?.addEventListener('click', () => $('account-file').click());
+    async function signInWithGoogle() {
+      if (!window.academyAuth) {
+        $('login-status').textContent = 'Google sign-in is unavailable. Check the Firebase configuration.';
+        $('login-status').classList.remove('hidden');
+        return;
       }
-      const savedProfile = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
-      if (savedProfile?.id === enteredId) {
-        state.profile = savedProfile;
-        localStorage.setItem(SESSION_KEY, JSON.stringify(savedProfile));
-        $('login-status').classList.add('hidden');
-        $('login-form').reset();
-        renderProfile();
-        render();
-        $('profile').scrollIntoView({ behavior: 'smooth' });
-      } else {
-        $('login-status').textContent = 'That Academy ID was not found on this device.';
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await window.academyAuth.signInWithPopup(provider);
+      } catch (error) {
+        $('login-status').textContent = error.message || 'Google sign-in failed.';
         $('login-status').classList.remove('hidden');
       }
-    });
+    }
+    $('google-login')?.addEventListener('click', signInWithGoogle);
+    $('google-signup')?.addEventListener('click', signInWithGoogle);
 
     $('edit-profile').addEventListener('click', openEditProfileModal);
     $('close-edit-profile').addEventListener('click', closeEditProfileModal);
@@ -1592,7 +1747,7 @@
       reader.readAsDataURL(picture);
     });
     function logout() {
-      // Keep the profile and plan saved so the user can return with the Academy ID.
+      // Keep the profile and plan saved so the user can return with the Google account.
       if (window.academyAuth && cloudUser) window.academyAuth.signOut().catch(console.error);
       cloudUser = null;
       cloudUserAcademyId = null;
@@ -1607,19 +1762,7 @@
     }
     $('logout').addEventListener('click', logout);
     $('mobile-logout').addEventListener('click', logout);
-    $('account-menu-toggle').addEventListener('click', () => {
-      const menu = $('account-menu');
-      const isOpen = !menu.classList.contains('hidden');
-      menu.classList.toggle('hidden', isOpen);
-      $('account-menu-toggle').setAttribute('aria-expanded', String(!isOpen));
-    });
-    document.addEventListener('click', event => {
-      const profileMenuWrap = $('profile-menu-wrap');
-      if (profileMenuWrap && !profileMenuWrap.contains(event.target)) {
-        $('account-menu').classList.add('hidden');
-        $('account-menu-toggle').setAttribute('aria-expanded', 'false');
-      }
-    });
+    // The three-dot account menu is initialized by script.js as a floating overlay.
     $('task-kind').addEventListener('change', () => {
       const isPlanned = $('task-kind').value === 'planned';
       $('planned-days').classList.toggle('hidden', !isPlanned);
@@ -1941,7 +2084,7 @@
       $('recovery-new-password').focus();
     });
 
-    $('save-recovery-password')?.addEventListener('click', () => {
+    $('save-recovery-password')?.addEventListener('click', async () => {
       const email = $('recovery-email').value.trim();
       const newPassword = $('recovery-new-password').value;
       const status = $('recovery-status');
@@ -1959,13 +2102,14 @@
         return;
       }
 
-      const updatedProfile = { ...account, password: newPassword };
+      const updatedProfile = { ...account, passwordHash: await hashSecret(newPassword) };
+      delete updatedProfile.password;
       localStorage.setItem(PROFILE_KEY, JSON.stringify(updatedProfile));
       if (state.profile?.id === account.id) {
         state.profile = updatedProfile;
         localStorage.setItem(SESSION_KEY, JSON.stringify(updatedProfile));
       }
-      status.textContent = `Password saved. You can sign in with Academy ID ${account.id}.`;
+      status.textContent = `Password saved. You can sign in with Google account ${account.id}.`;
       status.className = 'text-sm font-semibold text-forest';
       $('recovery-new-password').value = '';
     });
@@ -1995,19 +2139,57 @@
     // Keep the scheduler lightweight while checking once per minute for the
     // 10:00 PM local-time send window.
     setInterval(checkDailyReport, 60000);
-    const menuToggle=$('menu-toggle');
-    menuToggle?.addEventListener('click',()=>{
-      const open=menuToggle.getAttribute('aria-expanded')==='true';
-      menuToggle.setAttribute('aria-expanded',String(!open));
-      $('mobile-menu')?.classList.toggle('hidden');
-      $('menu-icon-open')?.classList.toggle('hidden');
-      $('menu-icon-close')?.classList.toggle('hidden');
+    const menuToggle = $('menu-toggle');
+    const mobileMenu = $('mobile-menu');
+    const mobileMenuBackdrop = $('mobile-menu-backdrop');
+    function closeMobileMenu() {
+      if (!menuToggle || !mobileMenu) return;
+      if (menuToggle.getAttribute('aria-expanded') !== 'true') return;
+      menuToggle.setAttribute('aria-expanded', 'false');
+      menuToggle.setAttribute('aria-label', 'Open menu');
+      mobileMenu.classList.add('hidden');
+      $('menu-icon-open')?.classList.remove('hidden');
+      $('menu-icon-close')?.classList.add('hidden');
+    }
+    menuToggle?.addEventListener('click', () => {
+      const open = menuToggle.getAttribute('aria-expanded') === 'true';
+      menuToggle.setAttribute('aria-expanded', String(!open));
+      menuToggle.setAttribute('aria-label', open ? 'Open menu' : 'Close menu');
+      mobileMenu?.classList.toggle('hidden', open);
+      $('menu-icon-open')?.classList.toggle('hidden', !open);
+      $('menu-icon-close')?.classList.toggle('hidden', open);
+    });
+    document.addEventListener('click', event => {
+      if (menuToggle?.getAttribute('aria-expanded') !== 'true') return;
+      if (!mobileMenu?.contains(event.target) && !menuToggle?.contains(event.target)) closeMobileMenu();
+    });
+    mobileMenu?.querySelectorAll('a, button').forEach(item => item.addEventListener('click', () => {
+      if (item.id !== 'privacy-open' && item.id !== 'storage-open-mobile') closeMobileMenu();
+    }));
+    mobileMenuBackdrop?.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeMobileMenu();
+    });
+
+    const privacyModal = $('privacy-modal');
+    function closePrivacyModal() {
+      privacyModal?.classList.add('hidden');
+      $('privacy-open')?.focus();
+    }
+    $('privacy-open')?.addEventListener('click', () => {
+      closeMobileMenu();
+      privacyModal?.classList.remove('hidden');
+      $('privacy-close')?.focus();
+    });
+    $('privacy-close')?.addEventListener('click', closePrivacyModal);
+    privacyModal?.addEventListener('click', event => {
+      if (event.target === privacyModal) closePrivacyModal();
     });
 
     const storageModal = $('study-storage');
     const storageOpenButtons = [$('storage-open'), $('storage-open-mobile')].filter(Boolean);
     function openStorageModal() {
       if (!storageModal) return;
+      setView('storage');
       storageModal.classList.add('storage-modal-open');
       $('storage-open')?.setAttribute('aria-expanded', 'true');
       $('storage-open-mobile')?.setAttribute('aria-expanded', 'true');
@@ -2025,12 +2207,13 @@
     function closeStorageModal() {
       if (!storageModal) return;
       storageModal.classList.remove('storage-modal-open');
+      setView('home');
       $('storage-open')?.setAttribute('aria-expanded', 'false');
       $('storage-open-mobile')?.setAttribute('aria-expanded', 'false');
       document.body.classList.remove('overflow-hidden');
     }
     storageOpenButtons.forEach(button => button.addEventListener('click', () => {
-      $('mobile-menu')?.classList.add('hidden');
+      closeMobileMenu();
       openStorageModal();
     }));
     $('storage-close')?.addEventListener('click', closeStorageModal);
@@ -2038,7 +2221,10 @@
       if (event.target === storageModal) closeStorageModal();
     });
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && storageModal?.classList.contains('storage-modal-open')) closeStorageModal();
+      if (event.key !== 'Escape') return;
+      if (storageModal?.classList.contains('storage-modal-open')) closeStorageModal();
+      if (!privacyModal?.classList.contains('hidden')) closePrivacyModal();
+      if (menuToggle?.getAttribute('aria-expanded') === 'true') closeMobileMenu();
     });
 
     const STORAGE_META_KEY = 'academyStudyStorageFolders';
@@ -2131,15 +2317,167 @@
       }
     });
 
-    const accountMode = new URLSearchParams(window.location.search).has('account') || window.location.hash === '#profile';
-    document.body.classList.toggle('public-home', !accountMode);
+    const accountMode = window.IS_DEV_MODE || new URLSearchParams(window.location.search).has('account') || window.location.hash === '#profile';
+    const viewNames = ['view-home', 'view-account', 'view-storage', 'view-owner'];
+    function setView(view) {
+      viewNames.forEach(name => document.body.classList.toggle(name, name === `view-${view}`));
+      document.body.classList.toggle('public-home', view === 'home');
+      document.body.classList.toggle('workspace-entry', view === 'account');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (view === 'account') {
+        setTimeout(() => (state.profile ? $('plan-workspace') : $('profile-name'))?.focus(), 350);
+      }
+    }
     const enterWorkspace = $('enter-workspace');
     enterWorkspace?.addEventListener('click', event => {
       event.preventDefault();
-      document.body.classList.add('workspace-entry');
-      $('profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setTimeout(() => (state.profile ? $('plan-workspace') : $('profile-name'))?.focus(), 350);
+      setView('account');
     });
+    $('workspace-logo')?.addEventListener('click', event => {
+      event.preventDefault();
+      setView('home');
+      history.replaceState(null, '', 'index.html');
+    });
+    $('account-nav-link')?.addEventListener('click', event => {
+      event.preventDefault();
+      closeMobileMenu();
+      setView('account');
+      history.replaceState(null, '', 'index.html?account#profile');
+    });
+
+    function applyDevAccountView(loggedIn) {
+      if (!window.IS_DEV_MODE) return;
+      if (loggedIn) {
+        cloudUser = { ...window.__academyDevUser };
+        cloudUserAcademyId = cloudUser.uid;
+        cloudSyncReady = false;
+        state.profile = state.profile?.uid === cloudUser.uid ? state.profile : {
+          id: cloudUser.uid,
+          uid: cloudUser.uid,
+          fullName: cloudUser.displayName,
+          name: cloudUser.displayName,
+          email: cloudUser.email,
+          cloudEmail: cloudUser.email,
+          institution: 'Test University',
+          department: 'Development',
+          session: 'Local development',
+          year: 'Graduate',
+          semester: '1st semester',
+          picture: cloudUser.photoURL
+        };
+        setView('account');
+        renderProfile();
+        render();
+      } else {
+        cloudUser = null;
+        cloudUserAcademyId = null;
+        cloudSyncReady = false;
+        state.profile = null;
+        setView('account');
+        renderProfile();
+      }
+    }
+
+    // The browser only requests admin data from a trusted backend endpoint.
+    // Configure this to your deployed HTTPS Cloud Function/API; never put a
+    // service-account key or database-admin credential in this file.
+    // Set this to the deployed HTTPS backend that verifies Firebase admin claims.
+    const OWNER_API_ENDPOINT = '';
+    const OWNER_PAGE_SIZE = 12;
+    let ownerUsers = [];
+    let ownerPage = 0;
+    function ownerStatus(message, error = false) {
+      const status = $('owner-dashboard-status');
+      if (status) { status.textContent = message; status.className = `mt-5 rounded-xl border p-4 text-sm ${error ? 'border-red-200 bg-red-50 text-red-700' : 'border-slate-200 bg-white text-slate-600'}`; }
+    }
+    function isOwnerUser(user) {
+      const email = String(user?.email || '').trim().toLowerCase();
+      const allowedEmail = String(window.OWNER_ADMIN_EMAIL || '').trim().toLowerCase();
+      // This check improves the UI only. ownerApi() remains the actual security boundary.
+      return Boolean(user && (
+        user.isOwner === true ||
+        (allowedEmail && email === allowedEmail)
+      ));
+    }
+    async function ownerApi(path = '') {
+      if (!OWNER_API_ENDPOINT || !cloudUser) throw new Error('Owner API is not configured. Deploy a trusted server endpoint and configure OWNER_API_ENDPOINT.');
+      const token = await cloudUser.getIdToken(true);
+      const response = await fetch(`${OWNER_API_ENDPOINT}${path}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!response.ok) {
+        const message = response.status === 403 ? 'Administrator access was denied.' : `Owner service returned ${response.status}.`;
+        recordOwnerError('Owner API error', message, `${OWNER_API_ENDPOINT}${path}`);
+        throw new Error(message);
+      }
+      return response.json();
+    }
+    function renderOwnerUsers() {
+      const query = $('owner-user-search').value.trim().toLowerCase();
+      const matches = ownerUsers.filter(user => `${user.displayName || ''} ${user.email || ''}`.toLowerCase().includes(query));
+      const pages = Math.max(1, Math.ceil(matches.length / OWNER_PAGE_SIZE));
+      ownerPage = Math.min(ownerPage, pages - 1);
+      const visible = matches.slice(ownerPage * OWNER_PAGE_SIZE, (ownerPage + 1) * OWNER_PAGE_SIZE);
+      $('owner-user-list').innerHTML = visible.length ? visible.map(user => `<button type="button" data-owner-user="${escapeHtml(user.uid)}" class="text-left rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-400"><strong class="block truncate text-slate-900">${escapeHtml(user.displayName || 'Unnamed user')}</strong><span class="mt-1 block truncate text-xs text-slate-500">${escapeHtml(user.email || 'No email provided')}</span><span class="mt-2 block text-[11px] text-slate-400">Website data only · ${escapeHtml(user.lastLoginAt || 'Unknown activity')}</span></button>`).join('') : '<p class="col-span-full rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">No permitted users found.</p>';
+      $('owner-page-label').textContent = `Page ${ownerPage + 1} of ${pages}`;
+      $('owner-previous-page').disabled = ownerPage === 0;
+      $('owner-next-page').disabled = ownerPage >= pages - 1;
+      $('owner-user-list').querySelectorAll('[data-owner-user]').forEach(button => button.addEventListener('click', () => openOwnerUser(button.dataset.ownerUser)));
+    }
+    async function loadOwnerUsers() {
+      ownerStatus('Loading permitted website users…');
+      try { const result = await ownerApi('/users'); ownerUsers = Array.isArray(result.users) ? result.users : []; ownerPage = 0; $('owner-dashboard-content').classList.remove('hidden'); ownerStatus('Only data returned by the authorized owner service is shown.'); renderOwnerUsers(); }
+      catch (error) { $('owner-dashboard-content').classList.add('hidden'); ownerStatus(error.message || 'Users could not be loaded.', true); }
+    }
+    async function openOwnerUser(uid) {
+      try { const result = await ownerApi(`/users/${encodeURIComponent(uid)}`); alert(JSON.stringify(result.user || result, null, 2)); }
+      catch (error) { ownerStatus(error.message || 'This user record could not be opened.', true); }
+    }
+    function ownerErrorLogs() {
+      return readCachedJSON('academyOwnerErrorLogs', []);
+    }
+    function renderOwnerErrorLogs() {
+      const list = $('owner-error-log-list');
+      const empty = $('owner-error-log-empty');
+      if (!list || !empty) return;
+      const logs = ownerErrorLogs();
+      empty.classList.toggle('hidden', logs.length > 0);
+      list.innerHTML = logs.map(log => `<article class="rounded-xl border border-slate-200 bg-white p-3 text-xs"><div class="flex items-center justify-between gap-2"><strong class="text-red-700">${escapeHtml(log.type)}</strong><time class="text-slate-500">${escapeHtml(new Date(log.timestamp).toLocaleString())}</time></div><p class="mt-1 break-words text-slate-700">${escapeHtml(log.message)}</p>${log.source ? `<p class="mt-1 break-all text-slate-500">${escapeHtml(log.source)}</p>` : ''}</article>`).join('');
+    }
+    async function openOwnerHealthModal() {
+      const modal = $('owner-health-modal');
+      const status = $('owner-health-status');
+      if (!modal || !cloudUser || !isOwnerUser(cloudUser)) return;
+      modal.classList.remove('hidden');
+      status.textContent = 'Checking Firebase connection…';
+      status.className = 'mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800';
+      renderOwnerErrorLogs();
+      try {
+        if (!window.academyAuth || !window.academyDatabase) throw new Error('Firebase SDK is unavailable.');
+        await cloudUser.getIdToken(true);
+        const connection = await window.academyDatabase.ref('.info/connected').once('value');
+        if (connection.val() !== true) throw new Error('Realtime Database is currently offline.');
+        status.textContent = 'Firebase Authentication and Realtime Database are available.';
+        status.className = 'mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800';
+      } catch (error) {
+        status.textContent = `Firebase connection check failed: ${error.message || 'Unknown error'}`;
+        status.className = 'mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700';
+      }
+    }
+    function closeOwnerHealthModal() { $('owner-health-modal')?.classList.add('hidden'); }
+    async function openOwnerDashboard() {
+      closeMobileMenu();
+      if (!cloudUser) return ownerStatus('Sign in with the authorized Firebase account to continue.', true);
+      if (!isOwnerUser(cloudUser)) return ownerStatus('Administrator access denied.', true);
+      openOwnerHealthModal();
+    }
+    $('owner-nav-link')?.addEventListener('click', openOwnerDashboard);
+    $('owner-health-close')?.addEventListener('click', closeOwnerHealthModal);
+    $('owner-health-modal')?.addEventListener('click', event => { if (event.target === $('owner-health-modal')) closeOwnerHealthModal(); });
+    $('owner-clear-logs')?.addEventListener('click', () => { localStorage.removeItem('academyOwnerErrorLogs'); renderOwnerErrorLogs(); });
+    $('owner-user-search')?.addEventListener('input', () => { ownerPage = 0; renderOwnerUsers(); });
+    $('owner-refresh-users')?.addEventListener('click', loadOwnerUsers);
+    $('owner-previous-page')?.addEventListener('click', () => { ownerPage--; renderOwnerUsers(); });
+    $('owner-next-page')?.addEventListener('click', () => { ownerPage++; renderOwnerUsers(); });
+    setView(accountMode ? 'account' : 'home');
     bindCloudAuth();
     renderProfile();
     render();
