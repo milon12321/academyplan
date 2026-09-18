@@ -1,3 +1,18 @@
+/* Responsive header navigation. */
+.desktop-nav { display: none; }
+.menu-toggle { display: inline-flex; }
+
+@media (min-width: 768px) {
+  .desktop-nav { display: flex; }
+  .menu-toggle { display: none; }
+  #mobile-menu { display: none !important; }
+}
+
+@media (max-width: 767px) {
+  .desktop-nav { display: none; }
+  .menu-toggle { display: inline-flex; }
+}
+
 /* Fixed mobile navigation drawer: it floats above the page without shifting layout. */
 #mobile-menu {
   position: fixed;
