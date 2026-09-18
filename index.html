@@ -426,18 +426,18 @@
         <span class="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center text-lg">▦</span>
         <span class="font-serif text-lg font-semibold leading-none text-slate-800">Study Workspace</span>
       </a>
-      <nav id="desktop-nav" class="desktop-nav items-center gap-2" aria-label="Main navigation">
+      <nav id="desktop-nav" class="desktop-nav desktop-nav-bar items-center gap-2" aria-label="Main navigation" data-navigation="desktop" data-desktop-navigation="links">
         <button id="desktop-storage-open" type="button" data-route="storage" class="menu-nav-item rounded-lg px-3 py-2 text-sm font-semibold">📁 Study Storage</button>
         <a id="desktop-account-link" href="index.html?account#profile" class="menu-nav-item rounded-lg px-3 py-2 text-sm">Account</a>
         <button id="desktop-owner-link" type="button" class="menu-nav-item hidden rounded-lg px-3 py-2 text-sm font-semibold">Owner Dashboard</button>
         <button id="desktop-privacy-open" type="button" class="menu-nav-item rounded-lg px-3 py-2 text-sm" aria-controls="privacy-modal" aria-haspopup="dialog">Privacy Notice</button>
       </nav>
-      <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" class="menu-toggle w-10 h-10 items-center justify-center rounded-full border border-line">
+      <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" class="menu-toggle responsive-menu-toggle w-10 h-10 items-center justify-center rounded-full border border-line" data-navigation="mobile" data-mobile-menu-toggle="true">
         <svg id="menu-icon-open" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
         <svg id="menu-icon-close" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
-    <div id="mobile-menu" class="hidden border-t border-line bg-paper px-5 py-4 space-y-3" aria-label="Main navigation">
+    <div id="mobile-menu" class="hidden border-t border-line bg-paper px-5 py-4 space-y-3" aria-label="Main navigation" aria-hidden="true">
       <button id="storage-open-mobile" type="button" data-route="storage" class="menu-nav-item block w-full text-left text-sm py-2 px-3 rounded-lg font-semibold" aria-controls="study-storage">📁 Study Storage</button>
       <a id="account-nav-link" href="index.html?account#profile" class="menu-nav-item block text-sm py-2 px-3 rounded-lg" aria-controls="profile">Account</a>
       <button id="owner-nav-link" type="button" class="menu-nav-item hidden block w-full text-left text-sm py-2 px-3 rounded-lg font-semibold">Owner Dashboard</button>
@@ -910,7 +910,6 @@
                 </table>
               </div>
             </section>
-            <div id="global-goals-preview" class="hidden mt-6 rounded-xl bg-slate-50 border border-[#E2E8F0] p-4 text-sm text-slate-700 whitespace-pre-wrap"></div>
             <p id="finish-note" class="hidden mt-5 rounded-xl bg-slate-100 text-slate-800 p-3 text-sm font-semibold"></p>
             </aside>
           </details>
@@ -1836,9 +1835,6 @@
       renderGoalList();
       renderPlanList();
       $('day-heading').textContent = dayLabel(state.day); $('day-note').value = state.plan.notes[state.day] || '';
-      const goals = state.plan.goals || [];
-      $('global-goals-preview').classList.toggle('hidden', !goals.length);
-      $('global-goals-preview').textContent = goals.length ? `Seven-day goals:\n${goals.map(goal => `• ${goal.text}`).join('\n')}` : '';
       if ($('task-kind').value === 'planned') renderPlannedDayOptions();
       $('day-tabs').innerHTML = Array.from({length:planLength()}, (_,i) => {
         const dayTasks = state.plan.tasks.filter(t=>t.days[i]);
@@ -2492,6 +2488,7 @@
       menuToggle.setAttribute('aria-expanded', 'false');
       menuToggle.setAttribute('aria-label', 'Open menu');
       mobileMenu.classList.add('hidden');
+      mobileMenu.setAttribute('aria-hidden', 'true');
       $('menu-icon-open')?.classList.remove('hidden');
       $('menu-icon-close')?.classList.add('hidden');
     }
@@ -2503,6 +2500,7 @@
       if (!mobileMenu) return;
       const open = mobileMenu.classList.contains('hidden');
       mobileMenu.classList.toggle('hidden', !open);
+      mobileMenu.setAttribute('aria-hidden', String(!open));
       menuToggle.setAttribute('aria-expanded', String(open));
       menuToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
       $('menu-icon-open')?.classList.toggle('hidden', open);
