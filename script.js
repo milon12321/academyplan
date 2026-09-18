@@ -23,6 +23,9 @@ window.academyToggleMobileMenu = function () {
   const menu = document.getElementById('mobile-menu');
   const toggle = document.getElementById('menu-toggle');
   if (!menu || !toggle) return false;
+
+  // The inline application listener uses the same state contract. Keeping this
+  // helper class-based makes it safe to call from responsive UI integrations.
   const opening = menu.classList.contains('hidden');
   menu.classList.toggle('hidden', !opening);
   toggle.setAttribute('aria-expanded', String(opening));
