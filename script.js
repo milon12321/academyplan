@@ -36,12 +36,30 @@ window.academySyncDailyNoteView = function (note = '') {
   const editContainer = document.getElementById('todays-note-edit-container');
   const displayContainer = document.getElementById('todays-note-display-container');
   const savedText = document.getElementById('saved-note-text');
+  const textarea = document.getElementById('day-note');
   const text = String(note || '').trim();
   if (!editContainer || !displayContainer || !savedText) return;
+  if (textarea && textarea.value !== text) textarea.value = text;
   savedText.textContent = text;
   editContainer.classList.toggle('hidden', Boolean(text));
   displayContainer.classList.toggle('hidden', !text);
+  editContainer.setAttribute('aria-hidden', String(Boolean(text)));
+  displayContainer.setAttribute('aria-hidden', String(!text));
 };
+
+// DOM-dependent note controls are initialized after parsing. The inline app
+// bootstrap marks its own handlers, so this only supplies a safe fallback.
+function initializeDailyNoteControls() {
+  const editButton = document.getElementById('edit-note-btn');
+  const editContainer = document.getElementById('todays-note-edit-container');
+  const displayContainer = document.getElementById('todays-note-display-container');
+  const textarea = document.getElementById('day-note');
+  const savedText = document.getElementById('saved-note-text');
+  if (!editButton || !editContainer || !displayContainer || !textarea || !savedText) return;
+  // The inline application bootstrap owns the edit click handler. This
+  // synchronization step intentionally avoids binding a second listener.
+  window.academySyncDailyNoteView(savedText.textContent || textarea.value);
+}
 
 // Keep the long daily overview collapsed until the learner requests it.
 (() => {
@@ -302,10 +320,16 @@ window.academyAccountRoute = function ({
     switchReportTab('overview');
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeReportTabs, { once: true });
-  } else {
+  // Keep explicit DOM-ready initialization for local files, GitHub Pages, and
+  // browsers that defer script execution differently.
+  const initializeAnalyticsAndNotes = () => {
     initializeReportTabs();
+    initializeDailyNoteControls();
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAnalyticsAndNotes, { once: true });
+  } else {
+    initializeAnalyticsAndNotes();
   }
 })();
 
