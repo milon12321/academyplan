@@ -1,32 +1,57 @@
 /* Responsive header navigation. */
-.desktop-nav { display: none; }
-.menu-toggle { display: inline-flex; }
+header { position: sticky; top: 0; z-index: 40; }
+header > div { min-width: 0; }
+.desktop-nav {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .35rem;
+  min-width: 0;
+  margin-left: auto;
+}
+.desktop-nav .menu-nav-item {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.menu-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 1001;
+}
 
 @media (min-width: 768px) {
   .desktop-nav { display: flex; }
   .menu-toggle { display: none; }
-  #mobile-menu { display: none !important; }
+  #mobile-menu,
+  #mobile-menu.hidden,
+  #mobile-menu:not(.hidden) { display: none !important; }
 }
 
 @media (max-width: 767px) {
-  .desktop-nav { display: none; }
+  .desktop-nav { display: none !important; }
   .menu-toggle { display: inline-flex; }
 }
 
-/* Fixed mobile navigation drawer: it floats above the page without shifting layout. */
+/* Mobile drawer: full-width below the sticky navbar, with no layout overflow. */
 #mobile-menu {
   position: fixed;
-  top: 4.5rem;
-  right: 1rem;
+  top: 4rem;
+  left: 0;
+  right: 0;
   z-index: 1000;
-  width: 260px;
-  max-width: calc(100vw - 2rem);
-  max-height: calc(100vh - 5.5rem);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  max-height: calc(100vh - 4rem);
+  overflow-x: hidden;
   overflow-y: auto;
-  border: 1px solid #DED5BE;
-  border-radius: 1rem;
-  box-shadow: 0 20px 45px rgba(15, 42, 32, .22);
-  transform-origin: top right;
+  border-top: 1px solid #DED5BE;
+  border-bottom: 1px solid #DED5BE;
+  border-radius: 0 0 1rem 1rem;
+  box-shadow: 0 18px 35px rgba(15, 42, 32, .18);
+  transform-origin: top center;
   transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
 }
 
@@ -71,12 +96,10 @@ body.view-storage #storage-open-mobile,
   font-weight: 700;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   #mobile-menu {
-    top: 4.25rem;
-    right: .75rem;
-    width: 260px;
-    max-width: calc(100vw - 1.5rem);
+    top: 4rem;
+    max-height: calc(100vh - 4rem);
   }
 }
 
@@ -88,6 +111,61 @@ body.view-storage #storage-open-mobile,
 
 .title {
   color: #5C6AC4;
+}
+
+/* The landing content uses the available desktop width instead of a narrow text column. */
+#landing-hero > div {
+  width: min(100% - 2.5rem, 72rem);
+}
+
+@media (min-width: 768px) {
+  #landing-hero > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(18rem, .85fr);
+    align-items: center;
+    column-gap: clamp(3rem, 8vw, 8rem);
+    min-height: clamp(34rem, 72vh, 48rem);
+    padding-top: clamp(5rem, 10vh, 8rem);
+    padding-bottom: clamp(5rem, 10vh, 8rem);
+  }
+
+  #landing-hero > div > * {
+    grid-column: 1;
+  }
+
+  #landing-hero > div::after {
+    content: 'PLAN  ·  FOCUS  ·  GROW';
+    grid-column: 2;
+    grid-row: 1 / span 6;
+    align-self: center;
+    justify-self: stretch;
+    padding: clamp(2rem, 5vw, 5rem) 1.5rem;
+    border: 1px solid rgba(232, 163, 61, .3);
+    border-radius: 2rem;
+    color: rgba(251, 247, 238, .78);
+    font-family: "Fraunces", Georgia, serif;
+    font-size: clamp(1.25rem, 2.2vw, 2.25rem);
+    letter-spacing: .12em;
+    line-height: 1.8;
+    text-align: center;
+    background: linear-gradient(145deg, rgba(44, 90, 70, .38), rgba(15, 42, 32, .12));
+  }
+
+  #landing-hero h1 {
+    max-width: 44rem;
+    font-size: clamp(2.75rem, 5vw, 5rem);
+  }
+
+  #landing-hero p,
+  #landing-hero blockquote {
+    max-width: 42rem;
+  }
+}
+
+@media (max-width: 767px) {
+  #landing-hero > div {
+    width: 100%;
+  }
 }
 
 /* Keep empty plan controls clear and intentional until a plan is selected. */
