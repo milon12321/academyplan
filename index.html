@@ -267,8 +267,22 @@
       #mobile-menu, #mobile-menu-backdrop { display:none !important; }
     }
 
-    /* Focused single-column dashboard with an opt-in progress overview. */
-    .study-dashboard-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:1.5rem; align-items:stretch; }
+    /* The dashboard always uses one bounded vertical flow. */
+    .dashboard-stack,
+    .dashboard-stack-container,
+    .study-dashboard-grid {
+      display:block;
+      width:100%;
+      max-width:100%;
+      min-width:0;
+    }
+    .dashboard-stack-container > * {
+      display:block;
+      width:100%;
+      max-width:100%;
+      min-width:0;
+    }
+    .dashboard-stack-container > * + * { margin-top:1.5rem; }
     .study-plan-panel, .progress-overview-accordion { min-width:0; }
     .progress-overview-accordion > summary { list-style:none; }
     .progress-overview-accordion > summary::-webkit-details-marker { display:none; }
@@ -276,13 +290,10 @@
     .progress-overview-toggle:hover { background:#F8FAFC; }
     .progress-overview-chevron { transition:transform .3s ease; }
     .progress-overview-accordion[open] .progress-overview-chevron { transform:rotate(180deg); }
-    .progress-overview-content { margin-top:.75rem; animation:progressOverviewOpen .3s ease both; }
+    .progress-overview-content { display:block; width:100%; max-width:100%; min-width:0; height:auto; max-height:none; overflow:visible; margin-top:.75rem; animation:progressOverviewOpen .3s ease both; }
     @keyframes progressOverviewOpen { from { opacity:0; transform:translateY(-.5rem); } to { opacity:1; transform:translateY(0); } }
-    /* Keep the progress overview below the study plan at every breakpoint. */
-    .study-dashboard-grid { grid-template-columns:minmax(0,1fr); }
     .progress-overview-accordion,
-    .progress-overview-accordion[open] { width:100%; }
-    .progress-overview-accordion[open] { display:block; }
+    .progress-overview-accordion[open] { display:block; width:100%; max-width:100%; min-width:0; height:auto; }
     .progress-overview-accordion[open] .progress-overview-content { width:100%; height:auto; }
     @media (prefers-reduced-motion:reduce) {
       .progress-overview-content, .progress-overview-chevron, .progress-overview-toggle { animation:none; transition:none; }
@@ -295,13 +306,45 @@
       z-index: 1000;
       display: flex;
       flex-direction: column;
-      width: max-content;
+      width: min(320px, calc(100vw - 2rem));
       min-width: 220px;
-      max-width: 280px;
+      max-width: calc(100vw - 2rem);
+      max-height: min(32rem, calc(100vh - 6rem));
       margin-top: .5rem;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       box-sizing: border-box;
-      white-space: nowrap;
+      white-space: normal;
+    }
+
+    #account-menu > .border-t {
+      margin-top: .5rem;
+      padding-top: .35rem;
+    }
+
+    #account-menu #saved-plans-panel,
+    #account-menu #restore-plans-panel {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+    }
+
+    #account-menu #plan-list {
+      max-height: 14rem;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: .15rem .1rem .25rem 0;
+    }
+
+    #account-menu #account-trash-list {
+      max-height: 10rem;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: .15rem .1rem .25rem 0;
     }
 
     /* Floating account options remain hidden until the three-dot button opens them. */
@@ -342,6 +385,28 @@
 
     .title {
       color: #5C6AC4;
+    }
+
+    .schedule-mode-button {
+      border: 1px solid #CBD5E1;
+      border-radius: .5rem;
+      background: #FFFFFF;
+      color: #475569;
+      padding: .35rem .45rem;
+      font-size: .68rem;
+      font-weight: 700;
+      line-height: 1;
+      transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+    }
+    .schedule-mode-button[aria-pressed="true"] {
+      border-color: #1E293B;
+      background: #1E293B;
+      color: #FFFFFF;
+    }
+    .schedule-mode-button:hover { background: #F1F5F9; }
+    .schedule-mode-button[aria-pressed="true"]:hover { background: #0F172A; }
+    @media (max-width: 640px) {
+      .schedule-mode-button { padding: .4rem .35rem; font-size: .62rem; }
     }
   </style>
 </head>
@@ -458,7 +523,7 @@
             </div>
             <div id="profile-menu-wrap" class="hidden relative shrink-0">
               <button id="account-menu-toggle" type="button" aria-label="Open profile options" aria-expanded="false" aria-controls="account-menu" class="w-9 h-9 rounded-full border border-line flex items-center justify-center text-lg hover:bg-forest/5">⋯</button>
-              <div id="account-menu" class="hidden absolute right-0 top-11 z-50 origin-top-right bg-white border border-line rounded-xl shadow-lg p-2">
+              <div id="account-menu" data-dismiss-on-action="true" class="hidden account-options-menu absolute right-0 top-11 z-50 origin-top-right bg-white border border-line rounded-xl shadow-lg p-2">
                 <div class="border-b border-line px-3 py-2 mb-1">
                   <div class="text-xs text-ink/55">Google account UID</div>
                   <div id="menu-profile-id" class="font-mono text-sm font-semibold text-forest-dark mt-0.5"></div>
@@ -472,7 +537,7 @@
                     <span>Saved plans</span>
                     <span class="text-xs">▸</span>
                   </button>
-                  <div id="saved-plans-panel" class="hidden px-3 pb-2">
+                  <div id="saved-plans-panel" class="hidden account-submenu px-3 pb-2">
                     <div class="flex items-center justify-between gap-2">
                       <span class="text-xs text-ink/60">Your plans</span>
                       <span id="plan-count" class="text-[10px] text-ink/50"></span>
@@ -492,7 +557,7 @@
                     <span>Restore plans</span>
                     <span class="text-xs">▸</span>
                   </button>
-                  <div id="restore-plans-panel" class="hidden px-3 pb-2">
+                  <div id="restore-plans-panel" class="hidden account-submenu px-3 pb-2">
                     <div class="flex items-center justify-between gap-2">
                       <span class="text-xs text-ink/60">Deleted plans</span>
                       <span class="text-[10px] text-ink/50">Deletes after 3 days</span>
@@ -533,10 +598,29 @@
           <div id="profile-details" class="hidden mt-6 grid sm:grid-cols-2 gap-3 text-sm"></div>
           <div id="profile-id" class="hidden" role="status"></div>
           <div id="profile-actions" class="hidden"></div>
-          <div id="profile-saved" class="hidden mt-4 text-sm font-semibold text-forest" role="status" aria-live="polite"></div>
+          <div id="profile-saved" class="hidden mt-4 text-sm font-semibold text-forest" role="status" aria-live="polite">          </div>
         </div>
       </div>
     </section>
+
+    <div id="onboarding-profile-modal" class="hidden fixed inset-0 z-[65] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="onboarding-profile-title">
+      <div class="min-h-full flex items-center justify-center">
+        <div class="onboarding-profile-panel w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
+          <p class="eyebrow-dark text-base">Welcome to your workspace</p>
+          <h2 id="onboarding-profile-title" class="font-serif text-2xl text-forest-dark mt-0.5">Complete your academic profile</h2>
+          <p class="mt-3 text-sm text-ink/70 leading-relaxed">Add your academic details to personalize your workspace. These details are saved securely with your Firebase account.</p>
+          <form id="onboarding-profile-form" class="mt-5 grid sm:grid-cols-2 gap-3">
+            <div><label for="onboarding-institution" class="field-label">Institution / university</label><input id="onboarding-institution" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your institution or university"></div>
+            <div><label for="onboarding-department" class="field-label">Department</label><input id="onboarding-department" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your department"></div>
+            <div><label for="onboarding-session" class="field-label">Session</label><input id="onboarding-session" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="2024–2025"></div>
+            <div><label for="onboarding-year" class="field-label">Year</label><select id="onboarding-year" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select year</option><option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option><option>Graduate</option></select></div>
+            <div><label for="onboarding-semester" class="field-label">Semester</label><select id="onboarding-semester" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select semester</option><option>1st semester</option><option>2nd semester</option><option>3rd semester</option><option>4th semester</option><option>5th semester</option><option>6th semester</option><option>7th semester</option><option>8th semester</option></select></div>
+            <button type="submit" class="sm:col-span-2 mt-3 bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm">Save academic details</button>
+            <p id="onboarding-profile-status" class="hidden sm:col-span-2 text-sm font-semibold" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <div id="edit-profile-modal" class="hidden fixed inset-0 z-[60] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title">
       <div class="min-h-full flex items-center justify-center">
@@ -566,29 +650,47 @@
       </div>
     </div>
 
-    <div id="plan-workspace" class="hidden">
+    <div id="plan-workspace" class="hidden dashboard-stack">
       <section class="pb-8 pt-2">
         <div class="w-full max-w-6xl mx-auto px-5 sm:px-8">
             <div class="workspace-card w-full p-5 sm:p-7">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between rounded-xl border border-[#E2E8F0] bg-white p-4 shadow-sm">
                 <div class="min-w-0 flex-1">
                   <label for="active-plan-selector" class="field-label text-slate-800">Saved Plans</label>
-                  <select id="active-plan-selector" class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white focus:border-slate-400" aria-label="Select active plan"><option value="" selected>Select or create a plan...</option></select>
+                  <select id="active-plan-selector" class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white focus:border-slate-400" aria-label="Select active plan"><option value="" selected disabled>No plans saved yet</option></select>
                 </div>
                 <button id="new-plan-top" type="button" class="w-full sm:w-auto border border-[#CBD5E1] hover:bg-slate-50 text-slate-800 font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors">New Plan</button>
               </div>
 
               <div class="mt-5">
                 <label for="plan-name" class="field-label text-slate-800">Plan name</label>
-                <input id="plan-name" type="text" value="" placeholder="Type your plan name..." class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm font-serif text-lg text-slate-800 bg-white placeholder:text-slate-400 focus:border-slate-400">
+                <input id="plan-name" type="text" value="" placeholder="Enter your plan name..." autocomplete="off" class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm font-serif text-lg text-slate-800 bg-white placeholder:text-slate-400 focus:border-slate-400">
               </div>
 
               <div class="workspace-card mt-5 p-4">
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  <div><label for="plan-start-date" class="field-label text-slate-800">Start date</label><input id="plan-start-date" type="date" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
-                  <div><label for="plan-start-time" class="field-label text-slate-800">Start time</label><input id="plan-start-time" type="time" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
+                  <div>
+                    <label for="plan-start-date" class="field-label text-slate-800">Start date</label>
+                    <div class="flex items-center gap-2">
+                      <input id="plan-start-date" type="date" autocomplete="off" data-timezone="Asia/Dhaka" class="min-w-0 flex-1 w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white">
+                      <div class="flex shrink-0 gap-1" role="group" aria-label="Start date mode">
+                        <button id="start-date-auto" type="button" class="schedule-mode-button" aria-pressed="true">Auto</button>
+                        <button id="start-date-manual" type="button" class="schedule-mode-button" aria-pressed="false">Manual</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="plan-start-time" class="field-label text-slate-800">Start time</label>
+                    <div class="flex items-center gap-2">
+                      <input id="plan-start-time" type="time" autocomplete="off" data-timezone="Asia/Dhaka" class="min-w-0 flex-1 w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white">
+                      <div class="flex shrink-0 gap-1" role="group" aria-label="Start time mode">
+                        <button id="start-time-auto" type="button" class="schedule-mode-button" aria-pressed="true">Auto</button>
+                        <button id="start-time-manual" type="button" class="schedule-mode-button" aria-pressed="false">Manual</button>
+                      </div>
+                    </div>
+                  </div>
                   <div><label for="plan-days" class="field-label text-slate-800">Plan days</label><input id="plan-days" type="number" value="0" min="0" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white" placeholder="0"></div>
-                  <div><label for="plan-end-date" class="field-label text-slate-800">End date</label><input id="plan-end-date" type="date" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
+                  <div><label for="plan-end-date" class="field-label text-slate-800">End date</label><input id="plan-end-date" type="date" autocomplete="off" data-timezone="Asia/Dhaka" class="w-full px-3 py-2.5 border border-[#D1D5DB] rounded-xl text-sm text-slate-800 bg-white"></div>
                 </div>
                 <p id="plan-schedule-summary" class="text-xs text-slate-500 mt-3">Choose a start date and duration to generate your schedule.</p>
               </div>
@@ -599,9 +701,13 @@
                     <label for="global-goal-input" class="field-label text-forest">Your Direction</label>
                     <div class="flex flex-col gap-2 sm:flex-row">
                       <input id="global-goal-input" type="text" class="min-w-0 flex-1 px-4 py-3 border border-line rounded-xl text-sm" placeholder="Add one goal...">
+                      <div class="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:flex-none">
+                        <label class="min-w-0 flex-1"><span class="field-label">From time</span><input id="global-goal-from-time" type="time" class="w-full px-3 py-3 border border-line rounded-xl text-sm bg-white" aria-label="From time"></label>
+                        <label class="min-w-0 flex-1"><span class="field-label">To time</span><input id="global-goal-to-time" type="time" class="w-full px-3 py-3 border border-line rounded-xl text-sm bg-white" aria-label="To time"></label>
+                      </div>
                       <button id="add-global-goal" type="button" aria-label="Add weekly goal" class="shrink-0 bg-forest hover:bg-forest-dark text-paper px-4 py-3 rounded-xl text-xl leading-none transition-colors">+</button>
                     </div>
-                    <div id="global-goal-list" class="mt-3 space-y-2"></div>
+                    <div id="global-goal-list" class="goal-item-list mt-3 space-y-2"></div>
                     <p class="text-xs text-ink/55 mt-2">Each goal is added to every day in your scheduled plan. Complete it separately on each day.</p>
                   </div>
                 </div>
@@ -618,7 +724,7 @@
 
       <section id="daily-checklist-section" class="py-4 md:py-8">
       <div class="max-w-6xl mx-auto px-5 sm:px-8">
-        <div class="study-dashboard-grid">
+        <div class="study-dashboard-grid dashboard-stack-container">
           <div class="workspace-card study-plan-panel p-5 sm:p-7">
             <div class="flex items-center justify-between gap-3">
               <div>
@@ -856,7 +962,8 @@
   </div>
 
   <footer class="site-footer" aria-label="Website footer">
-    <p class="footer-copyright">&copy; 2026 Academic Planning Workspace. All rights reserved.</p>
+    <p class="footer-copyright">&copy; <button id="copyright-year" type="button" class="footer-year" aria-label="Developer UI testing trigger">2026</button> Academic Planning Workspace. All rights reserved.</p>
+    <p id="mock-account-status" class="mock-account-status" role="status" aria-live="polite"></p>
     <span class="footer-separator" aria-hidden="true">•</span>
     <p class="footer-contact">Contact Owner: <a class="footer-contact-link" href="mailto:milonsarkar1231@gmail.com">milonsarkar1231@gmail.com</a></p>
   </footer>
@@ -864,7 +971,9 @@
   <script>
     // Merged helper logic from script.js. Defined before the application bootstrap
     // so synchronous cache hydration can use it safely.
-    function academyIsLegacyPlanTitleFallback() { return false; }
+    function academyIsLegacyPlanTitleFallback(value) {
+      return String(value || '').trim().toLowerCase() === 'my 7-day plan';
+    }
     if (typeof window.academyIsLegacyPlanTitle !== 'function') window.academyIsLegacyPlanTitle = academyIsLegacyPlanTitleFallback;
 
     window.academyStopDeletionNavigation = function (event) {
@@ -1096,7 +1205,10 @@
       if (state.plan) localStorage.setItem(KEY, JSON.stringify(state.plan));
       cloudSyncReady = true;
       renderProfile();
-      if (state.profile) render();
+      if (state.profile) {
+        render();
+        if (!hasAcademicDetails(state.profile)) showOnboardingProfile(state.profile);
+      }
     }
     function bindCloudAuth() {
       if (window.IS_DEV_MODE || !window.academyAuth) return;
@@ -1122,7 +1234,7 @@
       });
     }
     const TRASH_KEY = 'academyTrashPlans';
-    const DEFAULT_PLAN_TITLE = window.academyPlanDefaults?.title ?? '';
+    const DEFAULT_PLAN_TITLE = '';
     const DEFAULT_PLAN_DURATION = window.academyPlanDefaults?.duration ?? 0;
     const TRASH_RETENTION_DAYS = 3;
     const PROFILE_KEY = 'academyProfile';
@@ -1210,18 +1322,100 @@
       date: dateValue(new Date()),
       time: currentTimeValue()
     };
+    const goalTimeLabel = goal => {
+      const from = goal.fromTime || '';
+      const to = goal.toTime || '';
+      if (from && to) return `${formatTime(from)} - ${formatTime(to)}`;
+      if (from || to) return formatTime(from || to);
+      return goal.time ? formatTime(goal.time) : '';
+    };
     const taskTimeMarkup = task => task.time ? ` <time class="ml-1 text-xs font-semibold text-slate-500">· ${escapeHtml(formatTime(task.time))}</time>` : '';
 
     function renderActivePlanSelector() {
       const selector = $('active-plan-selector');
       if (!selector) return;
       if (!state.plans.length) {
-        selector.innerHTML = '<option value="" selected>No saved plans yet</option>';
+        selector.innerHTML = '<option value="" selected disabled>No plans saved yet</option>';
+        selector.value = '';
+        $('plan-name').value = '';
+        $('plan-name').placeholder = 'Enter your plan name...';
         return;
       }
       selector.innerHTML = '<option value="">Select a saved plan...</option>' + state.plans.map(plan => `<option value="${plan.id}">${escapeHtml(plan.title || 'Untitled plan')}</option>`).join('');
       selector.value = state.plan?.id || '';
     }
+
+    function initializeAccountMenu() {
+      const toggle = $('account-menu-toggle');
+      const menu = $('account-menu');
+      if (!toggle || !menu || toggle.dataset.bound === 'true') return;
+      toggle.dataset.bound = 'true';
+      toggle.addEventListener('click', event => {
+        event.stopPropagation();
+        const open = !menu.classList.contains('hidden');
+        menu.classList.toggle('hidden', open);
+        toggle.setAttribute('aria-expanded', String(!open));
+      });
+      document.addEventListener('click', event => {
+        if (!menu.contains(event.target) && event.target !== toggle) {
+          menu.classList.add('hidden');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key !== 'Escape' || menu.classList.contains('hidden')) return;
+        menu.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+      });
+    }
+
+    function hasAcademicDetails(profile) {
+      return Boolean(profile && ['institution', 'department', 'session', 'year', 'semester']
+        .every(field => String(profile[field] || '').trim()));
+    }
+
+    function showOnboardingProfile(profile) {
+      const modal = $('onboarding-profile-modal');
+      if (!modal || hasAcademicDetails(profile)) return;
+      $('onboarding-institution').value = profile?.institution || '';
+      $('onboarding-department').value = profile?.department || '';
+      $('onboarding-session').value = profile?.session || '';
+      $('onboarding-year').value = profile?.year || '';
+      $('onboarding-semester').value = profile?.semester || '';
+      modal.classList.remove('hidden');
+      $('onboarding-institution').focus();
+    }
+
+    async function saveOnboardingProfile(event) {
+      event.preventDefault();
+      if (!cloudUser || !state.profile) return;
+      const status = $('onboarding-profile-status');
+      const updated = {
+        ...state.profile,
+        institution: $('onboarding-institution').value.trim(),
+        department: $('onboarding-department').value.trim(),
+        session: $('onboarding-session').value.trim(),
+        year: $('onboarding-year').value,
+        semester: $('onboarding-semester').value
+      };
+      status.textContent = 'Saving your academic details…';
+      status.className = 'sm:col-span-2 text-sm font-semibold text-forest';
+      try {
+        state.profile = updated;
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(updated));
+        localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
+        if (cloudUserPath()) await cloudUserPath().set(cloudSnapshot());
+        $('onboarding-profile-modal').classList.add('hidden');
+        renderProfile();
+      } catch (error) {
+        console.error('Academic profile save failed:', error);
+        status.textContent = 'The details could not be saved. Please try again.';
+        status.className = 'sm:col-span-2 text-sm font-semibold text-rust';
+      }
+    }
+
+    $('onboarding-profile-form')?.addEventListener('submit', saveOnboardingProfile);
 
     function renderProfile() {
       const profile = state.profile;
@@ -1243,7 +1437,9 @@
       ownerLink?.classList.toggle('hidden', !canShowOwner);
       const lastVisitTimestamp = Number(localStorage.getItem('lastVisitTimestamp') || 0);
       const isRecentVisit = hasProfile && lastVisitTimestamp > 0 && Date.now() - lastVisitTimestamp < 5400000;
-      const profileGreeting = 'Student Profile';
+      const profileGreeting = hasProfile
+        ? (profile.fullName || profile.name || cloudUser?.displayName || 'Student Profile')
+        : 'Student Profile';
       if (hasProfile && !isRecentVisit) localStorage.setItem('lastVisitTimestamp', String(Date.now()));
       $('plan-workspace').classList.toggle('hidden', !hasProfile);
       document.body.classList.toggle('logged-in', hasProfile && accountMode);
@@ -1258,7 +1454,9 @@
       $('profile-session').value = profile?.session || '';
       $('profile-year').value = profile?.year || '';
       $('profile-semester').value = profile?.semester || '';
-      $('profile-heading').textContent = hasProfile ? profileGreeting : (cloudUser ? 'Complete your academic profile' : 'Sign in to your workspace');
+      $('profile-heading').textContent = cloudUser
+        ? (profile?.fullName || profile?.name || cloudUser.displayName || 'Student Profile')
+        : 'Sign in to your workspace';
       const showLogin = !hasProfile && !cloudUser;
       $('profile-form').classList.toggle('hidden', hasProfile || showLogin);
       $('login-form').classList.toggle('hidden', hasProfile || !showLogin);
@@ -1274,8 +1472,13 @@
         ].map(([label, value]) => `<div class="rounded-xl bg-paper border border-line p-3"><div class="text-xs text-ink/55">${label}</div><div class="font-semibold text-forest-dark mt-1">${escapeHtml(value || 'Not provided')}</div></div>`).join('');
       }
       const avatar = $('profile-avatar');
-      avatar.innerHTML = profile?.picture ? `<img src="${profile.picture}" alt="${escapeHtml(profile.fullName || profile.name || 'Profile picture')}" class="avatar-image w-full h-full">` : escapeHtml((profile?.fullName || profile?.name || '👋').charAt(0).toUpperCase());
+      const displayName = profile?.fullName || profile?.name || cloudUser?.displayName || 'Student Profile';
+      const photoUrl = profile?.picture || cloudUser?.photoURL || '';
+      avatar.innerHTML = photoUrl
+        ? `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(displayName)}" class="avatar-image w-full h-full">`
+        : escapeHtml(displayName.trim().charAt(0).toUpperCase() || 'L');
       $('profile-menu-wrap').classList.toggle('hidden', !hasProfile);
+      if (hasProfile) initializeAccountMenu();
       if (!hasProfile) {
         $('account-menu').classList.add('hidden');
         $('account-menu-toggle').setAttribute('aria-expanded', 'false');
@@ -1300,10 +1503,16 @@
         state.plan.goals = state.plan.goals.split('\n').map(text => text.trim()).filter(Boolean).map(text => ({ id: crypto.randomUUID(), text, done: Array(planLength()).fill(false) }));
       }
       state.plan.goals = (state.plan.goals || []).map(goal => ({
-        id: goal.id || crypto.randomUUID(), text: goal.text || String(goal), time: goal.time || '', done: Array.from({length}, (_, i) => Boolean(goal.done?.[i]))
+        id: goal.id || crypto.randomUUID(),
+        text: goal.text || String(goal),
+        time: goal.time || '',
+        fromTime: goal.fromTime || '',
+        toTime: goal.toTime || '',
+        createdAt: goal.createdAt || '',
+        done: Array.from({length}, (_, i) => Boolean(goal.done?.[i]))
       }));
       const goalTasks = state.plan.goals.map(goal => ({
-        id: `goal-${goal.id}`, goalId: goal.id, text: goal.text, time: goal.time || '', source: 'goal', days: Array(length).fill(true), done: goal.done
+        id: `goal-${goal.id}`, goalId: goal.id, text: goal.text, time: goalTimeLabel(goal), source: 'goal', days: Array(length).fill(true), done: goal.done
       }));
       state.plan.tasks = (state.plan.tasks || []).filter(task => task.source !== 'goal').map(task => ({
         ...task,
@@ -1317,7 +1526,23 @@
     }
     function renderGoalList() {
       const goals = state.plan?.goals || [];
-      $('global-goal-list').innerHTML = goals.length ? goals.map(goal => `<div class="flex items-center gap-2 rounded-xl border border-line bg-white px-3 py-2"><span class="flex-1 min-w-0 text-sm text-forest-dark">${escapeHtml(goal.text)}${goal.time ? ` <time class="ml-1 text-xs font-semibold text-slate-500">· ${escapeHtml(formatTime(goal.time))}</time>` : ''}</span><button type="button" data-remove-goal="${goal.id}" aria-label="Delete goal" class="shrink-0 text-ink/35 hover:text-rust text-lg">×</button></div>`).join('') : '<p class="text-xs text-ink/50">No goals added yet.</p>';
+      $('global-goal-list').innerHTML = goals.length ? goals.map(goal => {
+        const hasStudyWindow = Boolean(goal.fromTime && goal.toTime);
+        const studyTime = goal.fromTime || goal.toTime ? goalTimeLabel(goal) : '';
+        const duration = hasStudyWindow && typeof window.academyFormatGoalDuration === 'function'
+          ? window.academyFormatGoalDuration(goal.fromTime, goal.toTime)
+          : '';
+        const createdTime = goal.createdAt || (goal.time && !goal.fromTime && !goal.toTime ? goal.time : '');
+        return `<div class="goal-item-card${studyTime ? ' has-study-time' : ''} rounded-xl border border-line bg-white px-3 py-2">
+          <span class="goal-title text-sm text-forest-dark">${escapeHtml(goal.text)}</span>
+          ${duration ? `<span class="goal-duration">${escapeHtml(duration)}</span>` : '<span class="goal-duration goal-duration-empty" aria-hidden="true"></span>'}
+          <span class="goal-study-slot">${studyTime ? `<time class="goal-study-time">${escapeHtml(studyTime)}</time>` : ''}</span>
+          <span class="goal-actions">
+            <time class="goal-created-time">${createdTime ? escapeHtml(formatTime(createdTime)) : ''}</time>
+            <button type="button" data-remove-goal="${goal.id}" aria-label="Delete goal" class="shrink-0 text-ink/35 hover:text-rust text-lg">×</button>
+          </span>
+        </div>`;
+      }).join('') : '<p class="text-xs text-ink/50">No goals added yet.</p>';
       $('global-goal-list').querySelectorAll('[data-remove-goal]').forEach(button => button.addEventListener('click', () => {
         state.plan.goals = state.plan.goals.filter(goal => goal.id !== button.dataset.removeGoal);
         save();
@@ -1532,7 +1757,7 @@
       if (typeof window.academyIsLegacyPlanTitle === 'function' && window.academyIsLegacyPlanTitle(state.plan.title)) state.plan.title = '';
       renderActivePlanSelector();
       $('plan-name').value = state.plan.title || '';
-      $('plan-name').placeholder = window.academyPlanDefaults?.titlePlaceholder || 'Add your plan name...';
+      $('plan-name').placeholder = window.academyPlanDefaults?.titlePlaceholder || 'Enter your plan name...';
       $('plan-days').min = '0';
       $('plan-days').removeAttribute('max');
       $('plan-days').value = String(planLength());
@@ -1794,8 +2019,12 @@
       const input = $('global-goal-input');
       const text = input.value.trim();
       if (!text) return;
-      state.plan.goals.push({ id: crypto.randomUUID(), text, time: currentTimeValue(), done: Array(planLength()).fill(false) });
+      const fromTime = $('global-goal-from-time').value;
+      const toTime = $('global-goal-to-time').value;
+      state.plan.goals.push({ id: crypto.randomUUID(), text, time: '', fromTime, toTime, createdAt: currentTimeValue(), done: Array(planLength()).fill(false) });
       input.value = '';
+      $('global-goal-from-time').value = '';
+      $('global-goal-to-time').value = '';
       save();
       render();
       input.focus();
@@ -1819,7 +2048,7 @@
       state.plan.goals = (state.plan.goals || []).map(goal => ({...goal, done: Array.from({length}, (_, i) => Boolean(goal.done?.[i]))}));
       state.plan.tasks = (state.plan.tasks || []).map(task => ({...task, days: Array.from({length}, (_, i) => Boolean(task.days?.[i])), done: Array.from({length}, (_, i) => Boolean(task.done?.[i]))}));
       state.plan.tasks = state.plan.tasks.filter(task => task.source !== 'goal');
-      state.plan.goals.forEach(goal => state.plan.tasks.unshift({id:`goal-${goal.id}`, goalId:goal.id, text:goal.text, source:'goal', days:Array(length).fill(true), done:goal.done}));
+      state.plan.goals.forEach(goal => state.plan.tasks.unshift({id:`goal-${goal.id}`, goalId:goal.id, text:goal.text, time:goalTimeLabel(goal), source:'goal', days:Array(length).fill(true), done:goal.done}));
       state.day = length > 0 ? Math.min(state.day, length - 1) : 0;
       save();
       render();
@@ -1871,7 +2100,7 @@
       const now = dhakaNow();
       state.plan={id:crypto.randomUUID(),title:DEFAULT_PLAN_TITLE,created:new Date().toISOString(),duration:DEFAULT_PLAN_DURATION,startDate:now.date,startTime:now.time,goals:[],tasks:[],notes:[]};
         $('plan-name').value = '';
-        $('plan-name').placeholder = 'Type your plan name...';
+        $('plan-name').placeholder = 'Enter your plan name...';
         $('plan-days').min = '0';
         $('plan-days').removeAttribute('max');
         $('plan-days').value = '0';
@@ -2346,6 +2575,40 @@
       history.replaceState(null, '', 'index.html?account#profile');
     });
 
+    function applyMockAccountMode() {
+      if (!window.MOCK_ACCOUNT_MODE) return;
+      const mockUid = 'local-ui-test-user';
+      cloudUser = {
+        uid: mockUid,
+        email: 'local-ui-test@example.invalid',
+        displayName: 'Local UI Test User',
+        photoURL: '',
+        isMock: true
+      };
+      cloudUserAcademyId = mockUid;
+      cloudSyncReady = false;
+      state.profile = {
+        id: mockUid,
+        uid: mockUid,
+        fullName: 'Local UI Test User',
+        name: 'Local UI Test User',
+        email: 'local-ui-test@example.invalid',
+        cloudEmail: 'local-ui-test@example.invalid',
+        institution: 'Local UI Testing',
+        department: 'Interface Development',
+        session: 'Local preview',
+        year: 'Graduate',
+        semester: '1st semester',
+        picture: ''
+      };
+      setView('account');
+      renderProfile();
+      render();
+      $('profile-saved').textContent = 'Local UI simulation is active. No account was authenticated.';
+      $('profile-saved').classList.remove('hidden');
+    }
+    window.applyMockAccountMode = applyMockAccountMode;
+
     function applyDevAccountView(loggedIn) {
       if (!window.IS_DEV_MODE) return;
       if (loggedIn) {
@@ -2480,6 +2743,7 @@
     $('owner-next-page')?.addEventListener('click', () => { ownerPage++; renderOwnerUsers(); });
     setView(accountMode ? 'account' : 'home');
     bindCloudAuth();
+    if (window.MOCK_ACCOUNT_MODE === true) applyMockAccountMode();
     renderProfile();
     render();
     renderStorage().catch(error => console.error('Initial study storage load failed:', error));
@@ -2495,8 +2759,8 @@
     }, 1000);
 
     // Merged from script.js
-    function academyIsLegacyPlanTitleFallback() {
-      return false;
+    function academyIsLegacyPlanTitleFallback(value) {
+      return String(value || '').trim().toLowerCase() === 'my 7-day plan';
     }
 
     if (typeof window.academyIsLegacyPlanTitle !== 'function') {
