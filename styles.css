@@ -556,6 +556,117 @@ body.view-storage #storage-open-mobile,
   text-decoration-color: #E8A33D;
 }
 
+/* Final responsive navigation and landing-page layout rules. These come last
+   so they remain authoritative over the legacy merged styles above. */
+
+/* Keep account plan controls readable without nested or competing scroll areas. */
+#account-menu #plan-list,
+#account-menu #account-trash-list {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  max-height: none;
+  overflow: visible;
+  padding: .25rem 0 .5rem;
+}
+#account-menu #plan-list > *,
+#account-menu #account-trash-list > * {
+  position: static;
+  min-height: 0;
+  width: 100%;
+}
+#account-menu #saved-plans-panel,
+#account-menu #restore-plans-panel {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+@media (min-width: 768px) {
+  header .desktop-nav-bar {
+    display: flex !important;
+    flex: 0 1 auto;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .35rem;
+    width: auto;
+    max-width: none;
+    overflow: visible;
+  }
+
+  header .responsive-menu-toggle {
+    display: none !important;
+  }
+
+  header #mobile-menu,
+  header #mobile-menu.hidden,
+  header #mobile-menu:not(.hidden) {
+    display: none !important;
+  }
+
+  #landing-hero > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(17rem, .9fr);
+    align-items: center;
+    gap: clamp(2.5rem, 6vw, 6rem);
+    width: min(100% - 3rem, 72rem);
+    min-height: 0;
+    padding: clamp(5rem, 9vh, 7rem) 0;
+  }
+
+  #landing-hero > div::after {
+    grid-column: 2;
+    grid-row: 1 / span 6;
+    align-self: center;
+    min-height: 14rem;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+  }
+
+  #landing-hero h1 {
+    max-width: 42rem;
+    font-size: clamp(2.75rem, 4.8vw, 4.75rem);
+  }
+}
+
+@media (max-width: 767px) {
+  header .desktop-nav-bar {
+    display: none !important;
+  }
+
+  header .responsive-menu-toggle {
+    display: inline-flex !important;
+  }
+
+  header #mobile-menu {
+    display: flex;
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  header #mobile-menu.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transform: translateY(-.5rem);
+  }
+
+  header #mobile-menu:not(.hidden) {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  #landing-hero > div {
+    display: block;
+    width: 100%;
+    padding: 4.5rem 1.25rem 5rem;
+  }
+}
+
 /* Three-dot account options are a bounded floating panel. */
 #account-menu {
   position: absolute;
@@ -583,27 +694,27 @@ body.view-storage #storage-open-mobile,
 
 #account-menu #saved-plans-panel,
 #account-menu #restore-plans-panel {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  overflow: hidden;
+  height: auto;
+  overflow: visible;
   overflow-wrap: anywhere;
 }
 
-#account-menu #plan-list {
-  max-height: 14rem;
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding: .15rem .1rem .25rem 0;
-}
-
+#account-menu #plan-list,
 #account-menu #account-trash-list {
-  max-height: 10rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  width: 100%;
+  max-height: none;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding: .15rem .1rem .25rem 0;
+  overflow: visible;
+  padding: .25rem 0 .5rem;
 }
 
 #account-menu #saved-plans-panel > *,
@@ -855,3 +966,120 @@ body.recovery-modal-active { overflow: hidden; }
 }
 #recovery-status[role="alert"]::before { content: '⚠ '; }
 #recovery-status[role="status"]::before { content: '✓ '; }
+
+/* Authoritative responsive navigation and spacious account-menu rules. */
+@media (min-width: 768px) {
+  header .desktop-nav-bar {
+    display: flex !important;
+    flex: 0 1 auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .5rem;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    overflow: visible;
+  }
+
+  header .desktop-nav-bar .menu-nav-item {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  header .responsive-menu-toggle,
+  header #mobile-menu,
+  header #mobile-menu:not(.hidden) {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  header .desktop-nav-bar {
+    display: none !important;
+  }
+
+  header .responsive-menu-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  header #mobile-menu {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    max-width: 100vw;
+    max-height: calc(100vh - 4rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  header #mobile-menu.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transform: translateY(-.5rem);
+  }
+
+  header #mobile-menu:not(.hidden) {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transform: translateY(0);
+  }
+}
+
+/* The account menu remains a single padded flex stack; list sections do not
+   create nested scrollbars or clip plan action controls. */
+#account-menu {
+  max-height: none;
+  overflow: visible;
+}
+#account-menu #saved-plans-panel,
+#account-menu #restore-plans-panel,
+#account-menu #plan-list,
+#account-menu #account-trash-list {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  padding: .25rem 0 .5rem;
+}
+#account-menu #plan-list > *,
+#account-menu #account-trash-list > * {
+  position: static;
+  width: 100%;
+  min-height: 0;
+}
+
+/* Balanced landing composition on wide screens. */
+@media (min-width: 768px) {
+  #landing-hero > div {
+    width: min(calc(100% - 4rem), 76rem);
+    min-height: min(44rem, calc(100vh - 4rem));
+    padding: clamp(4rem, 8vh, 7rem) 0;
+    column-gap: clamp(3rem, 7vw, 7rem);
+  }
+
+  #landing-hero h1 {
+    max-width: 43rem;
+    font-size: clamp(2.75rem, 4.6vw, 4.75rem);
+    line-height: 1.08;
+  }
+
+  #landing-hero > div::after {
+    grid-column: 2;
+    grid-row: 1 / span 6;
+    width: 100%;
+    min-height: 17rem;
+    align-self: center;
+    justify-self: stretch;
+    padding: clamp(2rem, 4vw, 4rem) 1.5rem;
+  }
+}
