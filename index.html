@@ -421,12 +421,18 @@
         <span class="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center text-lg">▦</span>
         <span class="font-serif text-lg font-semibold leading-none text-slate-800">Study Workspace</span>
       </a>
-      <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" class="w-10 h-10 flex items-center justify-center rounded-full border border-line">
-        <svg id="menu-icon-open" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
-        <svg id="menu-icon-close" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      <nav id="desktop-nav" class="desktop-nav items-center gap-2" aria-label="Main navigation">
+        <button id="desktop-storage-open" type="button" data-route="storage" class="menu-nav-item rounded-lg px-3 py-2 text-sm font-semibold">📁 Study Storage</button>
+        <a id="desktop-account-link" href="index.html?account#profile" class="menu-nav-item rounded-lg px-3 py-2 text-sm">Account</a>
+        <button id="desktop-owner-link" type="button" class="menu-nav-item hidden rounded-lg px-3 py-2 text-sm font-semibold">Owner Dashboard</button>
+        <button id="desktop-privacy-open" type="button" class="menu-nav-item rounded-lg px-3 py-2 text-sm" aria-controls="privacy-modal" aria-haspopup="dialog">Privacy Notice</button>
+      </nav>
+      <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" class="menu-toggle w-10 h-10 items-center justify-center rounded-full border border-line">
+        <svg id="menu-icon-open" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        <svg id="menu-icon-close" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
-    <div id="mobile-menu" class="hidden md:hidden border-t border-line bg-paper px-5 py-4 space-y-3" aria-label="Main navigation">
+    <div id="mobile-menu" class="hidden border-t border-line bg-paper px-5 py-4 space-y-3" aria-label="Main navigation">
       <button id="storage-open-mobile" type="button" data-route="storage" class="menu-nav-item block w-full text-left text-sm py-2 px-3 rounded-lg font-semibold" aria-controls="study-storage">📁 Study Storage</button>
       <a id="account-nav-link" href="index.html?account#profile" class="menu-nav-item block text-sm py-2 px-3 rounded-lg" aria-controls="profile">Account</a>
       <button id="owner-nav-link" type="button" class="menu-nav-item hidden block w-full text-left text-sm py-2 px-3 rounded-lg font-semibold">Owner Dashboard</button>
@@ -2482,7 +2488,7 @@
       $('menu-icon-open')?.classList.remove('hidden');
       $('menu-icon-close')?.classList.add('hidden');
     }
-    menuToggle?.addEventListener('click', () => {
+        menuToggle?.addEventListener('click', () => {
       if (!mobileMenu) return;
       const open = mobileMenu.classList.contains('hidden');
       mobileMenu.classList.toggle('hidden', !open);
@@ -2491,6 +2497,13 @@
       $('menu-icon-open')?.classList.toggle('hidden', open);
       $('menu-icon-close')?.classList.toggle('hidden', !open);
     });
+    if (menuToggle) menuToggle.dataset.menuBound = 'true';
+    $('desktop-account-link')?.addEventListener('click', event => {
+      event.preventDefault();
+      $('account-nav-link')?.click();
+    });
+    $('desktop-privacy-open')?.addEventListener('click', () => $('privacy-open')?.click());
+    $('desktop-owner-link')?.addEventListener('click', () => $('owner-nav-link')?.click());
     document.addEventListener('click', event => {
       if (menuToggle?.getAttribute('aria-expanded') !== 'true') return;
       if (!mobileMenu?.contains(event.target) && !menuToggle?.contains(event.target)) closeMobileMenu();
@@ -2520,7 +2533,7 @@
     });
 
     const storageModal = $('study-storage');
-    const storageOpenButtons = [$('storage-open'), $('storage-open-mobile')].filter(Boolean);
+    const storageOpenButtons = [$('storage-open'), $('storage-open-mobile'), $('desktop-storage-open')].filter(Boolean);
     function openStorageModal() {
       if (!storageModal) return;
       setView('storage');
