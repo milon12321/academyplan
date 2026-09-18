@@ -111,10 +111,10 @@
     .eyebrow-dark { font-family:"Fraunces","Georgia",serif; font-style:italic; color:#1B4332; }
 
     /* Study storage opens as a focused workspace instead of occupying the dashboard. */
-    #study-storage { display:none; position:fixed; inset:0; z-index:50; overflow-y:auto; padding:1rem 0; background:transparent; }
+    /* Study Storage is a dedicated routed workspace, not an overlay modal. */
+    #study-storage { display:none; min-height:calc(100vh - 4rem); padding:2rem 0 3rem; background:#F8FAFC; }
     #study-storage.storage-modal-open { display:block; }
-    #study-storage::before { content:''; position:fixed; inset:0; z-index:40; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); pointer-events:none; }
-    #study-storage .storage-modal-panel { position:relative; z-index:50; background:#FFFFFF; color:#0F172A; }
+    #study-storage .storage-modal-panel { position:relative; background:#FFFFFF; color:#0F172A; }
     #study-storage .storage-modal-panel .workspace-heading,
     #study-storage .storage-modal-panel h2,
     #study-storage .storage-modal-panel h3,
@@ -398,13 +398,15 @@
       line-height: 1;
       transition: background-color .2s ease, color .2s ease, border-color .2s ease;
     }
-    .schedule-mode-button[aria-pressed="true"] {
+    .schedule-mode-button[aria-pressed="true"],
+    .schedule-mode-button.active {
       border-color: #1E293B;
       background: #1E293B;
       color: #FFFFFF;
     }
     .schedule-mode-button:hover { background: #F1F5F9; }
-    .schedule-mode-button[aria-pressed="true"]:hover { background: #0F172A; }
+    .schedule-mode-button[aria-pressed="true"]:hover,
+    .schedule-mode-button.active:hover { background: #0F172A; }
     @media (max-width: 640px) {
       .schedule-mode-button { padding: .4rem .35rem; font-size: .62rem; }
     }
@@ -423,11 +425,11 @@
       </button>
     </div>
     <div id="mobile-menu" class="hidden md:hidden border-t border-line bg-paper px-5 py-4 space-y-3" aria-label="Main navigation">
-      <button id="storage-open-mobile" type="button" class="block w-full text-left text-sm py-1 font-semibold">📁 Study Storage</button>
-      <a id="account-nav-link" href="#profile" class="block text-sm py-1">Account</a>
-      <button id="owner-nav-link" type="button" class="hidden block w-full text-left text-sm py-1 font-semibold">Owner Dashboard</button>
-      <button id="privacy-open" type="button" class="block w-full text-left text-sm py-1">Privacy Notice</button>
-      <button id="mobile-logout" type="button" class="hidden w-full text-left text-sm py-1 text-rust font-semibold">Log out</button>
+      <button id="storage-open-mobile" type="button" data-route="storage" class="menu-nav-item block w-full text-left text-sm py-2 px-3 rounded-lg font-semibold" aria-controls="study-storage">📁 Study Storage</button>
+      <a id="account-nav-link" href="index.html?account#profile" class="menu-nav-item block text-sm py-2 px-3 rounded-lg" aria-controls="profile">Account</a>
+      <button id="owner-nav-link" type="button" class="menu-nav-item hidden block w-full text-left text-sm py-2 px-3 rounded-lg font-semibold">Owner Dashboard</button>
+      <button id="privacy-open" type="button" class="menu-nav-item block w-full text-left text-sm py-2 px-3 rounded-lg" aria-controls="privacy-modal" aria-haspopup="dialog">Privacy Notice</button>
+      <button id="mobile-logout" type="button" class="hidden w-full text-left text-sm py-2 px-3 rounded-lg text-rust font-semibold">Log out</button>
     </div>
   </header>
   <main>
@@ -444,7 +446,11 @@
 
     <section id="study-storage" class="p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="storage-title">
       <div class="max-w-6xl mx-auto storage-modal-panel">
-        <div class="workspace-card p-5 sm:p-7">
+                  <div class="workspace-card p-5 sm:p-7">
+          <div class="flex items-center justify-between gap-3 mb-5 border-b border-slate-200 pb-4">
+            <a id="storage-back" href="index.html" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">← Back to Home / Workspace</a>
+            <span class="hidden sm:inline text-xs font-semibold uppercase tracking-wide text-slate-400">Dedicated study storage</span>
+          </div>
           <div class="flex items-start justify-between gap-4 mb-5">
             <div>
               <p class="eyebrow-dark text-base">Private browser storage</p>
@@ -513,7 +519,9 @@
       <div class="max-w-6xl mx-auto px-5 sm:px-8">
         <div id="account-card" class="max-w-2xl mx-auto bg-white rounded-2xl border border-line shadow-sm p-5 sm:p-7">
           <div class="flex items-start gap-4">
-            <div id="profile-avatar" class="w-16 h-16 shrink-0 rounded-full bg-forest/10 text-forest flex items-center justify-center text-2xl font-serif font-semibold overflow-hidden ring-2 ring-marigold/40 ring-offset-2 ring-offset-white">👋</div>
+            <div id="profile-avatar" class="profile-avatar profile-avatar-placeholder w-16 h-16 shrink-0 rounded-full flex items-center justify-center overflow-hidden" role="img" aria-label="Academic workspace avatar">
+              <span class="profile-avatar-mark" aria-hidden="true">▦</span>
+            </div>
             <div class="min-w-0 flex-1">
               <h2 id="profile-heading" class="font-serif text-2xl text-forest-dark mt-0.5">Create your account</h2>
               <div id="profile-contact" class="hidden mt-1">
@@ -531,7 +539,6 @@
                 <button id="edit-profile" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Edit profile</button>
                 <button id="change-picture" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Change profile picture</button>
                 <button id="export-account" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Export account data</button>
-                <button id="import-account" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Import account data</button>
                 <div class="border-t border-line mt-1 pt-1 space-y-1">
                   <button id="saved-plans-toggle" type="button" aria-expanded="false" aria-controls="saved-plans-panel" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">
                     <span>Saved plans</span>
@@ -566,19 +573,53 @@
                   </div>
                 </div>
                 <input id="profile-picture-change" type="file" accept="image/*" class="hidden" aria-label="Choose a new profile picture">
-                <input id="account-file" type="file" accept="application/json,.json" class="hidden" aria-label="Choose an account backup file">
                 <button id="logout" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-rust hover:bg-rust/5">Log out</button>
               </div>
             </div>
           </div>
 
-          <form id="login-form" class="hidden mt-6 space-y-3">
-            <p class="text-sm text-ink/70 leading-relaxed">Sign in securely with your Google account. Your study plans are saved to your authenticated Google account and can be completed with the academic details below.</p>
-            <button id="google-login" type="button" class="google-sign-in w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-800 font-semibold py-3 rounded-full text-sm shadow-sm hover:bg-slate-50 transition-colors"><span class="google-mark" aria-hidden="true">G</span> Sign in with Google</button>
-            <button id="import-login-account" type="button" class="w-full border border-forest text-forest-dark font-semibold py-3 rounded-full text-sm hover:bg-forest/5 transition-colors">Import account backup</button>
+          <div id="login-view">
+          <form id="login-form" class="mt-6 auth-form space-y-3" data-auth-flow="firebase-email">
+            <p class="text-sm text-ink/70 leading-relaxed">Sign in with your email and password, or continue securely with Google.</p>
+            <div class="auth-fields space-y-3">
+              <div><label for="login-email" class="field-label">Email</label><input id="login-email" name="email" type="email" inputmode="email" autocomplete="email" required class="auth-input w-full px-4 py-3 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
+              <div>
+                <div class="flex items-center justify-between gap-3">
+                  <label for="login-password" class="field-label mb-0">Password</label>
+                  <button id="open-recovery" type="button" class="password-recovery-link text-xs font-semibold text-forest-dark">Forgot Password?</button>
+                </div>
+                <input id="login-password" name="password" type="password" autocomplete="current-password" minlength="6" required class="auth-input w-full px-4 py-3 border border-line rounded-xl text-sm" placeholder="At least 6 characters">
+              </div>
+            </div>
+            <button id="manual-auth-submit" type="submit" class="auth-submit w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Log In</button>
+            <p class="text-center text-sm text-ink/60"><span id="manual-auth-prompt">New here?</span> <button id="email-mode-toggle" type="button" class="font-semibold text-forest-dark underline underline-offset-2">Sign Up</button></p>
+            <div class="auth-divider" aria-hidden="true"><span>OR</span></div>
+            <button id="google-login" type="button" class="google-sign-in auth-google w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-800 font-semibold py-3 rounded-full text-sm shadow-sm hover:bg-slate-50 transition-colors"><span class="google-mark" aria-hidden="true">G</span> Sign in with Google</button>
             <p id="login-status" class="hidden text-sm text-rust font-semibold" role="status" aria-live="polite"></p>
-            <p class="text-center text-sm text-ink/60">Use your Google account to access your workspace.</p>
           </form>
+          </div>
+
+          <div id="signup-view" class="signup-view hidden mt-6" aria-labelledby="signup-title">
+            <div class="signup-heading">
+              <p class="eyebrow-dark text-base">Create your workspace account</p>
+              <h3 id="signup-title" class="font-serif text-2xl text-forest-dark mt-0.5">Student registration</h3>
+              <p class="mt-2 text-sm text-ink/65">Add your academic details once, then use your email and password to sign in.</p>
+            </div>
+            <div id="signup-status" class="signup-status-banner hidden" role="alert" aria-live="polite"></div>
+            <form id="signup-form" class="signup-form mt-5 grid sm:grid-cols-2 gap-3" novalidate>
+              <div><label for="signup-full-name" class="field-label">Full Name</label><input id="signup-full-name" name="fullName" type="text" autocomplete="name" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+              <div><label for="signup-email" class="field-label">Email Address</label><input id="signup-email" name="email" type="email" autocomplete="email" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+              <div><label for="signup-university" class="field-label">University / Institution</label><input id="signup-university" name="institution" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+              <div><label for="signup-department" class="field-label">Department</label><input id="signup-department" name="department" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+              <div><label for="signup-session" class="field-label">Academic Session</label><input id="signup-session" name="session" type="text" placeholder="2022–2026" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+              <div><label for="signup-year" class="field-label">Academic Year</label><select id="signup-year" name="year" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select year</option><option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option><option>Graduate</option></select></div>
+              <div><label for="signup-semester" class="field-label">Semester</label><select id="signup-semester" name="semester" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select semester</option><option>1st semester</option><option>2nd semester</option><option>3rd semester</option><option>4th semester</option><option>5th semester</option><option>6th semester</option><option>7th semester</option><option>8th semester</option></select></div>
+              <div class="profile-picture-field"><label for="signup-picture" class="field-label">Profile Picture <span class="font-normal text-ink/50">(optional)</span></label><label for="signup-picture" class="profile-picture-upload"><span class="profile-picture-upload-button">Choose File</span><span id="signup-picture-name" class="profile-picture-upload-name">No file chosen</span><input id="signup-picture" name="picture" type="file" accept="image/*" class="profile-picture-input"></label></div>
+              <div><label for="signup-password" class="field-label">Create Password</label><input id="signup-password" name="password" type="password" minlength="6" autocomplete="new-password" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
+              <div><label for="signup-confirm-password" class="field-label">Confirm Password</label><input id="signup-confirm-password" name="confirmPassword" type="password" minlength="6" autocomplete="new-password" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"><p id="signup-password-match" class="hidden mt-1 text-xs font-semibold" role="status"></p></div>
+              <div class="sm:col-span-2 flex flex-col-reverse sm:flex-row gap-2 sm:justify-end mt-2"><button id="signup-back" type="button" class="border border-line hover:bg-forest/5 text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm">Back to Log In</button><button id="signup-submit" type="submit" class="bg-forest hover:bg-forest-dark text-paper font-semibold px-5 py-2.5 rounded-full text-sm">Create Account</button></div>
+            </form>
+          </div>
 
           <form id="profile-form" class="mt-6 grid sm:grid-cols-2 gap-3">
             <div><label for="profile-name" class="field-label">Full name</label><input id="profile-name" name="name" type="text" autocomplete="name" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your full name"></div>
@@ -589,7 +630,8 @@
             <div><label for="profile-year" class="field-label">Year</label><select id="profile-year" name="year" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select year</option><option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option><option>Graduate</option></select></div>
             <div><label for="profile-semester" class="field-label">Semester</label><select id="profile-semester" name="semester" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select semester</option><option>1st semester</option><option>2nd semester</option><option>3rd semester</option><option>4th semester</option><option>5th semester</option><option>6th semester</option><option>7th semester</option><option>8th semester</option></select></div>
             <div class="sm:col-span-2"><label for="profile-picture" class="field-label">Profile picture (optional)</label><input id="profile-picture" name="picture" type="file" accept="image/*" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-paper"></div>
-            <button id="google-signup" type="button" class="sm:col-span-2 google-sign-in w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-800 font-semibold py-3 rounded-full text-sm shadow-sm hover:bg-slate-50 transition-colors"><span class="google-mark" aria-hidden="true">G</span> Continue with Google</button>
+            <div class="sm:col-span-2 auth-divider" aria-hidden="true"><span>OR</span></div>
+            <button id="google-signup" type="button" class="sm:col-span-2 google-sign-in auth-google w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-800 font-semibold py-3 rounded-full text-sm shadow-sm hover:bg-slate-50 transition-colors"><span class="google-mark" aria-hidden="true">G</span> Continue with Google</button>
             <button type="submit" class="sm:col-span-2 bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Save academic profile</button>
             <p class="sm:col-span-2 text-center text-sm text-ink/60">Your Google account identifies your workspace; no separate password is required.</p>
           </form>
@@ -885,25 +927,19 @@
     </div>
   </div>
 
-  <div id="recovery-modal" class="hidden fixed inset-0 z-[70] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="recovery-title">
+  <div id="recovery-modal" class="recovery-modal hidden fixed inset-0 z-[70] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="recovery-title">
     <div class="min-h-full flex items-center justify-center">
       <div class="w-full max-w-md bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
         <div class="flex items-start justify-between gap-4">
-          <div><p class="eyebrow-dark text-base">Account recovery</p><h2 id="recovery-title" class="font-serif text-2xl text-forest-dark mt-0.5">Forgot your Google account or password?</h2></div>
-          <button id="close-recovery" type="button" aria-label="Close account recovery" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
+          <div><p class="eyebrow-dark text-base">Account recovery</p><h2 id="recovery-title" class="font-serif text-2xl text-forest-dark mt-0.5">Reset your password</h2></div>
+          <button id="close-recovery" type="button" aria-label="Close password reset" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
         </div>
-        <p class="mt-4 text-sm text-ink/70 leading-relaxed">Enter the email linked to your account. Recovery is handled locally in this browser; no email will be sent.</p>
+        <p class="mt-4 text-sm text-ink/70 leading-relaxed">Enter your registered email address and Firebase will send a secure password reset link.</p>
         <form id="recovery-form" class="mt-5 space-y-3">
-          <div><label for="recovery-email" class="field-label">Email address</label><input id="recovery-email" type="email" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
-          <button id="recovery-lookup" type="submit" class="w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm">Find my account</button>
+          <div><label for="recovery-email" class="field-label">Email address</label><input id="recovery-email" type="email" autocomplete="email" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
+          <button id="recovery-lookup" type="submit" class="w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm">Send Reset Link</button>
+          <button id="back-to-login" type="button" class="w-full border border-line hover:bg-forest/5 text-forest-dark font-semibold py-3 rounded-full text-sm">Back to Log In</button>
           <p id="recovery-status" class="hidden text-sm font-semibold" role="status" aria-live="polite"></p>
-          <div id="recovery-reset-panel" class="hidden rounded-xl border border-line bg-white p-4 space-y-3">
-            <p class="text-sm font-semibold text-forest-dark">Account found!</p>
-            <p class="text-sm text-ink/70">Google account: <strong id="recovery-academy-id" class="text-forest-dark"></strong></p>
-            <p class="text-sm font-semibold text-forest-dark">Reset your password below:</p>
-            <div><label for="recovery-new-password" class="field-label">New cloud password</label><input id="recovery-new-password" type="password" minlength="6" autocomplete="new-password" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="At least 6 characters"></div>
-            <button id="save-recovery-password" type="button" class="w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm">Save New Password</button>
-          </div>
         </form>
       </div>
     </div>
@@ -1041,9 +1077,11 @@
       const profileSaved = document.getElementById('profile-saved');
       const showLogin = mode === 'login';
       if (!loginForm || !profileForm) return;
+      document.getElementById('login-view')?.classList.toggle('hidden', !showLogin);
+      document.getElementById('signup-view')?.classList.toggle('hidden', showLogin);
       loginForm.classList.toggle('hidden', !showLogin);
       profileForm.classList.toggle('hidden', showLogin);
-      if (heading) heading.textContent = showLogin ? 'Open your account' : 'Create your account';
+      if (heading) heading.textContent = showLogin ? 'Sign in to your workspace' : 'Create your workspace account';
       if (loginStatus) loginStatus.classList.add('hidden');
       if (profileSaved) profileSaved.classList.add('hidden');
       document.getElementById(showLogin ? 'login-id' : 'profile-name')?.focus();
@@ -1443,7 +1481,9 @@
       if (hasProfile && !isRecentVisit) localStorage.setItem('lastVisitTimestamp', String(Date.now()));
       $('plan-workspace').classList.toggle('hidden', !hasProfile);
       document.body.classList.toggle('logged-in', hasProfile && accountMode);
-            $('login-form').classList.toggle('hidden', hasProfile);
+      $('login-view').classList.toggle('hidden', hasProfile);
+      $('signup-view').classList.add('hidden');
+      $('login-form').classList.toggle('hidden', hasProfile);
       $('profile-id').classList.add('hidden');
       $('menu-profile-id').textContent = hasProfile ? profile.id : '';
       $('profile-name').value = profile?.fullName || profile?.name || cloudUser?.displayName || '';
@@ -1472,11 +1512,24 @@
         ].map(([label, value]) => `<div class="rounded-xl bg-paper border border-line p-3"><div class="text-xs text-ink/55">${label}</div><div class="font-semibold text-forest-dark mt-1">${escapeHtml(value || 'Not provided')}</div></div>`).join('');
       }
       const avatar = $('profile-avatar');
-      const displayName = profile?.fullName || profile?.name || cloudUser?.displayName || 'Student Profile';
+      const displayName = profile?.fullName || profile?.name || cloudUser?.displayName || '';
       const photoUrl = profile?.picture || cloudUser?.photoURL || '';
+      const initial = displayName.trim().charAt(0).toUpperCase();
+      avatar.classList.toggle('profile-avatar-placeholder', !photoUrl && !initial);
+      avatar.classList.toggle('profile-avatar-initial', !photoUrl && Boolean(initial));
+      avatar.setAttribute('aria-label', photoUrl ? `${displayName || 'Student'} profile picture` : initial ? `${displayName} avatar` : 'Academic workspace avatar');
       avatar.innerHTML = photoUrl
-        ? `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(displayName)}" class="avatar-image w-full h-full">`
-        : escapeHtml(displayName.trim().charAt(0).toUpperCase() || 'L');
+        ? `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(displayName || 'Student')}" class="avatar-image w-full h-full" data-avatar-image>`
+        : initial
+          ? `<span class="profile-avatar-initial-mark" aria-hidden="true">${escapeHtml(initial)}</span>`
+          : '<span class="profile-avatar-mark" aria-hidden="true">▦</span>';
+      avatar.querySelector('[data-avatar-image]')?.addEventListener('error', () => {
+        avatar.classList.remove('profile-avatar-placeholder');
+        avatar.classList.add('profile-avatar-initial');
+        avatar.innerHTML = initial
+          ? `<span class="profile-avatar-initial-mark" aria-hidden="true">${escapeHtml(initial)}</span>`
+          : '<span class="profile-avatar-mark" aria-hidden="true">▦</span>';
+      }, { once: true });
       $('profile-menu-wrap').classList.toggle('hidden', !hasProfile);
       if (hasProfile) initializeAccountMenu();
       if (!hasProfile) {
@@ -1811,6 +1864,34 @@
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
     }
+    function updateAvatarPreview(name = '', picture = '') {
+      const avatar = $('profile-avatar');
+      if (!avatar) return;
+      const cleanName = String(name || '').trim();
+      const initial = cleanName.charAt(0).toUpperCase();
+      avatar.classList.toggle('profile-avatar-placeholder', !picture && !initial);
+      avatar.classList.toggle('profile-avatar-initial', !picture && Boolean(initial));
+      avatar.setAttribute('aria-label', picture ? `${cleanName || 'Student'} profile picture` : initial ? `${cleanName} avatar` : 'Academic workspace avatar');
+      avatar.innerHTML = picture
+        ? `<img src="${escapeHtml(picture)}" alt="${escapeHtml(cleanName || 'Student')}" class="avatar-image w-full h-full" data-avatar-image>`
+        : initial
+          ? `<span class="profile-avatar-initial-mark" aria-hidden="true">${escapeHtml(initial)}</span>`
+          : '<span class="profile-avatar-mark" aria-hidden="true">▦</span>';
+      avatar.querySelector('[data-avatar-image]')?.addEventListener('error', () => updateAvatarPreview(cleanName), { once: true });
+    }
+
+    $('signup-full-name')?.addEventListener('input', event => {
+      if (!$('signup-picture')?.files?.length) updateAvatarPreview(event.target.value);
+    });
+    $('signup-picture')?.addEventListener('change', event => {
+      const file = event.target.files?.[0];
+      if (!file) return updateAvatarPreview($('signup-full-name')?.value || '');
+      const reader = new FileReader();
+      reader.onload = () => updateAvatarPreview($('signup-full-name')?.value || '', reader.result);
+      reader.onerror = () => updateAvatarPreview($('signup-full-name')?.value || '');
+      reader.readAsDataURL(file);
+    });
+
     $('profile-form').addEventListener('submit', async e=>{
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
@@ -1849,14 +1930,15 @@
         window.academyToggleAccountMode(mode);
       } else {
         const showLogin = mode === 'login';
+        $('login-view')?.classList.toggle('hidden', !showLogin);
+        $('signup-view')?.classList.toggle('hidden', showLogin);
         $('login-form').classList.toggle('hidden', !showLogin);
         $('profile-form').classList.toggle('hidden', showLogin);
-        $('profile-heading').textContent = showLogin ? 'Open your account' : 'Create your account';
+        $('profile-heading').textContent = showLogin ? 'Sign in to your workspace' : 'Create your workspace account';
         $('login-status').classList.add('hidden');
         (showLogin ? $('login-id') : $('profile-name')).focus();
       }
     }
-    $('import-login-account')?.addEventListener('click', () => $('account-file').click());
     async function signInWithGoogle() {
       if (!window.academyAuth) {
         $('login-status').textContent = 'Google sign-in is unavailable. Check the Firebase configuration.';
@@ -1871,6 +1953,53 @@
         $('login-status').classList.remove('hidden');
       }
     }
+
+    let emailAuthSignUpMode = false;
+    function updateEmailAuthMode() {
+      $('manual-auth-submit').textContent = emailAuthSignUpMode ? 'Sign Up' : 'Log In';
+      $('manual-auth-prompt').textContent = emailAuthSignUpMode ? 'Already have an account?' : 'New here?';
+      $('email-mode-toggle').textContent = emailAuthSignUpMode ? 'Log In' : 'Sign Up';
+      $('login-password').autocomplete = emailAuthSignUpMode ? 'new-password' : 'current-password';
+      $('login-status').classList.add('hidden');
+    }
+
+    $('login-form')?.addEventListener('submit', async event => {
+      event.preventDefault();
+      const email = $('login-email').value.trim();
+      const password = $('login-password').value;
+      const status = $('login-status');
+      if (!window.academyAuth) {
+        status.textContent = 'Email sign-in is unavailable. Check the Firebase configuration.';
+        status.className = 'text-sm text-rust font-semibold';
+        status.classList.remove('hidden');
+        return;
+      }
+      const button = $('manual-auth-submit');
+      button.disabled = true;
+      button.textContent = emailAuthSignUpMode ? 'Creating account…' : 'Signing in…';
+      status.classList.add('hidden');
+      try {
+        if (emailAuthSignUpMode) {
+          await window.academyAuth.createUserWithEmailAndPassword(email, password);
+        } else {
+          await window.academyAuth.signInWithEmailAndPassword(email, password);
+        }
+      } catch (error) {
+        status.textContent = error.message || 'Email authentication failed.';
+        status.className = 'text-sm text-rust font-semibold';
+        status.classList.remove('hidden');
+        updateEmailAuthMode();
+      } finally {
+        button.disabled = false;
+        if (document.body.contains(button)) updateEmailAuthMode();
+      }
+    });
+    $('email-mode-toggle')?.addEventListener('click', () => {
+      emailAuthSignUpMode = !emailAuthSignUpMode;
+      updateEmailAuthMode();
+      $('login-email').focus();
+    });
+    updateEmailAuthMode();
     $('google-login')?.addEventListener('click', signInWithGoogle);
     $('google-signup')?.addEventListener('click', signInWithGoogle);
 
@@ -1897,32 +2026,6 @@
       link.click();
       URL.revokeObjectURL(link.href);
       $('account-menu').classList.add('hidden');
-    });
-    $('import-account').addEventListener('click', () => $('account-file').click());
-    $('account-file').addEventListener('change', async event => {
-      const file = event.target.files[0];
-      if (!file) return;
-      try {
-        const backup = JSON.parse(await file.text());
-        const importedPlans = backup.plans || (backup.plan ? [backup.plan] : null);
-        if (!backup.profile?.id || !backup.profile?.name || !backup.profile?.email || !importedPlans?.length) throw new Error('Invalid backup');
-        if (!confirm('Import this account and replace the current profile and saved plans?')) return;
-        state.profile = backup.profile;
-        state.plans = importedPlans.map(plan => ({ ...plan, id: plan.id || crypto.randomUUID() }));
-        state.plan = state.plans[0];
-        localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile));
-        localStorage.setItem(SESSION_KEY, JSON.stringify(state.profile));
-        save();
-        state.day = 0;
-        renderProfile();
-        render();
-        $('profile-saved').textContent = 'Account and Academy plan restored successfully.';
-        $('profile-saved').classList.remove('hidden');
-      } catch (error) {
-        alert('This is not a valid Academy account backup file.');
-      } finally {
-        event.target.value = '';
-      }
     });
     $('close-saved-plan-preview').addEventListener('click', closeSavedPlanPreview);
     $('cancel-saved-plan-preview').addEventListener('click', closeSavedPlanPreview);
@@ -2258,90 +2361,86 @@
     });
     $('send-report').addEventListener('click', () => sendProgressReport());
     const recoveryModal = $('recovery-modal');
-    function closeRecoveryModal() { recoveryModal?.classList.add('hidden'); }
-    $('open-recovery')?.addEventListener('click', () => {
-      recoveryModal?.classList.remove('hidden');
-      resetRecoveryPanel();
-      $('recovery-email').value = $('profile-email').value || '';
-      $('recovery-email').focus();
-    });
-    $('close-recovery')?.addEventListener('click', closeRecoveryModal);
-    recoveryModal?.addEventListener('click', event => { if (event.target === recoveryModal) closeRecoveryModal(); });
-    function resetRecoveryPanel() {
-      $('recovery-status').className = 'hidden text-sm font-semibold';
-      $('recovery-status').textContent = '';
-      $('recovery-reset-panel').classList.add('hidden');
-      $('recovery-academy-id').textContent = '';
-      $('recovery-new-password').value = '';
-      $('recovery-new-password').removeAttribute('required');
-      $('recovery-lookup').classList.remove('hidden');
+    function closeRecoveryModal() {
+      window.academyClosePasswordRecovery?.();
     }
-
-    function findLocalRecoveryAccount(email) {
-      const normalizedEmail = email.trim().toLowerCase();
-      const profiles = [
-        readCachedJSON(PROFILE_KEY, null),
-        readCachedJSON(SESSION_KEY, null)
-      ].filter(Boolean);
-      const plans = readCachedJSON(PLANS_KEY, []);
-      const planProfiles = Array.isArray(plans)
-        ? plans.flatMap(plan => plan.profile ? [plan.profile] : [])
-        : [];
-      return [...profiles, ...planProfiles].find(profile =>
-        String(profile.email || profile.cloudEmail || '').trim().toLowerCase() === normalizedEmail
-      ) || null;
-    }
-
-    $('recovery-form')?.addEventListener('submit', event => {
+    $('open-recovery')?.addEventListener('click', event => {
       event.preventDefault();
-      const email = $('recovery-email').value.trim();
+      resetRecoveryPanel();
+      window.academyOpenPasswordRecovery?.();
+    });
+    $('close-recovery')?.addEventListener('click', () => {
+      resetRecoveryPanel();
+      window.academyReturnToLogin?.();
+    });
+    function resetRecoveryPanel() {
       const status = $('recovery-status');
-      const account = findLocalRecoveryAccount(email);
+      const button = $('recovery-lookup');
+      if (status) {
+        status.className = 'hidden text-sm font-semibold';
+        status.textContent = '';
+      }
+      if (button) {
+        button.classList.remove('hidden');
+        button.disabled = false;
+        button.textContent = 'Send Reset Link';
+      }
+    }
 
-      if (!account) {
-        $('recovery-reset-panel').classList.add('hidden');
-        status.textContent = 'No account found with this email address.';
-        status.className = 'text-sm font-semibold text-rust';
+    $('recovery-form')?.addEventListener('submit', async event => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const emailInput = $('recovery-email');
+      const status = $('recovery-status');
+      const button = $('recovery-lookup');
+      if (!emailInput || !status || !button) return;
+
+      const email = emailInput.value.trim();
+      status.className = 'text-sm font-semibold';
+      status.classList.remove('hidden', 'text-rust', 'text-forest', 'text-error', 'text-success');
+
+      if (!email || !emailInput.validity.valid) {
+        status.textContent = 'Enter a valid email address.';
+        status.classList.add('text-error');
+        status.setAttribute('role', 'alert');
+        emailInput.focus();
+        return;
+      }
+      if (!window.academyAuth || typeof window.academyAuth.sendPasswordResetEmail !== 'function') {
+        status.textContent = 'Password reset is temporarily unavailable. Please try again later.';
+        status.classList.add('text-error');
+        status.setAttribute('role', 'alert');
         return;
       }
 
-      $('recovery-academy-id').textContent = account.id || 'Not available';
-      $('recovery-new-password').setAttribute('required', 'required');
-      $('recovery-reset-panel').classList.remove('hidden');
-      $('recovery-lookup').classList.add('hidden');
-      status.textContent = 'Account found! Reset your password below:';
-      status.className = 'text-sm font-semibold text-forest';
-      $('recovery-new-password').focus();
+      button.disabled = true;
+      button.textContent = 'Sending…';
+      button.setAttribute('aria-busy', 'true');
+      try {
+        // Keep the modal open for both success and failure. Only explicit user
+        // actions close it through academyReturnToLogin().
+        await window.academyAuth.sendPasswordResetEmail(email);
+        status.textContent = 'Reset link sent. Check your email to choose a new password.';
+        status.classList.add('text-success');
+        status.setAttribute('role', 'status');
+      } catch (error) {
+        status.textContent = typeof window.academyPasswordRecoveryErrorMessage === 'function'
+          ? window.academyPasswordRecoveryErrorMessage(error)
+          : 'Unable to send reset email. Please verify the email address or try again later.';
+        status.classList.add('text-error');
+        status.setAttribute('role', 'alert');
+        emailInput.focus();
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Send Reset Link';
+        button.removeAttribute('aria-busy');
+      }
     });
 
-    $('save-recovery-password')?.addEventListener('click', async () => {
-      const email = $('recovery-email').value.trim();
-      const newPassword = $('recovery-new-password').value;
-      const status = $('recovery-status');
-      const account = findLocalRecoveryAccount(email);
-
-      if (!account) {
-        status.textContent = 'No account found with this email address.';
-        status.className = 'text-sm font-semibold text-rust';
-        return;
-      }
-      if (newPassword.length < 6) {
-        status.textContent = 'Your new password must be at least 6 characters.';
-        status.className = 'text-sm font-semibold text-rust';
-        $('recovery-new-password').focus();
-        return;
-      }
-
-      const updatedProfile = { ...account, passwordHash: await hashSecret(newPassword) };
-      delete updatedProfile.password;
-      localStorage.setItem(PROFILE_KEY, JSON.stringify(updatedProfile));
-      if (state.profile?.id === account.id) {
-        state.profile = updatedProfile;
-        localStorage.setItem(SESSION_KEY, JSON.stringify(updatedProfile));
-      }
-      status.textContent = `Password saved. You can sign in with Google account ${account.id}.`;
-      status.className = 'text-sm font-semibold text-forest';
-      $('recovery-new-password').value = '';
+    $('back-to-login')?.addEventListener('click', () => {
+      resetRecoveryPanel();
+      window.academyReturnToLogin?.();
     });
     $('auto-daily-report').addEventListener('change', event => {
       const previousSettings = readCachedJSON(DAILY_REPORT_KEY, {});
@@ -2394,7 +2493,9 @@
       if (!mobileMenu?.contains(event.target) && !menuToggle?.contains(event.target)) closeMobileMenu();
     });
     mobileMenu?.querySelectorAll('a, button').forEach(item => item.addEventListener('click', () => {
-      if (item.id !== 'privacy-open' && item.id !== 'storage-open-mobile') closeMobileMenu();
+      // Every destination closes the drawer; the destination handler then opens
+      // its own modal or view when appropriate.
+      closeMobileMenu();
     }));
     mobileMenuBackdrop?.addEventListener('keydown', event => {
       if (event.key === 'Escape') closeMobileMenu();
@@ -2423,7 +2524,7 @@
       storageModal.classList.add('storage-modal-open');
       $('storage-open')?.setAttribute('aria-expanded', 'true');
       $('storage-open-mobile')?.setAttribute('aria-expanded', 'true');
-      document.body.classList.add('overflow-hidden');
+      document.body.classList.remove('overflow-hidden');
       renderStorage().catch(error => {
         console.error('Study storage could not be opened:', error);
         const status = $('storage-status');
@@ -2438,17 +2539,27 @@
       if (!storageModal) return;
       storageModal.classList.remove('storage-modal-open');
       setView('home');
+      const url = new URL(window.location.href);
+      url.searchParams.delete('storage');
+      history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
       $('storage-open')?.setAttribute('aria-expanded', 'false');
       $('storage-open-mobile')?.setAttribute('aria-expanded', 'false');
       document.body.classList.remove('overflow-hidden');
     }
     storageOpenButtons.forEach(button => button.addEventListener('click', () => {
       closeMobileMenu();
+      window.academyStorageRoute?.();
       openStorageModal();
     }));
     $('storage-close')?.addEventListener('click', closeStorageModal);
+    $('storage-back')?.addEventListener('click', event => {
+      event.preventDefault();
+      closeStorageModal();
+      history.replaceState(null, '', 'index.html');
+    });
+    // Dedicated storage views do not close when clicking the page background.
     storageModal?.addEventListener('click', event => {
-      if (event.target === storageModal) closeStorageModal();
+      if (event.target === storageModal) return;
     });
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
@@ -2558,6 +2669,12 @@
         setTimeout(() => (state.profile ? $('plan-workspace') : $('profile-name'))?.focus(), 350);
       }
     }
+    window.addEventListener('popstate', () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('storage')) openStorageModal();
+      else if (params.has('account') || window.location.hash === '#profile') setView('account');
+      else setView('home');
+    });
     const enterWorkspace = $('enter-workspace');
     enterWorkspace?.addEventListener('click', event => {
       event.preventDefault();
@@ -2571,8 +2688,50 @@
     $('account-nav-link')?.addEventListener('click', event => {
       event.preventDefault();
       closeMobileMenu();
-      setView('account');
-      history.replaceState(null, '', 'index.html?account#profile');
+      $('account-menu')?.classList.add('hidden');
+      $('account-menu-toggle')?.setAttribute('aria-expanded', 'false');
+
+      const focusLoginView = () => {
+        // Always show the sign-in form when there is no Firebase user. This
+        // also exits registration and any other routed view safely.
+        setView('account');
+        history.replaceState(null, '', 'index.html?account#profile');
+        if (typeof window.academyToggleAccountMode === 'function') {
+          window.academyToggleAccountMode('login');
+        } else {
+          $('signup-view')?.classList.add('hidden');
+          $('login-form')?.classList.remove('hidden');
+          $('profile-heading').textContent = 'Sign in to your workspace';
+        }
+        const loginField = $('login-email');
+        setTimeout(() => {
+          loginField?.focus();
+          if (!loginField) $('profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 0);
+      };
+
+      const openProfileView = () => {
+        // Re-selecting Account while already authenticated is intentionally
+        // idempotent: it keeps the user in the same profile destination.
+        setView('account');
+        history.replaceState(null, '', 'index.html?account#profile');
+        $('signup-view')?.classList.add('hidden');
+        $('login-form')?.classList.add('hidden');
+        $('profile')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+
+      const route = window.academyAccountRoute;
+      if (typeof route === 'function') {
+        route({
+          isAuthenticated: Boolean(cloudUser),
+          openProfile: openProfileView,
+          focusLogin: focusLoginView
+        });
+      } else if (cloudUser) {
+        openProfileView();
+      } else {
+        focusLoginView();
+      }
     });
 
     function applyMockAccountMode() {
@@ -2741,7 +2900,14 @@
     $('owner-refresh-users')?.addEventListener('click', loadOwnerUsers);
     $('owner-previous-page')?.addEventListener('click', () => { ownerPage--; renderOwnerUsers(); });
     $('owner-next-page')?.addEventListener('click', () => { ownerPage++; renderOwnerUsers(); });
-    setView(accountMode ? 'account' : 'home');
+    const initialView = new URLSearchParams(window.location.search).has('storage')
+      ? 'storage'
+      : accountMode ? 'account' : 'home';
+    setView(initialView);
+    if (initialView === 'storage') {
+      storageModal?.classList.add('storage-modal-open');
+      renderStorage().catch(error => console.error('Initial study storage load failed:', error));
+    }
     bindCloudAuth();
     if (window.MOCK_ACCOUNT_MODE === true) applyMockAccountMode();
     renderProfile();
@@ -2853,9 +3019,11 @@
       const profileSaved = document.getElementById('profile-saved');
       const showLogin = mode === 'login';
       if (!loginForm || !profileForm) return;
+      document.getElementById('login-view')?.classList.toggle('hidden', !showLogin);
+      document.getElementById('signup-view')?.classList.toggle('hidden', showLogin);
       loginForm.classList.toggle('hidden', !showLogin);
       profileForm.classList.toggle('hidden', showLogin);
-      if (heading) heading.textContent = showLogin ? 'Open your account' : 'Create your account';
+      if (heading) heading.textContent = showLogin ? 'Sign in to your workspace' : 'Create your workspace account';
       if (loginStatus) loginStatus.classList.add('hidden');
       if (profileSaved) profileSaved.classList.add('hidden');
       const target = document.getElementById(showLogin ? 'login-id' : 'profile-name');
