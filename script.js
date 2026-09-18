@@ -88,6 +88,11 @@ window.academyToggleMobileMenu = function () {
   // Add the live host (for example, username.github.io) to Firebase Console →
   // Authentication → Settings → Authorized domains. Without that domain,
   // Firebase may reject password-reset requests with auth/unauthorized-domain.
+  // Shown only after Firebase confirms that the reset email was accepted.
+  window.academyPasswordRecoverySuccessMessage = function () {
+    return 'Reset link sent! Check your inbox and Spam/Junk folder to choose a new password.';
+  };
+
   window.academyPasswordRecoveryErrorMessage = function (error) {
     const code = String(error?.code || '').toLowerCase();
     if (code === 'auth/user-not-found') {
