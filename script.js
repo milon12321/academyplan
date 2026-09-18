@@ -28,10 +28,12 @@ window.academyToggleMobileMenu = function () {
   // helper class-based makes it safe to call from responsive UI integrations.
   const opening = menu.classList.contains('hidden');
   menu.classList.toggle('hidden', !opening);
+  menu.setAttribute('aria-hidden', String(!opening));
   toggle.setAttribute('aria-expanded', String(opening));
   toggle.setAttribute('aria-label', opening ? 'Close menu' : 'Open menu');
   document.getElementById('menu-icon-open')?.classList.toggle('hidden', opening);
   document.getElementById('menu-icon-close')?.classList.toggle('hidden', !opening);
+  menu.setAttribute('aria-hidden', String(!opening));
   return opening;
 };
 
