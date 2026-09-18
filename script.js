@@ -18,6 +18,20 @@ window.academyStorageRoute = function () {
   }
 };
 
+// Toggle the responsive drawer without assuming that either element exists.
+window.academyToggleMobileMenu = function () {
+  const menu = document.getElementById('mobile-menu');
+  const toggle = document.getElementById('menu-toggle');
+  if (!menu || !toggle) return false;
+  const opening = menu.classList.contains('hidden');
+  menu.classList.toggle('hidden', !opening);
+  toggle.setAttribute('aria-expanded', String(opening));
+  toggle.setAttribute('aria-label', opening ? 'Close menu' : 'Open menu');
+  document.getElementById('menu-icon-open')?.classList.toggle('hidden', opening);
+  document.getElementById('menu-icon-close')?.classList.toggle('hidden', !opening);
+  return opening;
+};
+
 // Keep Account navigation independent from Firebase implementation details.
 // The page supplies the authenticated state and the appropriate view actions.
 (() => {
