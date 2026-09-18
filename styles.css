@@ -226,9 +226,18 @@ body.view-storage #storage-open-mobile,
   line-height: 1.45;
 }
 #recovery-status.text-success {
-  border: 1px solid #BBF7D0;
-  background: #F0FDF4;
+  display: block;
+  min-height: 3.25rem;
+  margin-top: .75rem;
+  padding: .9rem 1rem;
+  border: 1px solid #86EFAC;
+  border-radius: .75rem;
+  background: #DCFCE7;
   color: #166534;
+  font-size: .875rem;
+  font-weight: 700;
+  line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(22, 101, 52, .1);
 }
 #recovery-status.text-error {
   border: 1px solid #FECACA;
@@ -826,9 +835,18 @@ body.recovery-modal-active { overflow: hidden; }
   line-height: 1.45;
 }
 #recovery-status.text-success {
-  border: 1px solid #BBF7D0;
-  background: #F0FDF4;
+  display: block;
+  min-height: 3.25rem;
+  margin-top: .75rem;
+  padding: .9rem 1rem;
+  border: 1px solid #86EFAC;
+  border-radius: .75rem;
+  background: #DCFCE7;
   color: #166534;
+  font-size: .875rem;
+  font-weight: 700;
+  line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(22, 101, 52, .1);
 }
 #recovery-status.text-error {
   border: 1px solid #FECACA;
