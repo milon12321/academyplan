@@ -1,484 +1,239 @@
-/* Fixed mobile navigation drawer: it floats above the page without shifting layout. */
-#mobile-menu {
-  position: fixed;
-  top: 4.5rem;
-  right: 1rem;
-  z-index: 1000;
-  width: 260px;
-  max-width: calc(100vw - 2rem);
-  max-height: calc(100vh - 5.5rem);
-  overflow-y: auto;
-  border: 1px solid #DED5BE;
-  border-radius: 1rem;
-  box-shadow: 0 20px 45px rgba(15, 42, 32, .22);
-  transform-origin: top right;
-  transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
-}
+// Application behavior is defined in index.html.
+// Styles belong in styles.css; this file intentionally contains only valid JavaScript.
 
-/* No backdrop is used: the homepage remains visually unchanged behind the drawer. */
-#mobile-menu-backdrop {
-  display: none !important;
-}
+// Format the elapsed study window shown on goal cards. An end time earlier than
+// the start time is treated as an overnight window.
+window.academyFormatGoalDuration = function (fromTime, toTime) {
+  if (!fromTime || !toTime) return '';
+  const toMinutes = value => {
+    const [hours, minutes] = String(value).split(':').map(Number);
+    return Number.isFinite(hours) && Number.isFinite(minutes) ? hours * 60 + minutes : null;
+  };
+  const start = toMinutes(fromTime);
+  const end = toMinutes(toTime);
+  if (start === null || end === null) return '';
+  let difference = end - start;
+  if (difference < 0) difference += 24 * 60;
+  if (difference === 0) return '';
+  const hours = Math.floor(difference / 60);
+  const minutes = difference % 60;
+  const hourText = hours ? `${hours} hr${hours === 1 ? '' : 's'}` : '';
+  const minuteText = minutes ? `${minutes} min${minutes === 1 ? '' : 's'}` : '';
+  return `(${[hourText, minuteText].filter(Boolean).join(' ')})`;
+};
 
-#mobile-menu.hidden {
-  display: block !important;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(-.5rem) scale(.98);
-}
+// Local UI-only testing hook. It never authenticates with Firebase or enables
+// cloud access. The shortcut is intentionally gated by a rapid three-click
+// gesture so an accidental key press cannot open the simulated account view.
+(() => {
+  const CLICK_WINDOW_MS = 800;
+  const DEVELOPER_WINDOW_MS = 10000;
 
-#mobile-menu:not(.hidden) {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-}
+  // This hook only activates the local UI simulation; it never changes Firebase auth.
+  const MOCK_SHORTCUT = 'l';
 
-@media (max-width: 640px) {
-  #mobile-menu {
-    top: 4.25rem;
-    right: .75rem;
-    width: 260px;
-    max-width: calc(100vw - 1.5rem);
+  const closeAccountMenu = () => {
+    const menu = document.getElementById('account-menu');
+    const toggle = document.getElementById('account-menu-toggle');
+    if (!menu) return;
+    menu.classList.add('hidden');
+    menu.classList.remove('is-closing');
+    toggle?.setAttribute('aria-expanded', 'false');
+  };
+
+  const initializeAccountMenuDismissal = () => {
+    const menu = document.getElementById('account-menu');
+    if (!menu || menu.dataset.dismissBound === 'true') return;
+    menu.dataset.dismissBound = 'true';
+
+    // Keep accordion headers inside the dropdown so their panels can open.
+    // Other menu actions still close the dropdown immediately after activation.
+    menu.addEventListener('click', event => {
+      const action = event.target.closest('button');
+      if (!action || action.id === 'account-menu-toggle') return;
+      if (action.id === 'saved-plans-toggle' || action.id === 'restore-plans-toggle') return;
+      closeAccountMenu();
+    });
+  };
+
+  const initializeDashboardStack = () => {
+    document.querySelectorAll('.study-dashboard-grid').forEach(container => {
+      container.classList.add('dashboard-stack-container');
+    });
+  };
+
+  // Initialize empty controls once. Manual edits switch that field to manual
+  // mode and are never overwritten by later renders.
+  const initializeEmptyPlanControls = () => {
+    const selector = document.getElementById('active-plan-selector');
+    const planName = document.getElementById('plan-name');
+    const startDate = document.getElementById('plan-start-date');
+    const startTime = document.getElementById('plan-start-time');
+    const endDate = document.getElementById('plan-end-date');
+    const goalFromTime = document.getElementById('global-goal-from-time');
+    const goalToTime = document.getElementById('global-goal-to-time');
+
+    // Goal study times are optional and must never inherit a previous draft.
+    [goalFromTime, goalToTime].forEach(input => {
+      if (input) input.value = '';
+    });
+
+    const hasSavedPlan = Boolean(selector?.value) && selector?.options.length > 1;
+    if (selector && !hasSavedPlan && selector.options.length === 1) {
+      selector.options[0].value = '';
+      selector.options[0].textContent = 'No plans saved yet';
+      selector.options[0].disabled = true;
+      selector.options[0].selected = true;
+      selector.setAttribute('aria-label', 'Select active plan');
+    }
+    if (planName) {
+      planName.placeholder = 'Enter your plan name...';
+      if (!hasSavedPlan) planName.value = '';
+    }
+
+    const dhakaParts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Dhaka', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+    }).formatToParts(new Date()).reduce((result, part) => {
+      if (part.type !== 'literal') result[part.type] = part.value;
+      return result;
+    }, {});
+    const bangladeshDate = `${dhakaParts.year}-${dhakaParts.month}-${dhakaParts.day}`;
+    const bangladeshTime = `${dhakaParts.hour}:${dhakaParts.minute}`;
+
+    const getDhakaValue = input => {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Dhaka', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+      }).formatToParts(new Date()).reduce((result, part) => {
+        if (part.type !== 'literal') result[part.type] = part.value;
+        return result;
+      }, {});
+      return input.type === 'time'
+        ? `${parts.hour}:${parts.minute}`
+        : `${parts.year}-${parts.month}-${parts.day}`;
+    };
+
+    const setMode = (input, autoButton, manualButton, isAuto) => {
+      if (!input || !autoButton || !manualButton) return;
+      autoButton.setAttribute('aria-pressed', String(isAuto));
+      manualButton.setAttribute('aria-pressed', String(!isAuto));
+      input.disabled = isAuto;
+      input.readOnly = isAuto;
+      if (isAuto) input.value = getDhakaValue(input);
+    };
+
+    const bindMode = (input, autoId, manualId, autoValue) => {
+      const autoButton = document.getElementById(autoId);
+      const manualButton = document.getElementById(manualId);
+      if (!input || !autoButton || !manualButton || input.dataset.modeBound === 'true') return;
+      input.dataset.modeBound = 'true';
+      autoButton.addEventListener('click', () => {
+        setMode(input, autoButton, manualButton, true);
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      manualButton.addEventListener('click', () => setMode(input, autoButton, manualButton, false));
+      input.addEventListener('input', () => {
+        autoButton.setAttribute('aria-pressed', 'false');
+        manualButton.setAttribute('aria-pressed', 'true');
+      });
+      if (!input.value || autoValue) setMode(input, autoButton, manualButton, true);
+      else setMode(input, autoButton, manualButton, false);
+    };
+
+    bindMode(startDate, 'start-date-auto', 'start-date-manual', true);
+    bindMode(startTime, 'start-time-auto', 'start-time-manual', true);
+    if (endDate && !endDate.value) endDate.value = bangladeshDate;
+
+    // Keep Auto fields aligned with the current Dhaka date/time while leaving
+    // Manual fields untouched so custom past or future values are preserved.
+    setInterval(() => {
+      [
+        ['plan-start-date', 'start-date-auto', 'start-date-manual'],
+        ['plan-start-time', 'start-time-auto', 'start-time-manual']
+      ].forEach(([inputId, autoId, manualId]) => {
+        const input = document.getElementById(inputId);
+        const autoButton = document.getElementById(autoId);
+        const manualButton = document.getElementById(manualId);
+        if (input && autoButton?.getAttribute('aria-pressed') === 'true') {
+          setMode(input, autoButton, manualButton, true);
+        }
+      });
+    }, 60000);
+  };
+
+  const initializeLocalMockTrigger = () => {
+    initializeEmptyPlanControls();
+    initializeDashboardStack();
+    const yearButton = document.getElementById('copyright-year');
+    const hint = document.querySelector('.mock-account-hint');
+    hint?.setAttribute('hidden', '');
+    if (!yearButton) return;
+
+    window.MOCK_ACCOUNT_MODE = Boolean(window.MOCK_ACCOUNT_MODE);
+    initializeAccountMenuDismissal();
+    let clickTimes = [];
+    let developerWindowTimer = null;
+    let developerWindowArmed = false;
+
+    // Developer-mode activation is intentionally silent for public users.
+    const showStatus = () => {};
+
+    const disarmDeveloperWindow = () => {
+      developerWindowArmed = false;
+      clearTimeout(developerWindowTimer);
+      developerWindowTimer = null;
+    };
+
+    yearButton.addEventListener('click', () => {
+      const now = Date.now();
+      clickTimes = clickTimes.filter(time => now - time <= CLICK_WINDOW_MS);
+      clickTimes.push(now);
+
+      if (clickTimes.length < 3) {
+        showStatus(`Developer mode: ${clickTimes.length}/3 clicks registered.`);
+        return;
+      }
+
+      clickTimes = [];
+      developerWindowArmed = true;
+      clearTimeout(developerWindowTimer);
+      developerWindowTimer = setTimeout(() => {
+        disarmDeveloperWindow();
+        showStatus('Developer window expired after 10 seconds. Click 2026 three times to re-arm it.');
+      }, DEVELOPER_WINDOW_MS);
+      showStatus('Developer window armed for 10 seconds. Press Ctrl + Shift + L.');
+    });
+
+    document.addEventListener('keydown', event => {
+      const isDeveloperShortcut = event.ctrlKey && event.shiftKey &&
+        !event.altKey && !event.metaKey && event.key.toLowerCase() === 'l';
+      if (!isDeveloperShortcut) return;
+
+      event.preventDefault();
+      if (!developerWindowArmed) {
+        showStatus('Shortcut ignored. Click 2026 three times rapidly first.');
+        return;
+      }
+
+      disarmDeveloperWindow();
+      window.MOCK_ACCOUNT_MODE = true;
+      showStatus('Local UI simulation active. Firebase authentication is unchanged.');
+      if (typeof window.applyMockAccountMode === 'function') {
+        window.applyMockAccountMode();
+      }
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeLocalMockTrigger, { once: true });
+  } else {
+    initializeLocalMockTrigger();
   }
-}
 
-@media (min-width: 768px) {
-  #mobile-menu,
-  #mobile-menu-backdrop {
-    display: none !important;
-  }
-}
-
-.title {
-  color: #5C6AC4;
-}
-
-/* Keep empty plan controls clear and intentional until a plan is selected. */
-#active-plan-selector:has(option:only-child),
-#active-plan-selector option[value=""] {
-  color: #64748B;
-}
-
-#plan-name {
-  background: #FFFFFF;
-}
-
-#plan-name::placeholder {
-  color: #94A3B8;
-  opacity: 1;
-}
-
-/* Structured goal cards keep every title, duration, study window, and action
-   aligned consistently across the full stacked list. */
-.goal-item-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) auto minmax(12rem, 1fr) auto;
-  align-items: center;
-  column-gap: .75rem;
-  row-gap: .4rem;
-}
-
-.goal-item-card .goal-title {
-  min-width: 0;
-  overflow: hidden;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.goal-item-card .goal-duration {
-  min-width: max-content;
-  padding: .2rem .55rem;
-  border: 1px solid #F2D39A;
-  border-radius: 999px;
-  background: #FFF7E6;
-  color: #8F5A12;
-  font-size: .7rem;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.goal-item-card .goal-study-slot {
-  min-width: 0;
-  text-align: center;
-}
-
-.goal-item-card .goal-study-time {
-  display: inline-block;
-  overflow: hidden;
-  max-width: 100%;
-  color: #475569;
-  font-size: .75rem;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.goal-item-card .goal-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: .45rem;
-  min-width: max-content;
-  margin-left: 0;
-}
-
-.goal-item-card .goal-created-time {
-  color: #64748B;
-  font-size: .7rem;
-  font-weight: 600;
-  white-space: nowrap;
-  text-align: right;
-}
-
-.goal-item-card > button[data-remove-goal] {
-  min-width: 1.5rem;
-  margin-left: 0;
-}
-
-@media (max-width: 640px) {
-  .goal-item-card {
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: .55rem;
-  }
-
-  .goal-item-card .goal-duration {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .goal-item-card .goal-study-slot {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    text-align: left;
-  }
-
-  .goal-item-card .goal-actions {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    justify-content: flex-end;
-  }
-}
-
-#active-plan-selector:invalid,
-#active-plan-selector option[value=""] {
-  color: #64748B;
-}
-
-/* Date and time controls remain editable; these are only visual defaults. */
-#plan-start-date,
-#plan-start-time,
-#plan-end-date {
-  background: #FFFFFF;
-  color: #1E293B;
-}
-
-.site-footer {
-  border-top: 1px solid #E2E8F0;
-  background: #F8FAFC;
-  color: #64748B;
-  padding: 24px 16px;
-  text-align: center;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.site-footer p {
-  margin: 0;
-}
-
-.footer-copyright {
-  margin-bottom: 4px !important;
-}
-
-.footer-year {
-  appearance: none;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-}
-
-.footer-year:hover,
-.footer-year:focus-visible {
-  color: #1B4332;
-  text-decoration: underline;
-  text-decoration-color: #E8A33D;
-  text-underline-offset: 3px;
-}
-
-.mock-account-status,
-.mock-account-hint,
-[data-developer-status],
-[data-developer-message] {
-  display: none !important;
-  visibility: hidden !important;
-  width: 0 !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-}
-
-.mock-account-hint kbd {
-  display: none !important;
-}
-
-.mock-account-hint kbd {
-  border: 1px solid #CBD5E1;
-  border-bottom-width: 2px;
-  border-radius: 4px;
-  padding: 1px 4px;
-  background: #FFFFFF;
-  color: #475569;
-  font-family: inherit;
-  font-size: 10px;
-}
-
-.footer-separator {
-  display: inline-block;
-  margin: 0 .45rem;
-  color: #94A3B8;
-}
-
-.footer-contact {
-  display: inline-block;
-}
-
-.footer-contact-link {
-  color: #64748B;
-  text-decoration: underline;
-  text-decoration-color: #CBD5E1;
-  text-underline-offset: 3px;
-  transition: color .2s ease, text-decoration-color .2s ease;
-}
-
-.footer-contact-link:hover,
-.footer-contact-link:focus-visible {
-  color: #1B4332;
-  text-decoration-color: #E8A33D;
-}
-
-/* Three-dot account options are a bounded floating panel. */
-#account-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  width: min(320px, calc(100vw - 2rem));
-  min-width: 220px;
-  max-width: calc(100vw - 2rem);
-  max-height: min(32rem, calc(100vh - 6rem));
-  margin-top: .5rem;
-  overflow-x: hidden;
-  overflow-y: auto;
-  box-sizing: border-box;
-  white-space: normal;
-}
-
-/* Nested plan accordions stay inside the menu and scroll independently. */
-#account-menu > .border-t {
-  margin-top: .5rem;
-  padding-top: .35rem;
-}
-
-#account-menu #saved-plans-panel,
-#account-menu #restore-plans-panel {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  overflow: hidden;
-  overflow-wrap: anywhere;
-}
-
-#account-menu #plan-list {
-  max-height: 14rem;
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding: .15rem .1rem .25rem 0;
-}
-
-#account-menu #account-trash-list {
-  max-height: 10rem;
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding: .15rem .1rem .25rem 0;
-}
-
-#account-menu #saved-plans-panel > *,
-#account-menu #restore-plans-panel > * {
-  min-width: 0;
-}
-
-#account-menu.hidden,
-#account-menu.is-closing {
-  display: none !important;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-#account-menu:not(.hidden):not(.is-closing) {
-  visibility: visible;
-}
-
-/* Owner diagnostics are a floating, owner-only modal and never affect page layout. */
-#owner-health-modal { display: none; }
-#owner-health-modal:not(.hidden) { display: block; }
-#owner-health-modal .owner-health-panel { color: #0F172A; }
-
-/* Keep the onboarding form readable above the workspace backdrop. */
-#onboarding-profile-modal .onboarding-profile-panel { color: #0F172A; }
-#onboarding-profile-modal .onboarding-profile-panel h2,
-#onboarding-profile-modal .onboarding-profile-panel p,
-#onboarding-profile-modal .onboarding-profile-panel label { max-width: 100%; }
-#owner-health-modal .owner-health-panel h2,
-#owner-health-modal .owner-health-panel h3,
-#owner-health-modal .owner-health-panel p,
-#owner-health-modal .owner-health-panel span,
-#owner-health-modal .owner-health-panel div,
-#owner-health-modal .owner-health-panel button { max-width: 100%; }
-
-/* Dedicated navigation views prevent homepage sections from stacking vertically. */
-body.view-account #landing-hero,
-body.view-account #study-storage,
-body.view-account #owner-dashboard,
-body.view-storage #landing-hero,
-body.view-storage #profile,
-body.view-storage #plan-workspace,
-body.view-storage #owner-dashboard,
-body.view-owner #landing-hero,
-body.view-owner #study-storage,
-body.view-owner #profile,
-body.view-owner #plan-workspace {
-  display: none !important;
-}
-
-body.view-account #profile {
-  display: block !important;
-}
-
-body.view-owner #owner-dashboard {
-  display: block !important;
-}
-
-/* Owner Dashboard is a dedicated destination, never a section below the home page. */
-body.view-owner #landing-hero,
-body.view-owner #profile,
-body.view-owner #plan-workspace,
-body.view-owner #study-storage {
-  display: none !important;
-}
-
-body.view-storage #study-storage {
-  display: block !important;
-}
-
-body.view-home #profile,
-body.view-home #study-storage {
-  display: none !important;
-}
-
-body.view-home #landing-hero {
-  display: flex !important;
-}
-
-/* The study dashboard is intentionally a single vertical flow at every
-   viewport size. A block layout prevents the expanded report from creating a
-   second, independently stretching column. */
-.dashboard-stack,
-.dashboard-stack-container,
-.study-dashboard-grid {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.dashboard-stack-container > * {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.dashboard-stack-container > * + * {
-  margin-top: 1.5rem;
-}
-
-.study-plan-panel {
-  min-width: 0;
-}
-
-.progress-overview-accordion {
-  min-width: 0;
-}
-
-.progress-overview-accordion > summary {
-  list-style: none;
-}
-
-.progress-overview-accordion > summary::-webkit-details-marker {
-  display: none;
-}
-
-.progress-overview-toggle {
-  transition: background-color .2s ease, box-shadow .2s ease, transform .2s ease;
-}
-
-.progress-overview-toggle:hover {
-  background: #F8FAFC;
-}
-
-.progress-overview-chevron {
-  transition: transform .3s ease;
-}
-
-.progress-overview-accordion[open] .progress-overview-chevron {
-  transform: rotate(180deg);
-}
-
-.progress-overview-content {
-  margin-top: .75rem;
-  animation: progressOverviewOpen .3s ease both;
-}
-
-@keyframes progressOverviewOpen {
-  from { opacity: 0; transform: translateY(-.5rem); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.progress-overview-accordion,
-.progress-overview-accordion[open] {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  height: auto;
-}
-
-.progress-overview-accordion[open] .progress-overview-content {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  height: auto;
-  max-height: none;
-  overflow: visible;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .progress-overview-content,
-  .progress-overview-chevron,
-  .progress-overview-toggle {
-    animation: none;
-    transition: none;
-  }
-}
+  // Keep the layout guard available even if the application replaces dashboard
+  // markup after the initial page load.
+  document.addEventListener('toggle', event => {
+    if (event.target.matches?.('.progress-overview-accordion')) initializeDashboardStack();
+  }, true);
+})();
