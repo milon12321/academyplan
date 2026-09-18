@@ -168,15 +168,29 @@ body.view-storage #storage-open-mobile,
   }
 }
 
+.plan-name-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  background-color: #FFFFFF;
+  font-size: 1rem;
+  color: #1F2A24;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.plan-name-input:focus {
+  border-color: #1B4332;
+  box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.15);
+}
+
 /* Keep empty plan controls clear and intentional until a plan is selected. */
 #active-plan-selector:has(option:only-child),
 #active-plan-selector option[value=""] {
   color: #64748B;
 }
 
-#plan-name {
-  background: #FFFFFF;
-}
 
 /* Dynamic academic avatar: branded placeholder, name initial, or uploaded image. */
 .profile-avatar {
@@ -357,10 +371,83 @@ body.view-storage #storage-open-mobile,
 .auth-divider span { flex: 0 0 auto; }
 
 
-#plan-name::placeholder {
-  color: #94A3B8;
-  opacity: 1;
+/* Organized day navigation and compact per-day progress indicators. */
+.day-navigation {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  background: #F8FAFC;
 }
+.day-navigation-main { display: flex; align-items: flex-end; gap: .75rem; min-width: 0; flex: 1; }
+.day-navigation-main .field-label { margin-bottom: .55rem; white-space: nowrap; }
+.day-selector { min-width: 0; flex: 1; padding: .7rem .85rem; border: 1px solid #CBD5E1; border-radius: .75rem; background: #FFFFFF; color: #1E293B; font-size: .875rem; font-weight: 600; }
+.day-navigation-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }
+.day-navigation-button { padding: .65rem .8rem; border: 1px solid #CBD5E1; border-radius: .7rem; background: #FFFFFF; color: #334155; font-size: .75rem; font-weight: 700; transition: background-color .2s ease, color .2s ease; }
+.day-navigation-button:hover { background: #1E293B; color: #FFFFFF; }
+.day-progress-badge, .day-progress-status { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; padding: .35rem .6rem; background: #E2E8F0; color: #475569; font-size: .7rem; font-weight: 800; white-space: nowrap; }
+.day-progress-badge.is-active { background: #DBEAFE; color: #1D4ED8; }
+.day-progress-badge.is-complete, .day-progress-status.is-complete { background: #DCFCE7; color: #166534; }
+.day-progress-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .6rem; }
+.day-progress-item { display: flex; align-items: center; gap: .65rem; min-width: 0; padding: .65rem; border: 1px solid #E2E8F0; border-radius: .85rem; background: #FFFFFF; color: #334155; text-align: left; transition: border-color .2s ease, box-shadow .2s ease; }
+.day-progress-item:hover, .day-progress-item.is-selected { border-color: #3B82F6; box-shadow: 0 4px 12px rgba(30, 64, 175, .1); }
+.day-progress-ring { display: grid; flex: 0 0 auto; width: 2.75rem; height: 2.75rem; place-items: center; border-radius: 50%; background: conic-gradient(#22C55E var(--progress), #E2E8F0 0); position: relative; font-size: .65rem; font-weight: 800; color: #166534; }
+.day-progress-ring::before { content: ''; position: absolute; inset: .25rem; border-radius: 50%; background: #FFFFFF; }
+.day-progress-ring span { position: relative; z-index: 1; }
+.day-progress-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: .15rem; }
+.day-progress-copy strong, .day-progress-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.day-progress-copy strong { font-size: .75rem; }
+.day-progress-copy small { color: #64748B; font-size: .68rem; }
+@media (max-width: 767px) {
+  .day-navigation { align-items: stretch; flex-direction: column; }
+  .day-navigation-main { align-items: stretch; flex-wrap: wrap; }
+  .day-navigation-main .field-label { width: 100%; margin-bottom: 0; }
+  .day-navigation-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .day-navigation-actions .day-navigation-button:last-child { grid-column: 1 / -1; }
+  .day-progress-list { grid-template-columns: 1fr; }
+}
+
+/* Collapsible daily overview keeps long plans compact while retaining quick day access. */
+.toggle-days-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  width: 100%;
+  margin-top: .75rem;
+  padding: .7rem .9rem;
+  border: 1px solid #EAE3D2;
+  border-radius: .85rem;
+  background: #FDFBF7;
+  color: #1B4332;
+  font-size: .8rem;
+  font-weight: 700;
+  text-align: left;
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.toggle-days-btn:hover,
+.toggle-days-btn:focus-visible {
+  border-color: #1B4332;
+  background: #E8F1EA;
+  box-shadow: 0 3px 10px rgba(27, 67, 50, .1);
+}
+.toggle-days-btn .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.4rem;
+  padding: 0 .45rem;
+  border-radius: 999px;
+  background: #EAE3D2;
+  color: #6B7280;
+  font-size: .7rem;
+  line-height: 1;
+}
+.all-days-container.hidden { display: none; }
 
 /* Structured goal cards keep every title, duration, study window, and action
    aligned consistently across the full stacked list. */
@@ -1051,6 +1138,37 @@ body.recovery-modal-active { overflow: hidden; }
   overflow: visible;
   padding: .25rem 0 .5rem;
 }
+
+/* Dedicated plan views replace cramped nested account-menu lists. */
+#saved-plans-modal,
+#restore-plans-modal { backdrop-filter: blur(3px); }
+.saved-plan-list,
+.restore-plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  width: 100%;
+}
+.saved-plan-list > *,
+.restore-plan-list > * {
+  width: 100%;
+  min-width: 0;
+}
+.restore-plan-list > div {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .85rem;
+  border: 1px solid #DED5BE;
+  border-radius: .75rem;
+  background: #FFFFFF;
+}
+.restore-plan-list > div > button:first-child { min-width: 0; flex: 1 1 auto; }
+.restore-plan-list > div > button:not(:first-child) { flex: 0 0 auto; }
+@media (max-width: 640px) {
+  .restore-plan-list > div { align-items: flex-start; flex-wrap: wrap; }
+  .restore-plan-list > div > button:first-child { flex-basis: 100%; }
+}
 #account-menu #plan-list > *,
 #account-menu #account-trash-list > * {
   position: static;
@@ -1058,7 +1176,411 @@ body.recovery-modal-active { overflow: hidden; }
   min-height: 0;
 }
 
+/* Tabbed analytics dashboard. */
+.analytics-report-section.hidden {
+  display: none !important;
+}
+.analytics-report-section {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-top: 1rem;
+  animation: fadeIn .2s ease-in-out;
+}
+
+/* Keep chart space stable without imposing oversized report heights. */
+.chart-container,
+.analytics-report-section #progress-chart,
+.analytics-report-section [data-chart-wrapper],
+.analytics-report-section .chart-wrapper,
+#progress-chart {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 280px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.analytics-report-section #progress-chart svg,
+.analytics-report-section #progress-chart canvas,
+.analytics-report-section canvas {
+  display: block;
+  width: 100%;
+  max-width: none;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.report-dashboard-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #EAE3D2;
+}
+.report-view-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .5rem;
+}
+.report-tab-button,
+.report-all-button {
+  border: 1px solid #EAE3D2;
+  border-radius: .75rem;
+  background: #FDFBF7;
+  color: #1B4332;
+  padding: .65rem .85rem;
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+.report-tab-button:hover,
+.report-tab-button:focus-visible,
+.report-all-button:hover,
+.report-all-button:focus-visible {
+  border-color: #1B4332;
+  background: #E8F1EA;
+}
+.report-tab-button.is-active,
+.report-all-button[aria-pressed="true"] {
+  border-color: #1B4332;
+  background: #1B4332;
+  color: #FFFFFF;
+}
+.report-tab-content.hidden { display: none !important; }
+.report-tab-content { min-width: 0; }
+@media (max-width: 767px) {
+  .report-dashboard-toolbar { align-items: stretch; flex-direction: column; }
+  .report-view-tabs { justify-content: flex-start; }
+}
+
 /* Balanced landing composition on wide screens. */
+/* Daily checklist academic palette and completion states. */
+.daily-checklist-section {
+  background: #FDFBF7;
+}
+.daily-checklist-card,
+.academic-task-card {
+  background: #FDFBF7 !important;
+  border-color: #EAE3D2 !important;
+}
+.academic-day-select {
+  border-color: #EAE3D2;
+  background: #FDFBF7;
+  color: #1B4332;
+}
+.academic-day-select:focus {
+  border-color: #1B4332;
+  box-shadow: 0 0 0 3px rgba(27, 67, 50, .12);
+}
+.academic-day-button {
+  border-color: #EAE3D2;
+  background: #FDFBF7;
+  color: #1B4332;
+}
+.academic-day-button:hover,
+.academic-day-button:focus-visible {
+  border-color: #1B4332;
+  background: #E8F1EA;
+  color: #1B4332;
+}
+.day-progress-item.is-neutral,
+.day-progress-badge.is-neutral {
+  border-color: #EAE3D2;
+  background: #FDFBF7;
+  color: #6B7280;
+}
+.day-progress-item.is-active,
+.day-progress-badge.is-active {
+  border-color: #D97706;
+  background: #FFF7E6;
+  color: #92400E;
+}
+.day-progress-item.is-complete,
+.day-progress-badge.is-complete {
+  border-color: #2E7D32;
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+.day-progress-item.is-selected {
+  border-color: #1B4332;
+  box-shadow: 0 4px 12px rgba(27, 67, 50, .14);
+}
+.day-progress-ring {
+  background: conic-gradient(#EAE3D2 var(--progress), #EAE3D2 0);
+}
+.day-progress-ring.is-active {
+  background: conic-gradient(#D97706 var(--progress), #FDE7C2 0);
+  color: #92400E;
+}
+.day-progress-ring.is-complete {
+  background: conic-gradient(#2E7D32 var(--progress), #C8E6C9 0);
+  color: #2E7D32;
+}
+.day-progress-ring.is-neutral { color: #6B7280; }
+.day-progress-status.is-active { background: #FEF3C7; color: #92400E; }
+.day-progress-status.is-neutral { background: #EAE3D2; color: #6B7280; }
+.day-progress-status.is-complete { background: #C8E6C9; color: #2E7D32; }
+
+/* Authoritative analytics layout: visible report panels flow sequentially without
+   reserving space for hidden panels. */
+.analytics-report-section.hidden {
+  display: none !important;
+}
+.analytics-report-section {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-top: 1rem;
+  height: auto;
+  min-height: 0;
+  padding-top: 0;
+}
+.analytics-report-section .chart-container,
+.analytics-report-section #progress-chart,
+.analytics-report-section [data-chart-wrapper],
+.analytics-report-section .chart-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 280px;
+  height: auto;
+  padding-top: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.analytics-report-section canvas,
+.analytics-report-section svg {
+  display: block;
+  max-width: none;
+}
+.analytics-report-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Final analytics layout overrides: hidden panels take no space and visible
+   panels flow in Overview → Trend → Daily Summary order. */
+.analytics-report-section.hidden {
+  display: none !important;
+}
+.analytics-report-section {
+  display: block !important;
+  width: 100%;
+  margin-top: 1rem;
+  height: auto;
+  min-height: 0;
+  padding-top: 0;
+}
+.analytics-report-section + .analytics-report-section {
+  margin-top: 1rem;
+}
+.chart-container,
+.analytics-report-section #progress-chart,
+.analytics-report-section [data-chart-wrapper],
+.analytics-report-section .chart-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 280px;
+  height: 280px;
+  padding-top: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.chart-container canvas,
+.analytics-report-section #progress-chart canvas,
+.analytics-report-section [data-chart-wrapper] canvas,
+.analytics-report-section .chart-wrapper canvas {
+  display: block;
+  width: 100% !important;
+  height: 280px !important;
+}
+
+/* Final analytics layout: hidden sections collapse completely, while visible
+   reports flow in document order. */
+.analytics-report-section.hidden { display: none !important; }
+.analytics-report-section {
+  display: block !important;
+  width: 100%;
+  min-width: 0;
+  margin-top: 1rem;
+  height: auto;
+  min-height: 0;
+  padding-top: 0;
+}
+.analytics-report-section:first-child { margin-top: 0; }
+.analytics-report-section .chart-container,
+.analytics-report-section #progress-chart,
+.analytics-report-section [data-chart-wrapper],
+.analytics-report-section .chart-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 280px;
+  height: 280px;
+  margin-top: 1rem;
+  padding-top: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.analytics-report-section .chart-container canvas,
+.analytics-report-section #progress-chart canvas,
+.analytics-report-section [data-chart-wrapper] canvas,
+.analytics-report-section .chart-wrapper canvas {
+  display: block;
+  width: 100% !important;
+  height: 280px !important;
+}
+.analytics-report-section table { width: 100%; border-collapse: collapse; }
+
+/* The email controls stay above the dashboard views and never float beside headings. */
+#email-report-settings-container {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  background: #FFFFFF;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, .04);
+}
+#email-report-settings-container #report-recipient { flex: 1 1 16rem; min-width: 12rem; }
+#email-report-settings-container #report-send-status { flex: 1 1 12rem; }
+
+.daily-note-quote {
+  display: block;
+  color: #64748B;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+#todays-note-display-container {
+  background: rgba(251, 247, 238, .4);
+  border-left: 4px solid #E8A33D;
+  border-radius: 0 .75rem .75rem 0;
+  color: #64748B;
+}
+#saved-note-text {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+#edit-note-btn { font-style: normal; }
+#note-save-status:not(.hidden) { display: inline-flex; }
+
+/* Warm, cohesive styling for the plan creation workspace. */
+#plan-workspace > section:first-child .workspace-card {
+  background: #FDFBF7;
+  border: 1px solid #F0E6D2;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, .05);
+}
+
+#plan-workspace > section:first-child .workspace-card .workspace-card {
+  background: rgba(255, 255, 255, .72);
+  border-color: #F0E6D2;
+  box-shadow: 0 2px 10px -4px rgba(120, 82, 35, .12);
+}
+
+#plan-workspace > section:first-child .field-label {
+  color: #334155;
+  font-weight: 600;
+}
+
+#plan-workspace > section:first-child input,
+#plan-workspace > section:first-child select {
+  background: #FFFEFB;
+  border-color: #E5D8C2;
+  color: #1E293B;
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+#plan-workspace > section:first-child input:focus,
+#plan-workspace > section:first-child select:focus {
+  border-color: #E09F3E;
+  outline: 2px solid rgba(224, 159, 62, .35);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 1px rgba(224, 159, 62, .12);
+}
+
+#plan-workspace > section:first-child #plan-name-input {
+  background: #FFFEFB;
+  border-color: #E5D8C2;
+}
+
+#plan-workspace > section:first-child #save-plan,
+#plan-workspace > section:first-child #add-global-goal {
+  background: #E09F3E;
+  border-color: #E09F3E;
+  color: #FFFFFF;
+  box-shadow: 0 3px 8px -3px rgba(180, 112, 24, .45);
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+#plan-workspace > section:first-child #save-plan:hover,
+#plan-workspace > section:first-child #add-global-goal:hover {
+  background: #C98224;
+  border-color: #C98224;
+  box-shadow: 0 5px 12px -4px rgba(180, 112, 24, .5);
+}
+
+#plan-workspace > section:first-child #save-plan:active,
+#plan-workspace > section:first-child #add-global-goal:active {
+  transform: translateY(1px);
+}
+
+#plan-workspace > section:first-child #new-plan-top,
+#plan-workspace > section:first-child #view-report {
+  border: 1px solid #D1D5DB;
+  background: transparent;
+  color: #1E293B;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+#plan-workspace > section:first-child #new-plan-top:hover,
+#plan-workspace > section:first-child #view-report:hover {
+  border-color: #C98224;
+  background: #FFF8EA;
+  color: #92400E;
+}
+
+#plan-workspace > section:first-child .schedule-mode-button {
+  border-color: #E5D8C2;
+  background: #FFFEFB;
+  color: #64748B;
+}
+
+#plan-workspace > section:first-child .schedule-mode-button:hover {
+  border-color: #E09F3E;
+  background: #FFF8EA;
+  color: #92400E;
+}
+
+#plan-workspace > section:first-child .schedule-mode-button[aria-pressed="true"],
+#plan-workspace > section:first-child .schedule-mode-button.active {
+  border-color: #D8922E;
+  background: #F3C46B;
+  color: #5B3410;
+  box-shadow: 0 1px 4px rgba(180, 112, 24, .18);
+}
+
+#plan-workspace > section:first-child .schedule-mode-button[aria-pressed="true"]:hover,
+#plan-workspace > section:first-child .schedule-mode-button.active:hover {
+  border-color: #C98224;
+  background: #E09F3E;
+  color: #FFFFFF;
+}
+
 @media (min-width: 768px) {
   #landing-hero > div {
     width: min(calc(100% - 4rem), 76rem);
@@ -1082,4 +1604,189 @@ body.recovery-modal-active { overflow: hidden; }
     justify-self: stretch;
     padding: clamp(2rem, 4vw, 4rem) 1.5rem;
   }
+}
+
+/* Warm visual treatment for reporting controls and analytics cards. */
+#email-report-settings-container {
+  background: #FDFBF7;
+  border: 1px solid #F0E6D2;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, .04);
+  padding: 1rem;
+}
+
+#analytics-dashboard-container,
+#progress-overview-panel {
+  background: #FCFAF5;
+  border: 1px solid #EEE8D5;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px -4px rgba(120, 82, 35, .08);
+  padding: 1.25rem;
+}
+
+#analytics-dashboard-container .analytics-card,
+#progress-overview-panel .report-tab-content > section,
+#progress-overview-panel .results-tile,
+#progress-overview-panel .report-day-card {
+  background: #FFFFFF;
+  border-color: #EEE8D5;
+  border-radius: .85rem;
+  box-shadow: 0 3px 12px -6px rgba(120, 82, 35, .16);
+}
+
+#progress-overview-panel .report-dashboard-toolbar {
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom-color: #EEE8D5;
+}
+
+#analytics-dashboard-container .report-tab-button,
+#analytics-dashboard-container .report-all-button,
+#progress-overview-panel .report-tab-button,
+#progress-overview-panel .report-all-button {
+  border: 1px solid #E5E7EB;
+  border-radius: .75rem;
+  background: #FFFFFF;
+  color: #1E293B;
+  padding: .65rem .85rem;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+#analytics-dashboard-container .report-tab-button:hover,
+#analytics-dashboard-container .report-all-button:hover,
+#progress-overview-panel .report-tab-button:hover,
+#progress-overview-panel .report-all-button:hover {
+  border-color: #E09F3E;
+  background: #FFF8EA;
+  color: #92400E;
+}
+
+#analytics-dashboard-container .report-tab-button.is-active,
+#analytics-dashboard-container .report-all-button[aria-pressed="true"],
+#progress-overview-panel .report-tab-button.is-active,
+#progress-overview-panel .report-all-button[aria-pressed="true"] {
+  border-color: #1E3A2B;
+  background: #1E3A2B;
+  color: #FFFFFF;
+  box-shadow: 0 3px 8px -4px rgba(30, 58, 43, .45);
+}
+
+@media (max-width: 767px) {
+  #analytics-dashboard-container,
+  #progress-overview-panel {
+    padding: 1rem;
+  }
+}
+
+/* Final warm theme for the complete analytics dashboard. */
+#analytics-dashboard-container,
+#progress-overview-panel {
+  background: #fdfbf7;
+  border: 1px solid #f0e6d2;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, .04);
+  padding: 1.25rem;
+}
+
+#progress-overview-container,
+#progress-trend-container,
+#daily-summary-container {
+  background: #faf7f2;
+  border: 1px solid #eee8d5;
+  border-radius: .9rem;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+#progress-overview-container .results-tile,
+#progress-overview-container .report-day-card,
+#progress-trend-container > section,
+#daily-summary-container > section {
+  background: #ffffff;
+  border: 1px solid #eee8d5;
+  border-radius: .85rem;
+  box-shadow: 0 3px 12px -6px rgba(120, 82, 35, .16);
+  padding: 1rem;
+}
+
+#progress-overview-container .results-tile,
+#progress-overview-container .report-day-card {
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+#progress-overview-container .results-tile:hover,
+#progress-overview-container .report-day-card:hover {
+  background: #fffdf9;
+  border-color: #e5d8c2;
+  box-shadow: 0 5px 14px -7px rgba(120, 82, 35, .22);
+}
+
+#progress-overview-panel .report-dashboard-toolbar {
+  border-bottom: 1px solid #eee8d5;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+#progress-overview-panel .report-view-tabs {
+  margin-top: .25rem;
+}
+
+#progress-overview-panel .report-tab-button,
+#progress-overview-panel .report-all-button {
+  border: 1px solid #e5e7eb;
+  border-radius: .75rem;
+  background: #ffffff;
+  color: #1e293b;
+  padding: .65rem .85rem;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+#progress-overview-panel .report-tab-button:hover,
+#progress-overview-panel .report-tab-button:focus-visible,
+#progress-overview-panel .report-all-button:hover,
+#progress-overview-panel .report-all-button:focus-visible {
+  border-color: #e09f3e;
+  background: #fff8ea;
+  color: #92400e;
+}
+
+#progress-overview-panel .report-tab-button.is-active,
+#progress-overview-panel .report-all-button[aria-pressed="true"] {
+  border-color: #1e3a2b;
+  background: #1e3a2b;
+  color: #ffffff;
+  box-shadow: 0 3px 8px -4px rgba(30, 58, 43, .45);
+}
+
+#progress-overview-panel .report-tab-button.is-active:hover,
+#progress-overview-panel .report-all-button[aria-pressed="true"]:hover {
+  border-color: #173022;
+  background: #173022;
+  color: #ffffff;
+}
+
+#progress-trend-container > section,
+#daily-summary-container > section {
+  margin-top: 0;
+}
+
+#progress-trend-container #progress-chart {
+  background: #ffffff;
+  border: 1px solid #eee8d5;
+  border-radius: .75rem;
+  padding: .75rem;
+}
+
+#daily-summary-container table {
+  background: #ffffff;
+  border: 1px solid #eee8d5;
+  border-radius: .75rem;
+}
+
+#daily-summary-container thead {
+  background: #faf7f2;
+}
+
+.analytics-report-section.hidden {
+  display: none !important;
 }
