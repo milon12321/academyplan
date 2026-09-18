@@ -7,6 +7,91 @@ window.academyGetAvatarInitial = function (name) {
   return String(name || '').trim().charAt(0).toUpperCase();
 };
 
+// Keep day navigation values within the currently generated plan range.
+window.academyClampDayIndex = function (value, length) {
+  const count = Math.max(0, Number(length) || 0);
+  return count ? Math.min(Math.max(0, Number(value) || 0), count - 1) : 0;
+};
+
+// Shared visual state for daily progress indicators.
+window.academyProgressState = function (done, total) {
+  const completed = Math.max(0, Number(done) || 0);
+  const available = Math.max(0, Number(total) || 0);
+  if (available > 0 && completed >= available) return 'is-complete';
+  return completed > 0 ? 'is-active' : 'is-neutral';
+};
+
+// Render a saved daily reflection safely for the active checklist day.
+window.academyDailyNoteMarkup = function (note) {
+  const text = String(note || '').trim();
+  if (!text) return '';
+  const escaped = text.replace(/[&<>'"]/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[character]));
+  return `<span class="daily-note-quote">${escaped}</span>`;
+};
+
+// Switch the active day's note between editing and read-only display modes.
+window.academySyncDailyNoteView = function (note = '') {
+  const editContainer = document.getElementById('todays-note-edit-container');
+  const displayContainer = document.getElementById('todays-note-display-container');
+  const savedText = document.getElementById('saved-note-text');
+  const text = String(note || '').trim();
+  if (!editContainer || !displayContainer || !savedText) return;
+  savedText.textContent = text;
+  editContainer.classList.toggle('hidden', Boolean(text));
+  displayContainer.classList.toggle('hidden', !text);
+};
+
+// Keep the long daily overview collapsed until the learner requests it.
+(() => {
+  const initializeAllDaysOverview = () => {
+    const toggle = document.getElementById('toggle-all-days-btn');
+    const container = document.getElementById('day-progress-list');
+    if (!toggle || !container || toggle.dataset.bound === 'true') return;
+    toggle.dataset.bound = 'true';
+
+    const label = toggle.querySelector('span:first-child');
+    const badge = document.getElementById('all-days-count-badge');
+    const syncToggle = () => {
+      const expanded = !container.classList.contains('hidden');
+      if (label) label.textContent = expanded ? 'Hide All Days Overview' : 'Show All Days Overview';
+      toggle.setAttribute('aria-expanded', String(expanded));
+      container.setAttribute('aria-hidden', String(!expanded));
+    };
+
+    toggle.setAttribute('aria-controls', container.id);
+    toggle.addEventListener('click', () => {
+      container.classList.toggle('hidden');
+      syncToggle();
+    });
+
+    // Day cards are rendered dynamically, so use one delegated listener.
+    container.addEventListener('click', event => {
+      const card = event.target.closest('[data-progress-day]');
+      if (!card || !container.contains(card)) return;
+      const selector = document.getElementById('day-selector');
+      if (selector && selector.value !== card.dataset.progressDay) {
+        selector.value = card.dataset.progressDay;
+        selector.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+
+    const updateCount = () => {
+      if (badge) badge.textContent = String(container.querySelectorAll('[data-progress-day]').length);
+      syncToggle();
+    };
+    updateCount();
+    new MutationObserver(updateCount).observe(container, { childList: true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAllDaysOverview, { once: true });
+  } else {
+    initializeAllDaysOverview();
+  }
+})();
+
 // Storage navigation is a route transition; the page owns the actual view.
 window.academyStorageRoute = function () {
   try {
@@ -120,6 +205,7 @@ window.academyToggleMobileMenu = function () {
       window.academyReturnToLogin?.();
     });
     document.addEventListener('keydown', event => {
+      if (event.target?.tagName === 'INPUT' || event.target?.tagName === 'TEXTAREA' || event.target?.isContentEditable) return;
       if (event.key !== 'Escape' || modal.classList.contains('hidden')) return;
       event.preventDefault();
       window.academyReturnToLogin?.();
@@ -144,6 +230,84 @@ window.academyAccountRoute = function ({
   if (typeof focusLogin === 'function') focusLogin();
   return 'login';
 };
+
+// Analytics tabs are controlled centrally so dynamic plan renders never leave
+// a hidden section occupying space or a visible chart without dimensions.
+(() => {
+  const reportIds = [
+    'progress-overview-container',
+    'progress-trend-container',
+    'daily-summary-container'
+  ];
+  const tabButtons = {
+    overview: 'report-tab-overview',
+    trend: 'report-tab-trend',
+    summary: 'report-tab-summary',
+    all: 'report-show-all'
+  };
+  let activeReportTab = 'overview';
+
+  function switchReportTab(tabName = 'overview') {
+    const overview = document.getElementById('progress-overview-container');
+    const trend = document.getElementById('progress-trend-container');
+    const summary = document.getElementById('daily-summary-container');
+    if (!overview || !trend || !summary) return false;
+
+    const selected = ['overview', 'trend', 'summary', 'all'].includes(tabName) ? tabName : 'overview';
+    const visibility = {
+      overview: [true, false, false],
+      trend: [false, true, false],
+      summary: [false, false, true],
+      all: [true, true, true]
+    }[selected];
+    [overview, trend, summary].forEach((section, index) => {
+      section.classList.toggle('hidden', !visibility[index]);
+      section.setAttribute('aria-hidden', String(!visibility[index]));
+    });
+    activeReportTab = selected;
+
+    Object.entries(tabButtons).forEach(([name, id]) => {
+      const button = document.getElementById(id);
+      const active = name === selected;
+      button?.classList.toggle('is-active', active);
+      button?.setAttribute('aria-selected', String(active));
+      button?.setAttribute('aria-pressed', String(name === 'all' ? active : false));
+    });
+
+    // Let Chart.js and other responsive visualizations measure the newly visible section.
+    window.dispatchEvent(new Event('resize'));
+    window.dispatchEvent(new Event('reportviewchange'));
+    requestAnimationFrame?.(() => window.dispatchEvent(new Event('resize')));
+    return true;
+  }
+
+  window.switchReportTab = switchReportTab;
+
+  // The page's existing render() creates the N-day overview cards, trend data,
+  // and summary rows. Reapply the selected view after each of those renders.
+  window.academyRefreshAnalyticsView = function () {
+    return switchReportTab(activeReportTab);
+  };
+
+  const initializeReportTabs = () => {
+    Object.entries(tabButtons).forEach(([tabName, id]) => {
+      const button = document.getElementById(id);
+      if (!button || button.dataset.reportBound === 'true') return;
+      button.dataset.reportBound = 'true';
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        switchReportTab(tabName);
+      });
+    });
+    switchReportTab('overview');
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeReportTabs, { once: true });
+  } else {
+    initializeReportTabs();
+  }
+})();
 
 window.academyFormatGoalDuration = function (fromTime, toTime) {
   if (!fromTime || !toTime) return '';
@@ -359,7 +523,6 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
     menu.addEventListener('click', event => {
       const action = event.target.closest('button, a');
       if (!action || action.id === 'account-menu-toggle') return;
-      if (action.id === 'saved-plans-toggle' || action.id === 'restore-plans-toggle') return;
       closeAccountMenu();
     });
 
@@ -389,7 +552,7 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
   // mode and are never overwritten by later renders.
   const initializeEmptyPlanControls = () => {
     const selector = document.getElementById('active-plan-selector');
-    const planName = document.getElementById('plan-name');
+    const planName = document.getElementById('plan-name-input');
     const startDate = document.getElementById('plan-start-date');
     const startTime = document.getElementById('plan-start-time');
     const endDate = document.getElementById('plan-end-date');
@@ -411,7 +574,7 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
     }
     if (planName) {
       planName.placeholder = 'Enter your plan name...';
-      if (!hasSavedPlan) planName.value = '';
+      if (!hasSavedPlan && document.activeElement !== planName) planName.value = '';
     }
 
     const dhakaParts = new Intl.DateTimeFormat('en-CA', {
@@ -497,7 +660,17 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
     }, 60000);
   };
 
+  const initializePlanNameInput = () => {
+    const planInput = document.getElementById('plan-name-input');
+    if (!planInput || planInput.dataset.inputBound === 'true') return;
+    planInput.dataset.inputBound = 'true';
+    planInput.addEventListener('input', event => {
+      if (window.currentPlan) window.currentPlan.name = event.target.value;
+    });
+  };
+
   const initializeLocalMockTrigger = () => {
+    initializePlanNameInput();
     initializeEmptyPlanControls();
     initializeDashboardStack();
     const yearButton = document.getElementById('copyright-year');
@@ -540,12 +713,18 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
       showStatus('Developer window armed for 10 seconds. Press Ctrl + Shift + L.');
     });
 
-    document.addEventListener('keydown', event => {
-      const isDeveloperShortcut = event.ctrlKey && event.shiftKey &&
-        !event.altKey && !event.metaKey && event.key.toLowerCase() === 'l';
-      if (!isDeveloperShortcut) return;
+    const activateMockAccount = event => {
+      if (event.target?.tagName === 'INPUT' || event.target?.tagName === 'TEXTAREA' || event.target?.isContentEditable) return;
+      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
 
+      const isDeveloperShortcut = event.ctrlKey && event.shiftKey &&
+        !event.altKey && !event.metaKey &&
+        (String(event.key || '').toLowerCase() === 'l' || event.code === 'KeyL');
+      if (!isDeveloperShortcut || event.repeat) return;
+
+      // Prevent the browser/editor shortcut only outside editable controls.
       event.preventDefault();
+      event.stopPropagation();
       if (!developerWindowArmed) {
         showStatus('Shortcut ignored. Click 2026 three times rapidly first.');
         return;
@@ -557,7 +736,12 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
       if (typeof window.applyMockAccountMode === 'function') {
         window.applyMockAccountMode();
       }
-    });
+    };
+
+    // Capture the shortcut before other page listeners can consume it. The
+    // keyup fallback also supports browsers that expose the key only on release.
+    document.addEventListener('keydown', activateMockAccount, true);
+    document.addEventListener('keyup', activateMockAccount, true);
   };
 
   if (document.readyState === 'loading') {
