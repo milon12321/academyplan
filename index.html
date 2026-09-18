@@ -553,37 +553,8 @@
                 <button id="change-picture" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Change profile picture</button>
                 <button id="export-account" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Export account data</button>
                 <div class="border-t border-line mt-1 pt-1 space-y-1">
-                  <button id="saved-plans-toggle" type="button" aria-expanded="false" aria-controls="saved-plans-panel" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">
-                    <span>Saved plans</span>
-                    <span class="text-xs">▸</span>
-                  </button>
-                  <div id="saved-plans-panel" class="hidden account-submenu px-3 pb-2">
-                    <div class="flex items-center justify-between gap-2">
-                      <span class="text-xs text-ink/60">Your plans</span>
-                      <span id="plan-count" class="text-[10px] text-ink/50"></span>
-                    </div>
-                    <div class="flex items-center justify-between gap-2 mt-2">
-                      <label class="flex items-center gap-2 text-xs font-semibold text-forest-dark cursor-pointer">
-                        <input id="select-all-plans" type="checkbox" class="w-4 h-4 accent-forest" aria-label="Select all visible plans">
-                        Select all visible
-                      </label>
-                      <button id="delete-selected-plans" type="button" class="hidden text-xs font-semibold text-rust hover:underline">Delete selected</button>
-                    </div>
-                    <label for="plan-search" class="sr-only">Search saved plans</label>
-                    <input id="plan-search" type="search" class="w-full mt-2 px-3 py-2 border border-line rounded-lg text-xs" placeholder="Search plans...">
-                    <div id="plan-list" class="mt-2 space-y-2 max-h-56 overflow-y-auto"></div>
-                  </div>
-                  <button id="restore-plans-toggle" type="button" aria-expanded="false" aria-controls="restore-plans-panel" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">
-                    <span>Restore plans</span>
-                    <span class="text-xs">▸</span>
-                  </button>
-                  <div id="restore-plans-panel" class="hidden account-submenu px-3 pb-2">
-                    <div class="flex items-center justify-between gap-2">
-                      <span class="text-xs text-ink/60">Deleted plans</span>
-                      <span class="text-[10px] text-ink/50">Deletes after 3 days</span>
-                    </div>
-                    <div id="account-trash-list" class="mt-1 space-y-1"></div>
-                  </div>
+                  <button id="saved-plans-open" type="button" aria-haspopup="dialog" aria-controls="saved-plans-modal" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Saved plans</button>
+                  <button id="restore-plans-open" type="button" aria-haspopup="dialog" aria-controls="restore-plans-modal" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-forest-dark hover:bg-forest/5">Restore plans</button>
                 </div>
                 <input id="profile-picture-change" type="file" accept="image/*" class="hidden" aria-label="Choose a new profile picture">
                 <button id="logout" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-rust hover:bg-rust/5">Log out</button>
@@ -717,10 +688,8 @@
                 <button id="new-plan-top" type="button" class="w-full sm:w-auto border border-[#CBD5E1] hover:bg-slate-50 text-slate-800 font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors">New Plan</button>
               </div>
 
-              <div class="mt-5">
-                <label for="plan-name" class="field-label text-slate-800">Plan name</label>
-                <input id="plan-name" type="text" value="" placeholder="Enter your plan name..." autocomplete="off" class="w-full px-4 py-2.5 border border-[#D1D5DB] rounded-xl text-sm font-serif text-lg text-slate-800 bg-white placeholder:text-slate-400 focus:border-slate-400">
-              </div>
+              <label for="plan-name-input" class="field-label text-slate-800">Plan name</label>
+              <input type="text" id="plan-name-input" class="plan-name-input" placeholder="Enter your plan name..." />
 
               <div class="workspace-card mt-5 p-4">
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -777,10 +746,10 @@
         </div>
       </section>
 
-      <section id="daily-checklist-section" class="py-4 md:py-8">
+      <section id="daily-checklist-section" class="daily-checklist-section py-4 md:py-8">
       <div class="max-w-6xl mx-auto px-5 sm:px-8">
         <div class="study-dashboard-grid dashboard-stack-container">
-          <div class="workspace-card study-plan-panel p-5 sm:p-7">
+          <div class="workspace-card study-plan-panel daily-checklist-card p-5 sm:p-7">
             <div class="flex items-center justify-between gap-3">
               <div>
                 <p class="eyebrow-dark text-base">Daily checklist</p>
@@ -788,9 +757,25 @@
               </div>
               <span id="day-score" class="text-sm font-semibold text-forest">0/0 done</span>
             </div>
-            <div id="day-tabs" class="flex flex-wrap gap-2.5 mt-5"></div>
+            <div class="day-navigation mt-5" aria-label="Daily checklist navigation">
+              <div class="day-navigation-main">
+                <label for="day-selector" class="field-label">Select study day</label>
+                <select id="day-selector" class="day-selector academic-day-select" aria-label="Select study day"></select>
+                <span id="active-day-progress" class="day-progress-badge" role="status" aria-live="polite">0%</span>
+              </div>
+              <div class="day-navigation-actions" role="group" aria-label="Change selected day">
+                <button id="previous-day" type="button" class="day-navigation-button academic-day-button">← Previous Day</button>
+                <button id="jump-to-today" type="button" class="day-navigation-button academic-day-button">Today</button>
+                <button id="next-day" type="button" class="day-navigation-button academic-day-button">Next Day →</button>
+              </div>
+            </div>
+            <button id="toggle-all-days-btn" type="button" class="toggle-days-btn">
+              <span>Show All Days Overview</span>
+              <span id="all-days-count-badge" class="badge">0</span>
+            </button>
+            <div id="day-progress-list" class="day-progress-list all-days-container hidden mt-3" aria-label="Plan day progress"></div>
             <div class="mt-5 grid sm:grid-cols-2 gap-4">
-              <section class="rounded-xl border border-line bg-paper/60 p-4">
+              <section class="academic-task-card rounded-xl border border-line bg-paper/60 p-4">
                 <div class="flex items-center justify-between gap-2">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-wide text-forest">Scheduled plan</p>
@@ -800,7 +785,7 @@
                 </div>
                 <div id="planned-task-list" class="mt-3 space-y-2"></div>
               </section>
-              <section class="rounded-xl border border-marigold/50 bg-marigold/10 p-4">
+              <section class="academic-task-card rounded-xl border border-marigold/50 bg-marigold/10 p-4">
                 <div class="flex items-center justify-between gap-2">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-wide text-marigold-dark">Added today</p>
@@ -839,36 +824,47 @@
                 <div><p class="text-sm font-semibold text-forest-dark">Work on the selected day</p><p class="text-xs text-ink/60 mt-1">Use the day buttons above. Planned tasks are your commitment; added tasks capture unexpected work.</p></div>
               </div>
             </div>
-            <label for="day-note" class="field-label mt-6">Today's note</label><textarea id="day-note" rows="3" class="w-full px-4 py-3 border border-line rounded-xl text-sm resize-y" placeholder="What did you learn, finish, or discover today?"></textarea><button id="save-day" type="button" class="mt-3 w-full bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold py-3 rounded-full text-sm transition-colors">Save today's update</button>
+            <div id="todays-note-edit-container" class="mt-6">
+              <label for="day-note" class="field-label">Today's note</label>
+              <textarea id="day-note" rows="3" class="w-full px-4 py-3 border border-line rounded-xl text-sm resize-y" placeholder="What did you learn, finish, or discover today?"></textarea>
+              <button id="save-day" type="button" class="mt-3 w-full bg-marigold hover:bg-marigold-dark text-forest-dark font-semibold py-3 rounded-full text-sm transition-colors">Save today's update</button>
+            </div>
+            <div id="todays-note-display-container" class="hidden mt-6 rounded-r-lg border-l-4 border-marigold bg-paper/40 p-3 text-sm italic text-ink/60">
+              <div class="flex items-start justify-between gap-3">
+                <p id="saved-note-text" class="min-w-0 flex-1 whitespace-pre-wrap"></p>
+                <button id="edit-note-btn" type="button" class="shrink-0 rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold not-italic text-forest-dark hover:bg-forest/5">Edit</button>
+              </div>
+            </div>
+            <span id="note-save-status" class="hidden mt-2 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700" role="status" aria-live="polite">Note saved!</span>
           </div>
 
-          <details id="progress-overview-panel" class="progress-overview-accordion">
-            <summary class="workspace-card progress-overview-toggle list-none cursor-pointer p-4 sm:p-5" aria-label="View Progress Overview">
-              <span class="flex items-center justify-between gap-3">
-                <span>
-                  <span class="eyebrow text-base">Your results</span>
-                  <span class="workspace-heading block font-serif text-2xl mt-0.5">📊 View Progress Overview</span>
-                </span>
-                <span class="progress-overview-chevron text-slate-500" aria-hidden="true">⌄</span>
-              </span>
-            </summary>
-            <aside class="workspace-card results-card progress-overview-content p-5 sm:p-7">
-            <div class="flex items-center justify-between gap-3">
+          <div id="email-report-settings-container" class="email-report-settings-container" style="display:flex; flex-wrap:wrap; align-items:center; gap:1rem; width:100%; margin-bottom:1.5rem;">
+            <label for="report-recipient" class="sr-only">Report recipient email</label>
+            <input id="report-recipient" type="email" value="milonsarkar1231@gmail.com" autocomplete="email" class="min-w-0 flex-1 sm:w-64 px-3 py-2 border border-[#CBD5E1] rounded-full text-xs text-slate-900 bg-white focus:border-blue-500" placeholder="recipient@example.com">
+            <button id="send-report" type="button" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-xs font-semibold shadow-sm transition-colors">✉ Send report</button>
+            <label for="auto-daily-report" class="flex items-center gap-2 text-xs font-semibold text-slate-800"><input id="auto-daily-report" type="checkbox" class="w-4 h-4 accent-amber-500"> Auto-send daily at 10:00 PM</label>
+            <span id="report-send-status" class="text-xs font-semibold text-slate-600" role="status" aria-live="polite">Daily reporting is off.</span>
+          </div>
+
+          <section id="progress-overview-panel" class="workspace-card results-card progress-overview-content p-5 sm:p-7">
+            <div class="report-dashboard-toolbar" role="tablist" aria-label="Analytics views">
+              <div>
+                <p class="eyebrow text-base">Your results</p>
+                <h2 class="workspace-heading font-serif text-2xl mt-0.5">📊 Analytics dashboard</h2>
+              </div>
+              <div class="report-view-tabs">
+                <button id="report-tab-overview" type="button" data-report-tab="overview" data-report-action="overview" class="report-tab-button is-active" role="tab" aria-selected="true" aria-controls="progress-overview-container">Progress Overview</button>
+                <button id="report-tab-trend" type="button" data-report-tab="trend" data-report-action="trend" class="report-tab-button" role="tab" aria-selected="false" aria-controls="progress-trend-container">Progress Trend</button>
+                <button id="report-tab-summary" type="button" data-report-tab="summary" data-report-action="summary" class="report-tab-button" role="tab" aria-selected="false" aria-controls="daily-summary-container">Daily Summary</button>
+                <button id="report-show-all" type="button" data-report-tab="all" data-report-action="all" class="report-all-button" aria-pressed="false">Show All Reports</button>
+              </div>
+            </div>
+            <div id="progress-overview-container" class="report-tab-content analytics-report-section" role="tabpanel" aria-labelledby="report-tab-overview" aria-hidden="false">
+              <div class="flex items-center justify-between gap-3">
               <div>
                 <p class="eyebrow text-base">Your results</p>
                 <h2 class="workspace-heading font-serif text-2xl mt-0.5">Progress overview</h2>
               </div>
-              <div class="flex flex-wrap items-center justify-end gap-2">
-                <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-                  <label for="report-recipient" class="sr-only">Report recipient email</label>
-                  <input id="report-recipient" type="email" value="milonsarkar1231@gmail.com" autocomplete="email" class="min-w-0 flex-1 sm:w-64 px-3 py-2 border border-[#CBD5E1] rounded-full text-xs text-slate-900 bg-white focus:border-blue-500" placeholder="recipient@example.com">
-                  <button id="send-report" type="button" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-xs font-semibold shadow-sm transition-colors">✉ Send report</button>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
-              <label for="auto-daily-report" class="flex items-center gap-2 text-xs font-semibold text-slate-800"><input id="auto-daily-report" type="checkbox" class="w-4 h-4 accent-amber-500"> Auto-send daily at 10:00 PM</label>
-              <span id="report-send-status" class="text-xs font-semibold text-slate-600" role="status" aria-live="polite">Daily reporting is off.</span>
             </div>
 
             <div class="mt-7 flex items-center gap-5">
@@ -889,6 +885,8 @@
             </div>
 
             <div id="day-summary" class="mt-7 space-y-3"></div>
+            </div>
+            <div id="progress-trend-container" class="report-tab-content analytics-report-section hidden" role="tabpanel" aria-labelledby="report-tab-trend" aria-hidden="true">
             <section class="mt-7 rounded-xl border border-[#E2E8F0] bg-white p-4 sm:p-5" aria-labelledby="progress-chart-title">
               <div class="flex items-center justify-between gap-3">
                 <div>
@@ -897,27 +895,56 @@
                 </div>
                 <span class="text-xs text-slate-500">Completed / scheduled</span>
               </div>
-              <div id="progress-chart" class="mt-4 overflow-x-auto" role="img" aria-label="Daily task completion chart"></div>
+              <div id="progress-chart" class="chart-container mt-4 overflow-x-auto" role="img" aria-label="Daily task completion chart"></div>
             </section>
+            </div>
+            <div id="daily-summary-container" class="report-tab-content analytics-report-section hidden" role="tabpanel" aria-labelledby="report-tab-summary" aria-hidden="true">
             <section class="mt-4 rounded-xl border border-[#E2E8F0] bg-white p-4 sm:p-5" aria-labelledby="progress-table-title">
               <h3 id="progress-table-title" class="font-serif text-xl text-slate-900">Daily progress summary</h3>
               <div class="mt-3 overflow-x-auto">
                 <table class="w-full min-w-[560px] text-left text-xs">
                   <thead class="border-b border-slate-200 text-slate-500">
-                    <tr><th scope="col" class="px-3 py-2 font-semibold">Day</th><th scope="col" class="px-3 py-2 font-semibold">Plan date</th><th scope="col" class="px-3 py-2 font-semibold">Scheduled tasks</th><th scope="col" class="px-3 py-2 font-semibold">Completed</th><th scope="col" class="px-3 py-2 font-semibold">Completion</th></tr>
+                    <tr><th scope="col" class="px-3 py-2 font-semibold">Day</th><th scope="col" class="px-3 py-2 font-semibold">Plan date</th><th scope="col" class="px-3 py-2 font-semibold">Scheduled tasks</th><th scope="col" class="px-3 py-2 font-semibold">Completed</th><th scope="col" class="px-3 py-2 font-semibold">Completion</th><th scope="col" class="px-3 py-2 font-semibold">Notes / Reflections</th></tr>
                   </thead>
                   <tbody id="progress-summary-table" class="divide-y divide-slate-100 text-slate-700"></tbody>
                 </table>
               </div>
             </section>
+            </div>
             <p id="finish-note" class="hidden mt-5 rounded-xl bg-slate-100 text-slate-800 p-3 text-sm font-semibold"></p>
-            </aside>
-          </details>
+          </section>
         </div>
       </div>
       </section>
     </div>
   </main>
+
+  <div id="saved-plans-modal" class="hidden fixed inset-0 z-[65] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="saved-plans-title">
+    <div class="min-h-full flex items-center justify-center">
+      <div class="saved-plans-panel w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
+        <div class="flex items-start justify-between gap-4 border-b border-line pb-4">
+          <div><p class="eyebrow-dark text-base">Your workspace</p><h2 id="saved-plans-title" class="font-serif text-2xl text-forest-dark mt-0.5">Saved Plans</h2><p class="mt-1 text-sm text-ink/60">Search, select, preview, or remove your saved study plans.</p></div>
+          <button id="saved-plans-close" type="button" aria-label="Close Saved Plans" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
+        </div>
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-2"><label class="flex items-center gap-2 text-sm font-semibold text-forest-dark cursor-pointer"><input id="select-all-plans" type="checkbox" class="w-4 h-4 accent-forest" aria-label="Select all visible plans"> Select all visible</label><span id="plan-count" class="text-xs text-ink/50"></span></div>
+          <button id="delete-selected-plans" type="button" class="hidden text-sm font-semibold text-rust hover:underline">Delete selected</button>
+        </div>
+        <label for="plan-search" class="sr-only">Search saved plans</label>
+        <input id="plan-search" type="search" class="w-full mt-4 px-4 py-3 border border-line rounded-xl text-sm" placeholder="Search plans...">
+        <div id="plan-list" class="saved-plan-list mt-5"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="restore-plans-modal" class="hidden fixed inset-0 z-[65] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="restore-plans-title">
+    <div class="min-h-full flex items-center justify-center">
+      <div class="restore-plans-panel w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
+        <div class="flex items-start justify-between gap-4 border-b border-line pb-4"><div><p class="eyebrow-dark text-base">Recently removed</p><h2 id="restore-plans-title" class="font-serif text-2xl text-forest-dark mt-0.5">Restore Plans</h2><p class="mt-1 text-sm text-ink/60">Restore plans within the three-day retention period.</p></div><button id="restore-plans-close" type="button" aria-label="Close Restore Plans" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button></div>
+        <div id="account-trash-list" class="restore-plan-list mt-5"></div>
+      </div>
+    </div>
+  </div>
 
   <div id="privacy-modal" class="hidden fixed inset-0 z-[60] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
     <div class="min-h-full flex items-center justify-center">
@@ -1317,12 +1344,15 @@
       scheduleCloudSave();
     }
     state.plan = state.plans[0] || null;
+    window.currentPlan = state.plan;
     if (state.plan && window.academyIsLegacyPlanTitle?.(state.plan.title)) {
       state.plan.title = '';
       localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
       localStorage.setItem(KEY, JSON.stringify(state.plan));
     }
     const $ = id => document.getElementById(id);
+    const planNameInput = () => $('plan-name-input');
+    const isEditingPlanName = () => document.activeElement === planNameInput();
     // Hash passwords with SHA-256 before they ever touch localStorage or the
     // cloud database. Plain-text passwords were previously stored directly on
     // the profile object (and synced to Firebase), which is unsafe even for a
@@ -1337,6 +1367,7 @@
 
     const save = (forceAdd = false) => {
       if (!state.plan) return false;
+      window.currentPlan = state.plan;
       const index = state.plans.findIndex(plan => plan.id === state.plan.id);
       if (index === -1 && !forceAdd) return false;
       if (index === -1) state.plans.unshift(state.plan); else state.plans[index] = state.plan;
@@ -1387,8 +1418,9 @@
       if (!state.plans.length) {
         selector.innerHTML = '<option value="" selected disabled>No plans saved yet</option>';
         selector.value = '';
-        $('plan-name').value = '';
-        $('plan-name').placeholder = 'Enter your plan name...';
+        const planInput = $('plan-name-input');
+        if (document.activeElement !== planInput) planInput.value = '';
+        planInput.placeholder = 'Enter your plan name...';
         return;
       }
       selector.innerHTML = '<option value="">Select a saved plan...</option>' + state.plans.map(plan => `<option value="${plan.id}">${escapeHtml(plan.title || 'Untitled plan')}</option>`).join('');
@@ -1555,6 +1587,7 @@
         const now = dhakaNow();
         state.plan = { id: crypto.randomUUID(), title: DEFAULT_PLAN_TITLE, created: new Date().toISOString(), duration: DEFAULT_PLAN_DURATION, startDate: now.date, startTime: now.time, goals: [], tasks: [], notes: [] };
       }
+      window.currentPlan = state.plan;
       state.plan.id = state.plan.id || crypto.randomUUID();
       state.plan.title = typeof state.plan.title === 'string' ? state.plan.title : '';
       state.plan.duration = Math.max(0, Number.isFinite(Number(state.plan.duration)) ? Number(state.plan.duration) : 0);
@@ -1629,13 +1662,22 @@
         deleteSelected.textContent = `Delete selected (${selectedPlanIds.size})`;
       }
     }
+    function openSavedPlansModal() {
+      $('saved-plans-modal')?.classList.remove('hidden');
+      renderPlanList();
+      $('plan-search')?.focus();
+    }
+    function openRestorePlansModal() {
+      $('restore-plans-modal')?.classList.remove('hidden');
+      renderTrashMenu();
+      $('restore-plans-close')?.focus();
+    }
+    function closePlansModal(id, focusId) {
+      $(id)?.classList.add('hidden');
+      $(focusId)?.focus();
+    }
     function keepSavedPlansMenuOpen() {
-      $('account-menu').classList.remove('hidden');
-      $('account-menu-toggle').setAttribute('aria-expanded', 'true');
-      $('saved-plans-panel').classList.remove('hidden');
-      $('saved-plans-toggle').setAttribute('aria-expanded', 'true');
-      $('saved-plans-toggle').querySelector('span:last-child').textContent = '▾';
-      requestAnimationFrame(() => $('plan-list').scrollIntoView({ block: 'nearest' }));
+      openSavedPlansModal();
     }
     function movePlansToTrash(ids) {
       const plansToDelete = state.plans.filter(plan => ids.includes(plan.id));
@@ -1727,11 +1769,9 @@
       const trashMenu = $('restore-plans-panel');
       const trashList = $('account-trash-list');
       if (!state.trash.length) {
-        trashMenu.classList.add('hidden');
-        trashList.innerHTML = '';
+        trashList.innerHTML = '<p class="rounded-xl border border-dashed border-line p-6 text-center text-sm text-ink/55">No deleted plans are available.</p>';
         return;
       }
-      trashMenu.classList.remove('hidden');
       trashList.innerHTML = state.trash.map(item => `<div class="flex items-center gap-2"><button type="button" data-preview-plan="${item.plan.id}" class="min-w-0 flex-1 text-left"><span class="block text-xs font-semibold text-forest-dark truncate hover:underline">${escapeHtml(item.plan.title || 'Untitled plan')}</span><span class="block text-[10px] text-ink/50">Deleted ${new Date(item.deletedAt).toLocaleDateString()} · View plan</span></button><button type="button" data-restore-plan="${item.plan.id}" class="shrink-0 px-2 py-1 rounded-lg border border-forest text-forest-dark hover:bg-forest/5 text-[10px] font-semibold">Restore</button><button type="button" data-delete-permanently="${item.plan.id}" aria-label="Delete ${escapeHtml(item.plan.title || 'Untitled plan')} permanently" title="Delete permanently" class="shrink-0 w-8 h-8 rounded-lg border border-rust text-rust hover:bg-rust/5 text-sm font-semibold">×</button></div>`).join('');
       trashList.querySelectorAll('[data-preview-plan]').forEach(button => button.addEventListener('click', () => openTrashPreview(button.dataset.previewPlan)));
       trashList.querySelectorAll('[data-restore-plan]').forEach(button => button.addEventListener('click', event => {
@@ -1775,6 +1815,42 @@
       $('close-report').focus();
     }
     function closeReport() { $('report-preview').classList.add('hidden'); }
+    function dayProgress(day) {
+      const tasks = (state.plan?.tasks || []).filter(task => task.days?.[day]);
+      const done = tasks.filter(task => task.done?.[day]).length;
+      return { done, total: tasks.length, rate: tasks.length ? Math.round(done / tasks.length * 100) : 0 };
+    }
+
+    function renderDayNavigation() {
+      const selector = $('day-selector');
+      const progressList = $('day-progress-list');
+      const length = planLength();
+      if (!selector || !progressList) return;
+      selector.innerHTML = Array.from({ length }, (_, day) => `<option value="${day}">${dayLabel(day)}</option>`).join('');
+      selector.value = String(Math.min(state.day, Math.max(0, length - 1)));
+      const active = dayProgress(state.day);
+      const activeBadge = $('active-day-progress');
+      if (activeBadge) {
+        activeBadge.textContent = `${active.rate}% · ${active.done}/${active.total}`;
+        const activeState = active.rate === 100 && active.total ? 'is-complete' : active.done ? 'is-active' : 'is-neutral';
+        activeBadge.className = `day-progress-badge ${activeState}`;
+      }
+      progressList.innerHTML = Array.from({ length }, (_, day) => {
+        const progress = dayProgress(day);
+        const progressState = window.academyProgressState(progress.done, progress.total);
+        const statusLabel = progressState === 'is-complete' ? 'Complete' : progressState === 'is-active' ? 'In progress' : 'No tasks';
+        return `<button type="button" data-progress-day="${day}" class="day-progress-item ${progressState}${day === state.day ? ' is-selected' : ''}" aria-label="${dayLabel(day)}: ${progress.done} of ${progress.total} complete">
+          <span class="day-progress-ring ${progressState}" style="--progress:${progress.rate}%"><span>${progress.rate}%</span></span>
+          <span class="day-progress-copy"><strong>${dayLabel(day)}</strong><small>${progress.done}/${progress.total} complete</small></span>
+          <span class="day-progress-status ${progressState}">${statusLabel}</span>
+        </button>`;
+      }).join('');
+      progressList.querySelectorAll('[data-progress-day]').forEach(button => button.addEventListener('click', () => {
+        state.day = Number(button.dataset.progressDay);
+        render();
+      }));
+    }
+
     function updateDailyChecklistVisibility() {
       const checklist = $('daily-checklist-section');
       if (!checklist) return;
@@ -1799,14 +1875,17 @@
       const line = points.map(point => `${point.x},${point.y}`).join(' ');
       const area = points.length ? `${points[0].x},${chartBottom} ${line} ${points[points.length - 1].x},${chartBottom}` : '';
       chart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" class="w-full min-w-[640px] h-56" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="progress-area-gradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#3B82F6" stop-opacity=".24"/><stop offset="100%" stop-color="#3B82F6" stop-opacity=".02"/></linearGradient></defs><line x1="32" y1="${chartTop}" x2="${width - 22}" y2="${chartTop}" stroke="#E2E8F0"/><line x1="32" y1="${(chartTop + chartBottom) / 2}" x2="${width - 22}" y2="${(chartTop + chartBottom) / 2}" stroke="#E2E8F0"/><line x1="32" y1="${chartBottom}" x2="${width - 22}" y2="${chartBottom}" stroke="#CBD5E1"/><text x="4" y="${chartTop + 4}" font-size="10" fill="#64748B">100%</text><text x="10" y="${(chartTop + chartBottom) / 2 + 4}" font-size="10" fill="#64748B">50%</text><text x="20" y="${chartBottom + 4}" font-size="10" fill="#64748B">0%</text>${area ? `<polygon points="${area}" fill="url(#progress-area-gradient)"/><polyline points="${line}" fill="none" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${points.map(point => `<circle cx="${point.x}" cy="${point.y}" r="5" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="2"><title>${escapeHtml(point.label)}: ${point.done}/${point.total} (${point.rate}%)</title></circle><text x="${point.x}" y="${height - 10}" text-anchor="middle" font-size="10" fill="#475569">${escapeHtml(point.shortLabel)}</text>`).join('')}` : ''}</svg>`;
-      table.innerHTML = scores.map(score => `<tr><th scope="row" class="px-3 py-2.5 font-semibold text-slate-900">${escapeHtml(score.label)}</th><td class="px-3 py-2.5">${escapeHtml(score.date)}</td><td class="px-3 py-2.5">${score.total}</td><td class="px-3 py-2.5">${score.done}</td><td class="px-3 py-2.5 font-semibold">${score.rate}%</td></tr>`).join('');
+      table.innerHTML = scores.map(score => { const note = state.plan.notes?.[score.dayIndex] || ''; return `<tr><th scope="row" class="px-3 py-2.5 font-semibold text-slate-900">${escapeHtml(score.label)}</th><td class="px-3 py-2.5">${escapeHtml(score.date)}</td><td class="px-3 py-2.5">${score.total}</td><td class="px-3 py-2.5">${score.done}</td><td class="px-3 py-2.5 font-semibold">${score.rate}%</td><td class="px-3 py-2.5 italic text-slate-600">${note ? escapeHtml(note) : '—'}</td></tr>`; }).join('');
     }
 
     function render() {
+      window.currentPlan = state.plan;
+      const planInput = $('plan-name-input');
+      const planInputFocused = document.activeElement === planInput;
       if (!state.plan) {
         const now = dhakaNow();
         renderActivePlanSelector();
-        $('plan-name').value = '';
+        if (!isEditingPlanName() && !planInputFocused) $('plan-name-input').value = '';
         $('plan-days').value = '0';
         $('plan-start-date').value = now.date;
         $('plan-start-time').value = now.time;
@@ -1821,8 +1900,11 @@
       updateDailyChecklistVisibility();
       if (typeof window.academyIsLegacyPlanTitle === 'function' && window.academyIsLegacyPlanTitle(state.plan.title)) state.plan.title = '';
       renderActivePlanSelector();
-      $('plan-name').value = state.plan.title || '';
-      $('plan-name').placeholder = window.academyPlanDefaults?.titlePlaceholder || 'Enter your plan name...';
+      const planNameField = planNameInput();
+      if (!isEditingPlanName() && !planInputFocused) {
+        planNameField.value = state.plan.title || '';
+        planNameField.placeholder = window.academyPlanDefaults?.titlePlaceholder || 'Enter your plan name...';
+      }
       $('plan-days').min = '0';
       $('plan-days').removeAttribute('max');
       $('plan-days').value = String(planLength());
@@ -1834,14 +1916,17 @@
       $('plan-schedule-summary').textContent = planLength() ? `${planLength()} days · ${scheduleDate(0).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })} to ${scheduleDate(planLength() - 1).toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })}` : '0 days · No scheduled study days yet.';
       renderGoalList();
       renderPlanList();
-      $('day-heading').textContent = dayLabel(state.day); $('day-note').value = state.plan.notes[state.day] || '';
+      $('day-heading').textContent = dayLabel(state.day);
+      const activeNoteText = state.plan.notes[state.day] || '';
+      $('day-note').value = activeNoteText;
+      window.academySyncDailyNoteView?.(activeNoteText);
+      const activeNote = $('active-day-note');
+      if (activeNote) {
+        activeNote.innerHTML = activeNoteText ? `<span class="daily-note-quote">${escapeHtml(activeNoteText)}</span>` : '';
+        activeNote.classList.toggle('hidden', !activeNoteText);
+      }
       if ($('task-kind').value === 'planned') renderPlannedDayOptions();
-      $('day-tabs').innerHTML = Array.from({length:planLength()}, (_,i) => {
-        const dayTasks = state.plan.tasks.filter(t=>t.days[i]);
-        const dayDone = dayTasks.filter(t=>t.done[i]).length;
-        const pct = dayTasks.length ? Math.round(dayDone/dayTasks.length*100) : 0;
-        return `<button type="button" data-day="${i}" aria-label="${dayLabel(i)}: ${dayDone} of ${dayTasks.length} done" class="day-tab ${i===state.day?'is-active':''} min-h-12 px-2 rounded-full grid place-items-center" style="--p:${pct}"><span class="day-tab-inner min-h-[38px] px-2 rounded-full grid place-items-center text-[11px] font-semibold text-center leading-tight">${dayLabel(i)}</span></button>`;
-      }).join('');
+      renderDayNavigation();
       const today = state.plan.tasks.filter(t => t.days[state.day]);
       const planned = today.filter(t => t.source !== 'added');
       const added = today.filter(t => t.source === 'added');
@@ -1860,11 +1945,11 @@
       $('total-done').textContent=totals; $('total-rate').textContent=`${rate}%`;
       const ring = $('progress-ring-arc');
       ring.style.strokeDashoffset = String(RING_CIRCUMFERENCE - (rate/100)*RING_CIRCUMFERENCE);
-      const scores = Array.from({length:planLength()},(_,i)=>{ const dayTasks=state.plan.tasks.filter(t=>t.days[i]); const done=dayTasks.filter(t=>t.done[i]).length; const total=dayTasks.length; const date=scheduleDate(i); return { done, total, rate:total?Math.round(done/total*100):0, label:`Day ${i+1}`, shortLabel:`D${i+1}`, date:date.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})}; }); const best=scores.reduce((a,s,i)=>s.total && s.done/s.total > a.rate ? {rate:s.done/s.total,day:i+1}:a,{rate:0,day:null}); $('best-day').textContent=best.day?best.day:'—';
+      const scores = Array.from({length:planLength()},(_,i)=>{ const dayTasks=state.plan.tasks.filter(t=>t.days[i]); const done=dayTasks.filter(t=>t.done[i]).length; const total=dayTasks.length; const date=scheduleDate(i); return { done, total, rate:total?Math.round(done/total*100):0, label:`Day ${i+1}`, shortLabel:`D${i+1}`, dayIndex:i, date:date.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})}; }); const best=scores.reduce((a,s,i)=>s.total && s.done/s.total > a.rate ? {rate:s.done/s.total,day:i+1}:a,{rate:0,day:null}); $('best-day').textContent=best.day?best.day:'—';
       renderProgressVisuals(scores);
       $('day-summary').innerHTML = scores.map((s,i)=>{ const rate=s.rate; const status=rate===100&&s.total?'Complete':s.done?'Active':'Pending'; const statusClass=rate===100&&s.total?'report-status-complete':s.done?'report-status-active':'report-status-pending'; const barClass=rate===100&&s.total?'report-bar-complete':s.done?'report-bar-active':'report-bar-pending'; return `<div class="report-day-card"><div class="flex items-center justify-between gap-2 text-xs mb-2"><span class="font-semibold text-slate-900">${dayLabel(i)}</span><span class="report-status-badge ${statusClass}">${status}</span></div><div class="flex justify-between text-[11px] text-slate-600 mb-1"><span>${s.done}/${s.total} complete</span><span>${rate}%</span></div><div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="progress-fill h-full rounded-full ${barClass}" style="width:${rate}%"></div></div></div>`; }).join('');
+      window.academyRefreshAnalyticsView?.();
       const complete = possible > 0 && totals === possible; $('finish-note').classList.toggle('hidden',!complete); $('finish-note').textContent = complete ? '🎉 Excellent! You completed every task across this plan.' : '';
-      $('day-tabs').querySelectorAll('[data-day]').forEach(b=>b.addEventListener('click',()=>{state.day=Number(b.dataset.day);render();}));
       ['planned-task-list', 'added-task-list'].forEach(listId => {
         $(listId).querySelectorAll('[data-check]').forEach(b=>b.addEventListener('change',()=>{const t=state.plan.tasks[Number(b.dataset.check)];if (!t) return;t.done[state.day]=b.checked;save();render();}));
         $(listId).querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{state.plan.tasks.splice(Number(b.dataset.remove),1);save();render();}));
@@ -2101,6 +2186,28 @@
     $('logout').addEventListener('click', logout);
     $('mobile-logout').addEventListener('click', logout);
     // The three-dot account menu is initialized by script.js as a floating overlay.
+    $('day-selector')?.addEventListener('change', event => {
+      state.day = Number(event.target.value) || 0;
+      render();
+    });
+    $('previous-day')?.addEventListener('click', () => {
+      if (!state.plan) return;
+      state.day = Math.max(0, state.day - 1);
+      render();
+    });
+    $('next-day')?.addEventListener('click', () => {
+      if (!state.plan) return;
+      state.day = Math.min(Math.max(0, planLength() - 1), state.day + 1);
+      render();
+    });
+    $('jump-to-today')?.addEventListener('click', () => {
+      if (!state.plan) return;
+      const today = dhakaNow().date;
+      const target = Array.from({ length: planLength() }, (_, day) => dateValue(scheduleDate(day))).findIndex(date => date === today);
+      state.day = target >= 0 ? target : 0;
+      render();
+    });
+
     $('task-kind').addEventListener('change', () => {
       const isPlanned = $('task-kind').value === 'planned';
       $('planned-days').classList.toggle('hidden', !isPlanned);
@@ -2186,17 +2293,12 @@
     $('view-report').addEventListener('click', renderReport);
     $('close-report').addEventListener('click', closeReport);
     $('report-preview').addEventListener('click', event => { if (event.target === $('report-preview')) closeReport(); });
-    $('save-day').addEventListener('click',()=>{ensurePlan();state.plan.notes[state.day]=$('day-note').value.trim();save();$('plan-status').textContent=`${dayLabel(state.day)} update saved.`;});
-    $('plan-name').addEventListener('input',()=>{
-      ensurePlan();
-      state.plan.title=$('plan-name').value.trim();
-      save();
-      renderActivePlanSelector();
-      $('plan-status').textContent='Your plan is saved automatically on this device.';
-    });
+    let noteStatusTimer = null;
+    $('save-day').addEventListener('click',()=>{ensurePlan();state.plan.notes[state.day]=$('day-note').value.trim();save();render();window.academySyncDailyNoteView?.(state.plan.notes[state.day]);$('plan-status').textContent=`${dayLabel(state.day)} update saved.`;const status=$('note-save-status');if(status){status.textContent='Note saved!';status.classList.remove('hidden');clearTimeout(noteStatusTimer);noteStatusTimer=setTimeout(()=>status.classList.add('hidden'),2200);}});
+    $('edit-note-btn')?.addEventListener('click',()=>{const note=state.plan?.notes?.[state.day]||'';$('day-note').value=note;$('todays-note-edit-container')?.classList.remove('hidden');$('todays-note-display-container')?.classList.add('hidden');$('day-note')?.focus();});
     $('save-plan').addEventListener('click',()=>{
       ensurePlan();
-      const title = $('plan-name').value.trim();
+      const title = $('plan-name-input').value.trim();
       const duration = Number($('plan-days').value);
       if (!title || !Number.isFinite(duration) || duration < 1) {
         $('plan-status').textContent = 'Enter a plan name and at least 1 plan day before saving.';
@@ -2205,14 +2307,17 @@
       state.plan.title = title;
       state.plan.duration = duration;
       save(true);
-      $('plan-name').value=state.plan.title;
+      $('plan-name-input').value=state.plan.title;
       $('plan-status').textContent='Your plan has been saved.';
     });
     function createNewPlan() {
       const now = dhakaNow();
       state.plan={id:crypto.randomUUID(),title:DEFAULT_PLAN_TITLE,created:new Date().toISOString(),duration:DEFAULT_PLAN_DURATION,startDate:now.date,startTime:now.time,goals:[],tasks:[],notes:[]};
-        $('plan-name').value = '';
-        $('plan-name').placeholder = 'Enter your plan name...';
+      window.currentPlan = state.plan;
+        if (!isEditingPlanName()) {
+          $('plan-name-input').value = '';
+          $('plan-name-input').placeholder = 'Enter your plan name...';
+        }
         $('plan-days').min = '0';
         $('plan-days').removeAttribute('max');
         $('plan-days').value = '0';
@@ -2227,6 +2332,7 @@
       const selected = state.plans.find(plan => plan.id === event.target.value);
       if (!selected) return;
       state.plan = selected;
+      window.currentPlan = state.plan;
       state.day = 0;
       scheduleCloudSave();
       render();
@@ -2240,8 +2346,13 @@
       panel.classList.toggle('hidden', expanded);
       button.querySelector('span:last-child').textContent = expanded ? '▸' : '▾';
     }
-    $('saved-plans-toggle').addEventListener('click', () => toggleMenuPanel('saved-plans-toggle', 'saved-plans-panel'));
-    $('restore-plans-toggle').addEventListener('click', () => toggleMenuPanel('restore-plans-toggle', 'restore-plans-panel'));
+    $('saved-plans-open')?.addEventListener('click', openSavedPlansModal);
+    $('restore-plans-open')?.addEventListener('click', openRestorePlansModal);
+    $('saved-plans-close')?.addEventListener('click', () => closePlansModal('saved-plans-modal', 'saved-plans-open'));
+    $('restore-plans-close')?.addEventListener('click', () => closePlansModal('restore-plans-modal', 'restore-plans-open'));
+    ['saved-plans-modal', 'restore-plans-modal'].forEach(id => $(id)?.addEventListener('click', event => {
+      if (event.target === $(id)) closePlansModal(id, id === 'saved-plans-modal' ? 'saved-plans-open' : 'restore-plans-open');
+    }));
     $('select-all-plans').addEventListener('change', event => {
       $('plan-list').querySelectorAll('[data-select-plan]').forEach(input => {
         input.checked = event.target.checked;
@@ -2590,6 +2701,8 @@
       if (event.key !== 'Escape') return;
       if (storageModal?.classList.contains('storage-modal-open')) closeStorageModal();
       if (!privacyModal?.classList.contains('hidden')) closePrivacyModal();
+      if (!$('saved-plans-modal')?.classList.contains('hidden')) closePlansModal('saved-plans-modal', 'saved-plans-open');
+      if (!$('restore-plans-modal')?.classList.contains('hidden')) closePlansModal('restore-plans-modal', 'restore-plans-open');
       if (menuToggle?.getAttribute('aria-expanded') === 'true') closeMobileMenu();
     });
 
