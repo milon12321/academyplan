@@ -2434,7 +2434,9 @@
         // Keep the modal open for both success and failure. Only explicit user
         // actions close it through academyReturnToLogin().
         await window.academyAuth.sendPasswordResetEmail(email);
-        status.textContent = 'Reset link sent. Check your email to choose a new password.';
+        status.textContent = typeof window.academyPasswordRecoverySuccessMessage === 'function'
+          ? window.academyPasswordRecoverySuccessMessage()
+          : 'Reset link sent! Check your inbox and Spam/Junk folder to choose a new password.';
         status.classList.add('text-success');
         status.setAttribute('role', 'status');
       } catch (error) {
