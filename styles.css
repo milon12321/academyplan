@@ -191,7 +191,6 @@ body.view-storage #storage-open-mobile,
   color: #64748B;
 }
 
-
 /* Dynamic academic avatar: branded placeholder, name initial, or uploaded image. */
 .profile-avatar {
   position: relative;
@@ -223,7 +222,7 @@ body.view-storage #storage-open-mobile,
   padding: 1.25rem;
   border: 1px solid #E2E8F0;
   border-radius: 1rem;
-  background: #FFFFFF;
+  background: #FBF7EE;
   box-shadow: 0 8px 20px rgba(15, 23, 42, .06);
 }
 
@@ -273,17 +272,11 @@ body.view-storage #storage-open-mobile,
   text-underline-offset: 3px;
 }
 .password-recovery-link:active { opacity: .75; }
-#recovery-status.text-forest { color: #166534; }
-#recovery-status.text-rust { color: #B91C1C; }
-#recovery-status.text-success { color: #166534; }
-#recovery-status.text-error { color: #B91C1C; }
-#recovery-lookup:disabled { cursor: wait; opacity: .7; }
-.signup-view { max-width: 42rem; margin-inline: auto; padding: 1.25rem; border: 1px solid #E2E8F0; border-radius: 1rem; background: #FFFFFF; box-shadow: 0 8px 20px rgba(15, 23, 42, .06); animation: signupReveal .25s ease both; }
+
+.signup-view { max-width: 42rem; margin-inline: auto; padding: 1.25rem; border: 1px solid #E2E8F0; border-radius: 1rem; background: #FBF7EE; box-shadow: 0 8px 20px rgba(15, 23, 42, .06); animation: signupReveal .25s ease both; }
 .signup-form input:focus, .signup-form select:focus { border-color: #1B4332; box-shadow: 0 0 0 3px rgba(27, 67, 50, .1); }
 .signup-form button { transition: transform .2s ease, background-color .2s ease, box-shadow .2s ease; }
 .signup-form button:hover { transform: translateY(-1px); }
-#signup-password-match.text-success { color: #166534; }
-#signup-password-match.text-error { color: #B91C1C; }
 
 /* Polished optional profile-picture upload control. */
 .profile-picture-upload {
@@ -335,41 +328,6 @@ body.view-storage #storage-open-mobile,
   clip-path: inset(50%);
   white-space: nowrap;
 }
-@media (max-width: 640px) {
-  .profile-picture-upload { gap: .5rem; }
-  .profile-picture-upload-button { padding-inline: .7rem; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .profile-picture-upload { transition: none; }
-}
-
-.signup-status-banner {
-  margin-top: 1.25rem;
-  padding: .85rem 1rem;
-  border: 1px solid transparent;
-  border-radius: .75rem;
-  font-size: .875rem;
-  font-weight: 600;
-  line-height: 1.45;
-}
-.signup-status-banner.signup-status-error {
-  border-color: #FECACA;
-  background: #FEF2F2;
-  color: #B91C1C;
-}
-.signup-status-banner.signup-status-success {
-  border-color: #BBF7D0;
-  background: #F0FDF4;
-  color: #166534;
-}
-.signup-status-banner.signup-status-error::before { content: '⚠ '; }
-.signup-status-banner.signup-status-success::before { content: '✓ '; }
-@keyframes signupReveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { .signup-view { animation: none; } }
-.auth-divider { display: flex; align-items: center; gap: .75rem; color: #94A3B8; font-size: .7rem; font-weight: 700; letter-spacing: .12em; }
-.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
-.auth-divider span { flex: 0 0 auto; }
-
 
 /* Organized day navigation and compact per-day progress indicators. */
 .day-navigation {
@@ -388,69 +346,8 @@ body.view-storage #storage-open-mobile,
 .day-navigation-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }
 .day-navigation-button { padding: .65rem .8rem; border: 1px solid #CBD5E1; border-radius: .7rem; background: #FFFFFF; color: #334155; font-size: .75rem; font-weight: 700; transition: background-color .2s ease, color .2s ease; }
 .day-navigation-button:hover { background: #1E293B; color: #FFFFFF; }
-.day-progress-badge, .day-progress-status { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; padding: .35rem .6rem; background: #E2E8F0; color: #475569; font-size: .7rem; font-weight: 800; white-space: nowrap; }
-.day-progress-badge.is-active { background: #DBEAFE; color: #1D4ED8; }
-.day-progress-badge.is-complete, .day-progress-status.is-complete { background: #DCFCE7; color: #166534; }
-.day-progress-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .6rem; }
-.day-progress-item { display: flex; align-items: center; gap: .65rem; min-width: 0; padding: .65rem; border: 1px solid #E2E8F0; border-radius: .85rem; background: #FFFFFF; color: #334155; text-align: left; transition: border-color .2s ease, box-shadow .2s ease; }
-.day-progress-item:hover, .day-progress-item.is-selected { border-color: #3B82F6; box-shadow: 0 4px 12px rgba(30, 64, 175, .1); }
-.day-progress-ring { display: grid; flex: 0 0 auto; width: 2.75rem; height: 2.75rem; place-items: center; border-radius: 50%; background: conic-gradient(#22C55E var(--progress), #E2E8F0 0); position: relative; font-size: .65rem; font-weight: 800; color: #166534; }
-.day-progress-ring::before { content: ''; position: absolute; inset: .25rem; border-radius: 50%; background: #FFFFFF; }
-.day-progress-ring span { position: relative; z-index: 1; }
-.day-progress-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: .15rem; }
-.day-progress-copy strong, .day-progress-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.day-progress-copy strong { font-size: .75rem; }
-.day-progress-copy small { color: #64748B; font-size: .68rem; }
-@media (max-width: 767px) {
-  .day-navigation { align-items: stretch; flex-direction: column; }
-  .day-navigation-main { align-items: stretch; flex-wrap: wrap; }
-  .day-navigation-main .field-label { width: 100%; margin-bottom: 0; }
-  .day-navigation-actions { display: grid; grid-template-columns: 1fr 1fr; }
-  .day-navigation-actions .day-navigation-button:last-child { grid-column: 1 / -1; }
-  .day-progress-list { grid-template-columns: 1fr; }
-}
 
-/* Collapsible daily overview keeps long plans compact while retaining quick day access. */
-.toggle-days-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .75rem;
-  width: 100%;
-  margin-top: .75rem;
-  padding: .7rem .9rem;
-  border: 1px solid #EAE3D2;
-  border-radius: .85rem;
-  background: #FDFBF7;
-  color: #1B4332;
-  font-size: .8rem;
-  font-weight: 700;
-  text-align: left;
-  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
-}
-.toggle-days-btn:hover,
-.toggle-days-btn:focus-visible {
-  border-color: #1B4332;
-  background: #E8F1EA;
-  box-shadow: 0 3px 10px rgba(27, 67, 50, .1);
-}
-.toggle-days-btn .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.75rem;
-  height: 1.4rem;
-  padding: 0 .45rem;
-  border-radius: 999px;
-  background: #EAE3D2;
-  color: #6B7280;
-  font-size: .7rem;
-  line-height: 1;
-}
-.all-days-container.hidden { display: none; }
-
-/* Structured goal cards keep every title, duration, study window, and action
-   aligned consistently across the full stacked list. */
+/* Goal Item Card Styling */
 .goal-item-card {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) auto minmax(12rem, 1fr) auto;
@@ -458,7 +355,6 @@ body.view-storage #storage-open-mobile,
   column-gap: .75rem;
   row-gap: .4rem;
 }
-
 .goal-item-card .goal-title {
   min-width: 0;
   overflow: hidden;
@@ -466,7 +362,6 @@ body.view-storage #storage-open-mobile,
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .goal-item-card .goal-duration {
   min-width: max-content;
   padding: .2rem .55rem;
@@ -480,81 +375,7 @@ body.view-storage #storage-open-mobile,
   white-space: nowrap;
 }
 
-.goal-item-card .goal-study-slot {
-  min-width: 0;
-  text-align: center;
-}
-
-.goal-item-card .goal-study-time {
-  display: inline-block;
-  overflow: hidden;
-  max-width: 100%;
-  color: #475569;
-  font-size: .75rem;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.goal-item-card .goal-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: .45rem;
-  min-width: max-content;
-  margin-left: 0;
-}
-
-.goal-item-card .goal-created-time {
-  color: #64748B;
-  font-size: .7rem;
-  font-weight: 600;
-  white-space: nowrap;
-  text-align: right;
-}
-
-.goal-item-card > button[data-remove-goal] {
-  min-width: 1.5rem;
-  margin-left: 0;
-}
-
-@media (max-width: 640px) {
-  .goal-item-card {
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: .55rem;
-  }
-
-  .goal-item-card .goal-duration {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .goal-item-card .goal-study-slot {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    text-align: left;
-  }
-
-  .goal-item-card .goal-actions {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    justify-content: flex-end;
-  }
-}
-
-#active-plan-selector:invalid,
-#active-plan-selector option[value=""] {
-  color: #64748B;
-}
-
-/* Date and time controls remain editable; these are only visual defaults. */
-#plan-start-date,
-#plan-start-time,
-#plan-end-date {
-  background: #FFFFFF;
-  color: #1E293B;
-}
-
+/* Site Footer */
 .site-footer {
   border-top: 1px solid #E2E8F0;
   background: #F8FAFC;
@@ -564,1394 +385,461 @@ body.view-storage #storage-open-mobile,
   font-size: 14px;
   line-height: 1.6;
 }
+.site-footer p { margin: 0; }
 
-.site-footer p {
-  margin: 0;
-}
-
-.footer-copyright {
-  margin-bottom: 4px !important;
-}
-
-.footer-year {
-  appearance: none;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-}
-
-.footer-year:hover,
-.footer-year:focus-visible {
-  color: #1B4332;
-  text-decoration: underline;
-  text-decoration-color: #E8A33D;
-  text-underline-offset: 3px;
-}
-
-.mock-account-status,
-.mock-account-hint,
-[data-developer-status],
-[data-developer-message] {
-  display: none !important;
-  visibility: hidden !important;
-  width: 0 !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-}
-
-.mock-account-hint kbd {
-  display: none !important;
-}
-
-.mock-account-hint kbd {
-  border: 1px solid #CBD5E1;
-  border-bottom-width: 2px;
-  border-radius: 4px;
-  padding: 1px 4px;
-  background: #FFFFFF;
-  color: #475569;
-  font-family: inherit;
-  font-size: 10px;
-}
-
-.footer-separator {
-  display: inline-block;
-  margin: 0 .45rem;
-  color: #94A3B8;
-}
-
-.footer-contact {
-  display: inline-block;
-}
-
-.footer-contact-link {
-  color: #64748B;
-  text-decoration: underline;
-  text-decoration-color: #CBD5E1;
-  text-underline-offset: 3px;
-  transition: color .2s ease, text-decoration-color .2s ease;
-}
-
-.footer-contact-link:hover,
-.footer-contact-link:focus-visible {
-  color: #1B4332;
-  text-decoration-color: #E8A33D;
-}
-
-/* Final responsive navigation and landing-page layout rules. These come last
-   so they remain authoritative over the legacy merged styles above. */
-
-/* Keep account plan controls readable without nested or competing scroll areas. */
-#account-menu #plan-list,
-#account-menu #account-trash-list {
-  display: flex;
-  flex-direction: column;
-  gap: .75rem;
-  max-height: none;
-  overflow: visible;
-  padding: .25rem 0 .5rem;
-}
-#account-menu #plan-list > *,
-#account-menu #account-trash-list > * {
-  position: static;
-  min-height: 0;
-  width: 100%;
-}
-#account-menu #saved-plans-panel,
-#account-menu #restore-plans-panel {
-  height: auto;
-  max-height: none;
-  overflow: visible;
-}
-@media (min-width: 768px) {
-  header .desktop-nav-bar {
-    display: flex !important;
-    flex: 0 1 auto;
-    align-items: center;
-    justify-content: flex-end;
-    gap: .35rem;
-    width: auto;
-    max-width: none;
-    overflow: visible;
-  }
-
-  header .responsive-menu-toggle {
-    display: none !important;
-  }
-
-  header #mobile-menu,
-  header #mobile-menu.hidden,
-  header #mobile-menu:not(.hidden) {
-    display: none !important;
-  }
-
-  #landing-hero > div {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(17rem, .9fr);
-    align-items: center;
-    gap: clamp(2.5rem, 6vw, 6rem);
-    width: min(100% - 3rem, 72rem);
-    min-height: 0;
-    padding: clamp(5rem, 9vh, 7rem) 0;
-  }
-
-  #landing-hero > div::after {
-    grid-column: 2;
-    grid-row: 1 / span 6;
-    align-self: center;
-    min-height: 14rem;
-    display: grid;
-    place-items: center;
-    padding: 2rem;
-  }
-
-  #landing-hero h1 {
-    max-width: 42rem;
-    font-size: clamp(2.75rem, 4.8vw, 4.75rem);
-  }
-}
-
-@media (max-width: 767px) {
-  header .desktop-nav-bar {
-    display: none !important;
-  }
-
-  header .responsive-menu-toggle {
-    display: inline-flex !important;
-  }
-
-  header #mobile-menu {
-    display: flex;
-    width: 100vw;
-    max-width: 100vw;
-  }
-
-  header #mobile-menu.hidden {
-    display: none;
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-    transform: translateY(-.5rem);
-  }
-
-  header #mobile-menu:not(.hidden) {
-    display: flex;
-    opacity: 1;
-    pointer-events: auto;
-    visibility: visible;
-    transform: translateY(0);
-  }
-
-  #landing-hero > div {
-    display: block;
-    width: 100%;
-    padding: 4.5rem 1.25rem 5rem;
-  }
-}
-
-/* Three-dot account options are a bounded floating panel. */
-#account-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  width: min(320px, calc(100vw - 2rem));
-  min-width: 220px;
-  max-width: calc(100vw - 2rem);
-  max-height: min(32rem, calc(100vh - 6rem));
-  margin-top: .5rem;
-  overflow-x: hidden;
-  overflow-y: auto;
-  box-sizing: border-box;
-  white-space: normal;
-}
-
-/* Nested plan accordions stay inside the menu and scroll independently. */
-#account-menu > .border-t {
-  margin-top: .5rem;
-  padding-top: .35rem;
-}
-
-#account-menu #saved-plans-panel,
-#account-menu #restore-plans-panel {
-  display: flex;
-  flex-direction: column;
-  gap: .75rem;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  height: auto;
-  overflow: visible;
-  overflow-wrap: anywhere;
-}
-
-#account-menu #plan-list,
-#account-menu #account-trash-list {
-  display: flex;
-  flex-direction: column;
-  gap: .75rem;
-  width: 100%;
-  max-height: none;
-  min-height: 0;
-  overflow: visible;
-  padding: .25rem 0 .5rem;
-}
-
-#account-menu #saved-plans-panel > *,
-#account-menu #restore-plans-panel > * {
-  min-width: 0;
-}
-
-#account-menu.hidden,
-#account-menu.is-closing {
-  display: none !important;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-#account-menu:not(.hidden):not(.is-closing) {
-  visibility: visible;
-}
-
-/* Owner diagnostics are a floating, owner-only modal and never affect page layout. */
-#owner-health-modal { display: none; }
-#owner-health-modal:not(.hidden) { display: block; }
-#owner-health-modal .owner-health-panel { color: #0F172A; }
-
-/* Keep the onboarding form readable above the workspace backdrop. */
-#onboarding-profile-modal .onboarding-profile-panel { color: #0F172A; }
-#onboarding-profile-modal .onboarding-profile-panel h2,
-#onboarding-profile-modal .onboarding-profile-panel p,
-#onboarding-profile-modal .onboarding-profile-panel label { max-width: 100%; }
-#owner-health-modal .owner-health-panel h2,
-#owner-health-modal .owner-health-panel h3,
-#owner-health-modal .owner-health-panel p,
-#owner-health-modal .owner-health-panel span,
-#owner-health-modal .owner-health-panel div,
-#owner-health-modal .owner-health-panel button { max-width: 100%; }
-
-/* Dedicated Study Storage workspace view. */
-#study-storage {
-  min-height: calc(100vh - 4rem);
-  padding: 2rem 0 3rem;
-  background: #F8FAFC;
-}
-#study-storage .storage-modal-panel {
-  width: 100%;
-  background: #FFFFFF;
-  color: #0F172A;
-  border-radius: 1.25rem;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, .08);
-}
-#storage-back {
-  transition: color .2s ease, background-color .2s ease, border-color .2s ease, transform .2s ease;
-}
-#storage-back:hover { transform: translateX(-2px); }
-#storage-back:focus-visible { outline: 2px solid #1B4332; outline-offset: 3px; }
-@media (max-width: 640px) {
-  #study-storage { padding: 1rem 0 2rem; }
-  #study-storage .storage-modal-panel { border-radius: 1rem; }
-}
-
-/* Dedicated navigation views prevent homepage sections from stacking vertically. */
-body.view-account #landing-hero,
-body.view-account #study-storage,
-body.view-account #owner-dashboard,
-body.view-storage #landing-hero,
-body.view-storage #profile,
-body.view-storage #plan-workspace,
-body.view-storage #owner-dashboard,
-body.view-owner #landing-hero,
-body.view-owner #study-storage,
-body.view-owner #profile,
-body.view-owner #plan-workspace {
-  display: none !important;
-}
-
-body.view-account #profile {
-  display: block !important;
-}
-
-body.view-owner #owner-dashboard {
-  display: block !important;
-}
-
-/* Owner Dashboard is a dedicated destination, never a section below the home page. */
-body.view-owner #landing-hero,
-body.view-owner #profile,
-body.view-owner #plan-workspace,
-body.view-owner #study-storage {
-  display: none !important;
-}
-
-body.view-storage #study-storage {
-  display: block !important;
-}
-
-body.view-home #profile,
-body.view-home #study-storage {
-  display: none !important;
-}
-
-body.view-home #landing-hero {
-  display: flex !important;
-}
-
-/* The study dashboard is intentionally a single vertical flow at every
-   viewport size. A block layout prevents the expanded report from creating a
-   second, independently stretching column. */
-.dashboard-stack,
-.dashboard-stack-container,
-.study-dashboard-grid {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.dashboard-stack-container > * {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.dashboard-stack-container > * + * {
-  margin-top: 1.5rem;
-}
-
-.study-plan-panel {
-  min-width: 0;
-}
-
-.progress-overview-accordion {
-  min-width: 0;
-}
-
-.progress-overview-accordion > summary {
-  list-style: none;
-}
-
-.progress-overview-accordion > summary::-webkit-details-marker {
-  display: none;
-}
-
-.progress-overview-toggle {
-  transition: background-color .2s ease, box-shadow .2s ease, transform .2s ease;
-}
-
-.progress-overview-toggle:hover {
-  background: #F8FAFC;
-}
-
-.progress-overview-chevron {
-  transition: transform .3s ease;
-}
-
-.progress-overview-accordion[open] .progress-overview-chevron {
-  transform: rotate(180deg);
-}
-
-.progress-overview-content {
-  margin-top: .75rem;
-  animation: progressOverviewOpen .3s ease both;
-}
-
-@keyframes progressOverviewOpen {
-  from { opacity: 0; transform: translateY(-.5rem); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.progress-overview-accordion,
-.progress-overview-accordion[open] {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  height: auto;
-}
-
-.progress-overview-accordion[open] .progress-overview-content {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  height: auto;
-  max-height: none;
-  overflow: visible;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .progress-overview-content,
-  .progress-overview-chevron,
-  .progress-overview-toggle {
-    animation: none;
-    transition: none;
-  }
-}
-
-/* Password recovery uses an explicit transition instead of an abrupt hidden/display swap. */
-#recovery-modal {
-  opacity: 0;
-  transition: opacity .22s ease;
-}
-#recovery-modal.recovery-modal-open,
-#recovery-modal.recovery-modal-closing {
-  display: block !important;
-}
-#recovery-modal.recovery-modal-open { opacity: 1; }
-#recovery-modal.recovery-modal-closing { opacity: 0; }
-#recovery-modal > div > div {
-  transform: translateY(8px) scale(.985);
-  transition: transform .22s ease;
-}
-#recovery-modal.recovery-modal-open > div > div { transform: translateY(0) scale(1); }
-body.recovery-modal-active { overflow: hidden; }
-#recovery-status.text-success { color: #166534; }
-#recovery-status.text-error { color: #B91C1C; }
-@media (prefers-reduced-motion: reduce) {
-  #recovery-modal,
-  #recovery-modal > div > div { transition: none; }
-}
-
-/* Password recovery feedback stays inside the dialog and never dismisses it. */
-#recovery-status:not(.hidden) {
-  display: block;
-  min-height: 1.5rem;
-  margin-top: .25rem;
-  padding: .75rem .85rem;
-  border-radius: .75rem;
-  font-size: .875rem;
-  font-weight: 600;
-  line-height: 1.45;
-}
-#recovery-status.text-success {
-  display: block;
-  min-height: 3.25rem;
-  margin-top: .75rem;
-  padding: .9rem 1rem;
-  border: 1px solid #86EFAC;
-  border-radius: .75rem;
-  background: #DCFCE7;
-  color: #166534;
-  font-size: .875rem;
-  font-weight: 700;
-  line-height: 1.5;
-  box-shadow: 0 2px 8px rgba(22, 101, 52, .1);
-}
-#recovery-status.text-error {
-  border: 1px solid #FECACA;
-  background: #FEF2F2;
-  color: #B91C1C;
-}
-#recovery-status[role="alert"]::before { content: '⚠ '; }
-#recovery-status[role="status"]::before { content: '✓ '; }
-
-/* Authoritative responsive navigation and spacious account-menu rules. */
-@media (min-width: 768px) {
-  header .desktop-nav-bar {
-    display: flex !important;
-    flex: 0 1 auto;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    gap: .5rem;
-    width: auto;
-    max-width: none;
-    min-width: 0;
-    overflow: visible;
-  }
-
-  header .desktop-nav-bar .menu-nav-item {
-    display: inline-flex;
-    align-items: center;
-    white-space: nowrap;
-  }
-
-  header .responsive-menu-toggle,
-  header #mobile-menu,
-  header #mobile-menu:not(.hidden) {
-    display: none !important;
-  }
-}
-
-@media (max-width: 767px) {
-  header .desktop-nav-bar {
-    display: none !important;
-  }
-
-  header .responsive-menu-toggle {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-  }
-
-  header #mobile-menu {
-    display: flex;
-    flex-direction: column;
-    width: 100vw;
-    max-width: 100vw;
-    max-height: calc(100vh - 4rem);
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  header #mobile-menu.hidden {
-    display: none;
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-    transform: translateY(-.5rem);
-  }
-
-  header #mobile-menu:not(.hidden) {
-    display: flex;
-    opacity: 1;
-    pointer-events: auto;
-    visibility: visible;
-    transform: translateY(0);
-  }
-}
-
-/* The account menu remains a single padded flex stack; list sections do not
-   create nested scrollbars or clip plan action controls. */
-#account-menu {
-  max-height: none;
-  overflow: visible;
-}
-#account-menu #saved-plans-panel,
-#account-menu #restore-plans-panel,
-#account-menu #plan-list,
-#account-menu #account-trash-list {
-  display: flex;
-  flex-direction: column;
-  gap: .75rem;
-  height: auto;
-  max-height: none;
-  overflow: visible;
-  padding: .25rem 0 .5rem;
-}
-
-/* Dedicated plan views replace cramped nested account-menu lists. */
-#saved-plans-modal,
-#restore-plans-modal { backdrop-filter: blur(3px); }
-.saved-plan-list,
-.restore-plan-list {
-  display: flex;
-  flex-direction: column;
-  gap: .75rem;
-  width: 100%;
-}
-.saved-plan-list > *,
-.restore-plan-list > * {
-  width: 100%;
-  min-width: 0;
-}
-.restore-plan-list > div {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  padding: .85rem;
-  border: 1px solid #DED5BE;
-  border-radius: .75rem;
-  background: #FFFFFF;
-}
-.restore-plan-list > div > button:first-child { min-width: 0; flex: 1 1 auto; }
-.restore-plan-list > div > button:not(:first-child) { flex: 0 0 auto; }
-@media (max-width: 640px) {
-  .restore-plan-list > div { align-items: flex-start; flex-wrap: wrap; }
-  .restore-plan-list > div > button:first-child { flex-basis: 100%; }
-}
-#account-menu #plan-list > *,
-#account-menu #account-trash-list > * {
-  position: static;
-  width: 100%;
-  min-height: 0;
-}
-
-/* Tabbed analytics dashboard. */
-.analytics-report-section.hidden {
-  display: none !important;
-}
-.analytics-report-section {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  margin-top: 1rem;
-  animation: fadeIn .2s ease-in-out;
-}
-
-/* Keep chart space stable without imposing oversized report heights. */
-.chart-container,
-.analytics-report-section #progress-chart,
-.analytics-report-section [data-chart-wrapper],
-.analytics-report-section .chart-wrapper,
-#progress-chart {
-  position: relative;
-  display: block;
-  width: 100%;
-  min-width: 0;
-  min-height: 280px;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.analytics-report-section #progress-chart svg,
-.analytics-report-section #progress-chart canvas,
-.analytics-report-section canvas {
-  display: block;
-  width: 100%;
-  max-width: none;
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.report-dashboard-toolbar {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #EAE3D2;
-}
-.report-view-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: .5rem;
-}
-.report-tab-button,
-.report-all-button {
-  border: 1px solid #EAE3D2;
-  border-radius: .75rem;
-  background: #FDFBF7;
-  color: #1B4332;
-  padding: .65rem .85rem;
-  font-size: .75rem;
-  font-weight: 700;
-  line-height: 1.2;
-  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
-}
-.report-tab-button:hover,
-.report-tab-button:focus-visible,
-.report-all-button:hover,
-.report-all-button:focus-visible {
-  border-color: #1B4332;
-  background: #E8F1EA;
-}
-.report-tab-button.is-active,
-.report-all-button[aria-pressed="true"] {
-  border-color: #1B4332;
-  background: #1B4332;
-  color: #FFFFFF;
-}
-.report-tab-content.hidden { display: none !important; }
-.report-tab-content { min-width: 0; }
-@media (max-width: 767px) {
-  .report-dashboard-toolbar { align-items: stretch; flex-direction: column; }
-  .report-view-tabs { justify-content: flex-start; }
-}
-
-/* Balanced landing composition on wide screens. */
-/* Daily checklist academic palette and completion states. */
-.daily-checklist-section {
-  background: #FDFBF7;
-}
-.daily-checklist-card,
-.academic-task-card {
-  background: #FDFBF7 !important;
-  border-color: #EAE3D2 !important;
-}
-.academic-day-select {
-  border-color: #EAE3D2;
-  background: #FDFBF7;
-  color: #1B4332;
-}
-.academic-day-select:focus {
-  border-color: #1B4332;
-  box-shadow: 0 0 0 3px rgba(27, 67, 50, .12);
-}
-.academic-day-button {
-  border-color: #EAE3D2;
-  background: #FDFBF7;
-  color: #1B4332;
-}
-.academic-day-button:hover,
-.academic-day-button:focus-visible {
-  border-color: #1B4332;
-  background: #E8F1EA;
-  color: #1B4332;
-}
-.day-progress-item.is-neutral,
-.day-progress-badge.is-neutral {
-  border-color: #EAE3D2;
-  background: #FDFBF7;
-  color: #6B7280;
-}
-.day-progress-item.is-active,
-.day-progress-badge.is-active {
-  border-color: #D97706;
-  background: #FFF7E6;
-  color: #92400E;
-}
-.day-progress-item.is-complete,
-.day-progress-badge.is-complete {
-  border-color: #2E7D32;
-  background: #E8F5E9;
-  color: #2E7D32;
-}
-.day-progress-item.is-selected {
-  border-color: #1B4332;
-  box-shadow: 0 4px 12px rgba(27, 67, 50, .14);
-}
-.day-progress-ring {
-  background: conic-gradient(#EAE3D2 var(--progress), #EAE3D2 0);
-}
-.day-progress-ring.is-active {
-  background: conic-gradient(#D97706 var(--progress), #FDE7C2 0);
-  color: #92400E;
-}
-.day-progress-ring.is-complete {
-  background: conic-gradient(#2E7D32 var(--progress), #C8E6C9 0);
-  color: #2E7D32;
-}
-.day-progress-ring.is-neutral { color: #6B7280; }
-.day-progress-status.is-active { background: #FEF3C7; color: #92400E; }
-.day-progress-status.is-neutral { background: #EAE3D2; color: #6B7280; }
-.day-progress-status.is-complete { background: #C8E6C9; color: #2E7D32; }
-
-/* Authoritative analytics layout: visible report panels flow sequentially without
-   reserving space for hidden panels. */
-.analytics-report-section.hidden {
-  display: none !important;
-}
-.analytics-report-section {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  margin-top: 1rem;
-  height: auto;
-  min-height: 0;
-  padding-top: 0;
-}
-.analytics-report-section .chart-container,
-.analytics-report-section #progress-chart,
-.analytics-report-section [data-chart-wrapper],
-.analytics-report-section .chart-wrapper {
-  position: relative;
-  display: block;
-  width: 100%;
-  min-width: 0;
-  min-height: 280px;
-  height: auto;
-  padding-top: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-.analytics-report-section canvas,
-.analytics-report-section svg {
-  display: block;
-  max-width: none;
-}
-.analytics-report-section table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-/* Final analytics layout overrides: hidden panels take no space and visible
-   panels flow in Overview → Trend → Daily Summary order. */
-.analytics-report-section.hidden {
-  display: none !important;
-}
-.analytics-report-section {
-  display: block !important;
-  width: 100%;
-  margin-top: 1rem;
-  height: auto;
-  min-height: 0;
-  padding-top: 0;
-}
-.analytics-report-section + .analytics-report-section {
-  margin-top: 1rem;
-}
-.chart-container,
-.analytics-report-section #progress-chart,
-.analytics-report-section [data-chart-wrapper],
-.analytics-report-section .chart-wrapper {
-  position: relative;
-  display: block;
-  width: 100%;
-  min-height: 280px;
-  height: 280px;
-  padding-top: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-.chart-container canvas,
-.analytics-report-section #progress-chart canvas,
-.analytics-report-section [data-chart-wrapper] canvas,
-.analytics-report-section .chart-wrapper canvas {
-  display: block;
-  width: 100% !important;
-  height: 280px !important;
-}
-
-/* Final analytics layout: hidden sections collapse completely, while visible
-   reports flow in document order. */
-.analytics-report-section.hidden { display: none !important; }
-.analytics-report-section {
-  display: block !important;
-  width: 100%;
-  min-width: 0;
-  margin-top: 1rem;
-  height: auto;
-  min-height: 0;
-  padding-top: 0;
-}
-.analytics-report-section:first-child { margin-top: 0; }
-.analytics-report-section .chart-container,
-.analytics-report-section #progress-chart,
-.analytics-report-section [data-chart-wrapper],
-.analytics-report-section .chart-wrapper {
-  position: relative;
-  display: block;
-  width: 100%;
-  min-width: 0;
-  min-height: 280px;
-  height: 280px;
-  margin-top: 1rem;
-  padding-top: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-.analytics-report-section .chart-container canvas,
-.analytics-report-section #progress-chart canvas,
-.analytics-report-section [data-chart-wrapper] canvas,
-.analytics-report-section .chart-wrapper canvas {
-  display: block;
-  width: 100% !important;
-  height: 280px !important;
-}
-.analytics-report-section table { width: 100%; border-collapse: collapse; }
-
-/* The email controls stay above the dashboard views and never float beside headings. */
-#email-report-settings-container {
-  display: flex !important;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  border: 1px solid #E2E8F0;
-  border-radius: 1rem;
-  background: #FFFFFF;
-  box-shadow: 0 4px 10px rgba(15, 23, 42, .04);
-}
-#email-report-settings-container #report-recipient { flex: 1 1 16rem; min-width: 12rem; }
-#email-report-settings-container #report-send-status { flex: 1 1 12rem; }
-
-.daily-note-quote {
-  display: block;
-  color: #64748B;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-#todays-note-display-container {
-  background: rgba(251, 247, 238, .4);
-  border-left: 4px solid #E8A33D;
-  border-radius: 0 .75rem .75rem 0;
-  color: #64748B;
-}
-#saved-note-text {
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-}
-#edit-note-btn { font-style: normal; }
-#note-save-status:not(.hidden) { display: inline-flex; }
-
-/* Warm, cohesive styling for the plan creation workspace. */
-#plan-workspace > section:first-child .workspace-card {
-  background: #FDFBF7;
-  border: 1px solid #F0E6D2;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, .05);
-}
-
-#plan-workspace > section:first-child .workspace-card .workspace-card {
-  background: rgba(255, 255, 255, .72);
-  border-color: #F0E6D2;
-  box-shadow: 0 2px 10px -4px rgba(120, 82, 35, .12);
-}
-
-#plan-workspace > section:first-child .field-label {
-  color: #334155;
-  font-weight: 600;
-}
-
-#plan-workspace > section:first-child input,
-#plan-workspace > section:first-child select {
-  background: #FFFEFB;
-  border-color: #E5D8C2;
-  color: #1E293B;
-  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
-}
-
-#plan-workspace > section:first-child input:focus,
-#plan-workspace > section:first-child select:focus {
-  border-color: #E09F3E;
-  outline: 2px solid rgba(224, 159, 62, .35);
-  outline-offset: 1px;
-  box-shadow: 0 0 0 1px rgba(224, 159, 62, .12);
-}
-
-#plan-workspace > section:first-child #plan-name-input {
-  background: #FFFEFB;
-  border-color: #E5D8C2;
-}
-
-#plan-workspace > section:first-child #save-plan,
-#plan-workspace > section:first-child #add-global-goal {
-  background: #E09F3E;
-  border-color: #E09F3E;
-  color: #FFFFFF;
-  box-shadow: 0 3px 8px -3px rgba(180, 112, 24, .45);
-  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
-}
-
-#plan-workspace > section:first-child #save-plan:hover,
-#plan-workspace > section:first-child #add-global-goal:hover {
-  background: #C98224;
-  border-color: #C98224;
-  box-shadow: 0 5px 12px -4px rgba(180, 112, 24, .5);
-}
-
-#plan-workspace > section:first-child #save-plan:active,
-#plan-workspace > section:first-child #add-global-goal:active {
-  transform: translateY(1px);
-}
-
-#plan-workspace > section:first-child #new-plan-top,
-#plan-workspace > section:first-child #view-report {
-  border: 1px solid #D1D5DB;
-  background: transparent;
-  color: #1E293B;
-  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
-}
-
-#plan-workspace > section:first-child #new-plan-top:hover,
-#plan-workspace > section:first-child #view-report:hover {
-  border-color: #C98224;
-  background: #FFF8EA;
-  color: #92400E;
-}
-
-#plan-workspace > section:first-child .schedule-mode-button {
-  border-color: #E5D8C2;
-  background: #FFFEFB;
-  color: #64748B;
-}
-
-#plan-workspace > section:first-child .schedule-mode-button:hover {
-  border-color: #E09F3E;
-  background: #FFF8EA;
-  color: #92400E;
-}
-
-#plan-workspace > section:first-child .schedule-mode-button[aria-pressed="true"],
-#plan-workspace > section:first-child .schedule-mode-button.active {
-  border-color: #D8922E;
-  background: #F3C46B;
-  color: #5B3410;
-  box-shadow: 0 1px 4px rgba(180, 112, 24, .18);
-}
-
-#plan-workspace > section:first-child .schedule-mode-button[aria-pressed="true"]:hover,
-#plan-workspace > section:first-child .schedule-mode-button.active:hover {
-  border-color: #C98224;
-  background: #E09F3E;
-  color: #FFFFFF;
-}
-
-@media (min-width: 768px) {
-  #landing-hero > div {
-    width: min(calc(100% - 4rem), 76rem);
-    min-height: min(44rem, calc(100vh - 4rem));
-    padding: clamp(4rem, 8vh, 7rem) 0;
-    column-gap: clamp(3rem, 7vw, 7rem);
-  }
-
-  #landing-hero h1 {
-    max-width: 43rem;
-    font-size: clamp(2.75rem, 4.6vw, 4.75rem);
-    line-height: 1.08;
-  }
-
-  #landing-hero > div::after {
-    grid-column: 2;
-    grid-row: 1 / span 6;
-    width: 100%;
-    min-height: 17rem;
-    align-self: center;
-    justify-self: stretch;
-    padding: clamp(2rem, 4vw, 4rem) 1.5rem;
-  }
-}
-
-/* Warm visual treatment for reporting controls and analytics cards. */
-#email-report-settings-container {
-  background: #FDFBF7;
-  border: 1px solid #F0E6D2;
-  border-radius: 1rem;
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, .04);
-  padding: 1rem;
-}
-
-#analytics-dashboard-container,
-#progress-overview-panel {
-  background: #FCFAF5;
-  border: 1px solid #EEE8D5;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px -4px rgba(120, 82, 35, .08);
-  padding: 1.25rem;
-}
-
-#analytics-dashboard-container .analytics-card,
-#progress-overview-panel .report-tab-content > section,
-#progress-overview-panel .results-tile,
-#progress-overview-panel .report-day-card {
-  background: #FFFFFF;
-  border-color: #EEE8D5;
-  border-radius: .85rem;
-  box-shadow: 0 3px 12px -6px rgba(120, 82, 35, .16);
-}
-
-#progress-overview-panel .report-dashboard-toolbar {
-  gap: 1rem;
-  padding-bottom: 1rem;
-  border-bottom-color: #EEE8D5;
-}
-
-#analytics-dashboard-container .report-tab-button,
-#analytics-dashboard-container .report-all-button,
-#progress-overview-panel .report-tab-button,
-#progress-overview-panel .report-all-button {
-  border: 1px solid #E5E7EB;
-  border-radius: .75rem;
-  background: #FFFFFF;
-  color: #1E293B;
-  padding: .65rem .85rem;
-  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
-}
-
-#analytics-dashboard-container .report-tab-button:hover,
-#analytics-dashboard-container .report-all-button:hover,
-#progress-overview-panel .report-tab-button:hover,
-#progress-overview-panel .report-all-button:hover {
-  border-color: #E09F3E;
-  background: #FFF8EA;
-  color: #92400E;
-}
-
-#analytics-dashboard-container .report-tab-button.is-active,
-#analytics-dashboard-container .report-all-button[aria-pressed="true"],
-#progress-overview-panel .report-tab-button.is-active,
-#progress-overview-panel .report-all-button[aria-pressed="true"] {
-  border-color: #1E3A2B;
-  background: #1E3A2B;
-  color: #FFFFFF;
-  box-shadow: 0 3px 8px -4px rgba(30, 58, 43, .45);
-}
-
-@media (max-width: 767px) {
-  #analytics-dashboard-container,
-  #progress-overview-panel {
-    padding: 1rem;
-  }
-}
-
-/* Final warm theme for the complete analytics dashboard. */
-#analytics-dashboard-container,
-#progress-overview-panel {
-  background: #fdfbf7;
-  border: 1px solid #f0e6d2;
-  border-radius: 1rem;
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, .04);
-  padding: 1.25rem;
-}
-
-#progress-overview-container,
-#progress-trend-container,
-#daily-summary-container {
-  background: #faf7f2;
-  border: 1px solid #eee8d5;
-  border-radius: .9rem;
-  padding: 1rem;
-  margin-top: 1rem;
-}
-
-#progress-overview-container .results-tile,
-#progress-overview-container .report-day-card,
-#progress-trend-container > section,
-#daily-summary-container > section {
-  background: #ffffff;
-  border: 1px solid #eee8d5;
-  border-radius: .85rem;
-  box-shadow: 0 3px 12px -6px rgba(120, 82, 35, .16);
-  padding: 1rem;
-}
-
-#progress-overview-container .results-tile,
-#progress-overview-container .report-day-card {
-  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
-}
-
-#progress-overview-container .results-tile:hover,
-#progress-overview-container .report-day-card:hover {
-  background: #fffdf9;
-  border-color: #e5d8c2;
-  box-shadow: 0 5px 14px -7px rgba(120, 82, 35, .22);
-}
-
-#progress-overview-panel .report-dashboard-toolbar {
-  border-bottom: 1px solid #eee8d5;
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
-}
-
-#progress-overview-panel .report-view-tabs {
-  margin-top: .25rem;
-}
-
-#progress-overview-panel .report-tab-button,
-#progress-overview-panel .report-all-button {
-  border: 1px solid #e5e7eb;
-  border-radius: .75rem;
-  background: #ffffff;
-  color: #1e293b;
-  padding: .65rem .85rem;
-  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
-}
-
-#progress-overview-panel .report-tab-button:hover,
-#progress-overview-panel .report-tab-button:focus-visible,
-#progress-overview-panel .report-all-button:hover,
-#progress-overview-panel .report-all-button:focus-visible {
-  border-color: #e09f3e;
-  background: #fff8ea;
-  color: #92400e;
-}
-
-#progress-overview-panel .report-tab-button.is-active,
-#progress-overview-panel .report-all-button[aria-pressed="true"] {
-  border-color: #1e3a2b;
-  background: #1e3a2b;
-  color: #ffffff;
-  box-shadow: 0 3px 8px -4px rgba(30, 58, 43, .45);
-}
-
-#progress-overview-panel .report-tab-button.is-active:hover,
-#progress-overview-panel .report-all-button[aria-pressed="true"]:hover {
-  border-color: #173022;
-  background: #173022;
-  color: #ffffff;
-}
-
-#progress-trend-container > section,
-#daily-summary-container > section {
-  margin-top: 0;
-}
-
-#progress-trend-container #progress-chart {
-  background: #ffffff;
-  border: 1px solid #eee8d5;
-  border-radius: .75rem;
-  padding: .75rem;
-}
-
-#daily-summary-container table {
-  background: #ffffff;
-  border: 1px solid #eee8d5;
-  border-radius: .75rem;
-}
-
-#daily-summary-container thead {
-  background: #faf7f2;
-}
-
-.analytics-report-section.hidden {
-  display: none !important;
-}
-
-/* Final layout guarantees for deferred initialization and responsive reports. */
-.analytics-report-section:not(.hidden) {
-  display: block !important;
-  width: 100%;
-  margin-top: 1rem;
-}
-.analytics-report-section .chart-container,
-.analytics-report-section #progress-chart,
-.analytics-report-section [data-chart-wrapper],
-.analytics-report-section .chart-wrapper {
-  position: relative;
-  width: 100%;
-  min-height: 280px;
-  height: 280px;
-}
-#todays-note-display-container[aria-hidden="true"],
-#todays-note-edit-container[aria-hidden="true"] {
-  display: none !important;
-}
-
-/* Fluid responsive foundation: preserves the warm theme while keeping wide
-   screens balanced and compact devices comfortable. */
+/* Fluid responsive foundation */
 :root {
   --content-max-width: 80rem;
   --content-gutter: clamp(1rem, 3vw, 1.5rem);
 }
-
 body {
   font-size: clamp(.9375rem, .15vw + .9rem, 1rem);
   line-height: 1.6;
 }
 
-main > section > .max-w-6xl,
-main > section > div.max-w-6xl,
-#plan-workspace > section > .w-full.max-w-6xl,
-#plan-workspace > section > div.max-w-6xl {
-  width: 100%;
-  max-width: var(--content-max-width);
-  margin-inline: auto;
-  padding-inline: var(--content-gutter);
+/* Professional visual polish: compact rhythm, restrained scale, and clear hierarchy. */
+header > div {
+  padding-block: .65rem;
+}
+
+#landing-hero > div {
+  width: min(100% - 2rem, 72rem);
 }
 
 #landing-hero h1 {
-  font-size: clamp(2rem, 4vw, 3.25rem);
-  line-height: 1.08;
+  margin-bottom: 1.15rem;
+  font-size: clamp(2.25rem, 4.2vw, 3.75rem);
+  line-height: 1.2;
+  letter-spacing: -.025em;
 }
 
 #landing-hero p,
-#landing-hero blockquote,
-.site-footer,
-.menu-nav-item {
-  font-size: clamp(.875rem, .2vw + .82rem, 1rem);
+#landing-hero blockquote {
+  line-height: 1.55;
 }
 
-header .max-w-6xl {
-  width: 100%;
-  max-width: var(--content-max-width);
-  margin-inline: auto;
-  padding-inline: var(--content-gutter);
-}
-
-/* Keep the planning controls fluid instead of allowing long labels or inputs
-   to force a wider layout on tablets and smaller laptops. */
-#plan-workspace .workspace-card,
-#email-report-settings-container,
-#progress-overview-panel,
-#progress-overview-container,
-#progress-trend-container,
-#daily-summary-container {
-  min-width: 0;
-  max-width: 100%;
-}
-
-#email-report-settings-container,
-.report-dashboard-toolbar,
-.day-navigation,
-#plan-workspace > section:first-child .flex.flex-col {
-  flex-wrap: wrap;
-}
-
-.report-view-tabs {
-  min-width: 0;
-  flex-wrap: wrap;
-}
-
-@media (max-width: 768px) {
-  .max-w-6xl,
-  main > section > .max-w-6xl,
-  main > section > div.max-w-6xl {
-    padding-inline: 1rem;
+@media (min-width: 768px) {
+  #landing-hero > div {
+    grid-template-columns: minmax(0, 1.08fr) minmax(16rem, .72fr);
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+    min-height: clamp(28rem, 62vh, 40rem);
+    padding-top: clamp(3rem, 6vh, 5rem);
+    padding-bottom: clamp(3rem, 6vh, 5rem);
   }
 
   #landing-hero h1 {
-    font-size: clamp(2rem, 8vw, 2.75rem);
+    max-width: 40rem;
+    font-size: clamp(2.35rem, 3.7vw, 3.75rem);
+    line-height: 1.18;
   }
 
-  #landing-hero > div {
-    padding-top: clamp(3.5rem, 12vw, 5rem);
-    padding-bottom: clamp(3.5rem, 12vw, 5rem);
-  }
-
-  #email-report-settings-container,
-  .report-dashboard-toolbar,
-  .day-navigation,
-  .day-navigation-main,
-  .report-view-tabs {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  #email-report-settings-container > *,
-  .report-view-tabs > * {
-    width: 100%;
-  }
-
-  #email-report-settings-container #report-recipient {
-    min-width: 0;
-    width: 100%;
-  }
-
-  .report-view-tabs > button {
-    text-align: center;
-  }
-
-  #progress-overview-panel,
-  #progress-overview-container,
-  #progress-trend-container,
-  #daily-summary-container {
-    padding: 1rem;
-  }
-
-  .chart-container,
-  .analytics-report-section #progress-chart,
-  .analytics-report-section .chart-wrapper {
-    min-height: 220px;
-    height: 220px;
-  }
-
-  .chart-container svg,
-  .analytics-report-section #progress-chart svg {
-    min-width: 560px;
-  }
-}
-
-@media (min-width: 1024px) {
-  #plan-workspace > section:first-child .grid,
-  #plan-workspace .daily-checklist-card > .grid {
-    align-items: start;
-  }
-
-  #email-report-settings-container {
-    align-items: center;
-  }
-
-  #progress-overview-container .results-tile {
-    min-height: 5rem;
+  #landing-hero > div::after {
+    max-width: 22rem;
+    justify-self: end;
+    padding: clamp(1.75rem, 3.5vw, 3rem) 1.25rem;
+    border-radius: 1.5rem;
+    font-size: clamp(1.05rem, 1.55vw, 1.6rem);
+    line-height: 1.65;
   }
 }
 
 @media (min-width: 1280px) {
-  #landing-hero h1 {
-    font-size: clamp(3rem, 4vw, 4.25rem);
+  #landing-hero > div {
+    width: min(100% - 3rem, 74rem);
+    column-gap: 4.5rem;
+    min-height: 36rem;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
   }
+
+  #landing-hero h1 {
+    font-size: 3.75rem;
+  }
+}
+
+/* Consistent control and card treatment across dashboard surfaces. */
+.auth-form,
+.signup-view,
+.day-navigation {
+  border-radius: .875rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, .055);
+}
+
+.auth-form,
+.signup-view {
+  padding: 1.1rem;
+}
+
+.plan-name-input,
+.auth-input,
+.day-selector,
+.profile-picture-upload {
+  border-radius: .65rem;
+}
+
+.plan-name-input,
+.auth-input,
+.day-selector {
+  min-height: 2.85rem;
+  padding: .65rem .85rem;
+}
+
+.profile-picture-upload {
+  min-height: 2.85rem;
+}
+
+.auth-submit,
+.auth-google,
+.day-navigation-button,
+.profile-picture-upload-button {
+  border-radius: .65rem;
+}
+
+@media (max-width: 767px) {
+  header > div {
+    padding-block: .5rem;
+  }
+
+  #landing-hero h1 {
+    font-size: clamp(2rem, 9vw, 2.75rem);
+    line-height: 1.2;
+  }
+
+  #landing-hero > div {
+    padding-block: 2.75rem;
+  }
+}
+
+/* Analytics report controls: warm default buttons with a clear active state. */
+#plan-workspace .report-dashboard-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+#plan-workspace .report-view-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .5rem;
+  width: 100%;
+  margin-top: .25rem;
+}
+
+#plan-workspace .report-tab-button,
+#plan-workspace .report-all-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: .65rem .9rem;
+  border: 1px solid #B77932;
+  border-radius: .75rem;
+  background: #F7E3B5;
+  color: #6B4322;
+  box-shadow: 0 3px 8px rgba(107, 67, 34, .14);
+  cursor: pointer;
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+#plan-workspace .report-tab-button:hover,
+#plan-workspace .report-all-button:hover {
+  border-color: #9A6128;
+  background: #EBCB83;
+  color: #55351D;
+  box-shadow: 0 5px 12px rgba(107, 67, 34, .2);
+  transform: translateY(-1px);
+}
+
+#plan-workspace .report-tab-button:active,
+#plan-workspace .report-all-button:active {
+  transform: translateY(0);
+}
+
+#plan-workspace .report-tab-button.is-active,
+#plan-workspace .report-tab-button[aria-selected="true"],
+#plan-workspace .report-all-button.is-active,
+#plan-workspace .report-all-button[aria-pressed="true"] {
+  border-color: #7A4423;
+  background: #7A4423;
+  color: #FFF9ED;
+  box-shadow: 0 5px 14px rgba(122, 68, 35, .26);
+}
+
+#plan-workspace .report-tab-button.is-active:hover,
+#plan-workspace .report-tab-button[aria-selected="true"]:hover,
+#plan-workspace .report-all-button.is-active:hover,
+#plan-workspace .report-all-button[aria-pressed="true"]:hover {
+  border-color: #5C311D;
+  background: #5C311D;
+  color: #FFF9ED;
+}
+
+#plan-workspace .report-tab-content {
+  width: 100%;
+  min-width: 0;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  #plan-workspace .report-view-tabs {
+    width: auto;
+    max-width: 100%;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  #plan-workspace .report-view-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #plan-workspace .report-tab-button,
+  #plan-workspace .report-all-button {
+    width: 100%;
+    min-height: 2.65rem;
+    padding-inline: .55rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #plan-workspace .report-tab-button,
+  #plan-workspace .report-all-button {
+    transition: none;
+  }
+}
+
+/* Warm report-delivery panel matching the analytics controls. */
+#plan-workspace .email-report-settings-container {
+  display: block;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid #B77932;
+  border-radius: 1rem;
+  background: linear-gradient(145deg, #FFF8E9 0%, #F7E3B5 100%);
+  box-shadow: 0 8px 18px rgba(107, 67, 34, .12);
+}
+
+#plan-workspace .email-report-settings-heading h3 {
+  margin: .15rem 0 0;
+  color: #55351D;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+#plan-workspace .email-report-settings-heading p:last-child {
+  margin-top: .35rem;
+  color: #79552F;
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+#plan-workspace .email-report-settings-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: .75rem;
+  margin-top: 1rem;
+}
+
+#plan-workspace .email-report-recipient-field {
+  min-width: 0;
+  flex: 1 1 16rem;
+}
+
+#plan-workspace .email-report-recipient-field label {
+  display: block;
+  margin-bottom: .3rem;
+  color: #6B4322;
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+#plan-workspace #report-recipient {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: .65rem .85rem;
+  border: 1px solid #C58A43;
+  border-radius: .7rem;
+  background: #FFFDF8;
+  color: #55351D;
+  font-size: .8rem;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+#plan-workspace #report-recipient:focus {
+  border-color: #7A4423;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(122, 68, 35, .14);
+}
+
+#plan-workspace .email-report-send-button {
+  flex: 0 0 auto;
+  min-height: 2.5rem;
+  padding: .65rem .95rem;
+  border: 1px solid #7A4423;
+  border-radius: .7rem;
+  background: #7A4423;
+  color: #FFF9ED;
+  font-size: .75rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(122, 68, 35, .2);
+  transition: background-color .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+#plan-workspace .email-report-send-button:hover {
+  border-color: #5C311D;
+  background: #5C311D;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(122, 68, 35, .25);
+}
+
+#plan-workspace .email-report-send-button:active { transform: translateY(0); }
+
+#plan-workspace .email-report-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: 2.5rem;
+  color: #6B4322;
+  font-size: .75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#plan-workspace .email-report-toggle input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #7A4423;
+}
+
+#plan-workspace .email-report-status {
+  flex: 1 1 100%;
+  color: #79552F;
+  font-size: .75rem;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  #plan-workspace .email-report-settings-controls { align-items: stretch; }
+  #plan-workspace .email-report-send-button,
+  #plan-workspace .email-report-toggle { width: 100%; }
+  #plan-workspace .email-report-send-button { justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #plan-workspace .email-report-send-button,
+  #plan-workspace #report-recipient { transition: none; }
+}
+
+/* Warm paper backgrounds for the daily checklist and study dashboard panels. */
+#daily-checklist-section .daily-checklist-card,
+#daily-checklist-section .academic-task-card,
+#daily-checklist-section .email-report-settings-container,
+#daily-checklist-section #progress-overview-panel,
+#daily-checklist-section #progress-trend-container > section,
+#daily-checklist-section #daily-summary-container > section {
+  background: #FBF7EE;
+}
+
+/* Keep the outer daily checklist workspace card on the same warm paper tone. */
+#daily-checklist-section > .max-w-6xl > .dashboard-stack-container > .daily-checklist-card {
+  background: #FBF7EE;
+}
+
+/* Match the remaining daily checklist sub-cards to the warm paper theme. */
+#daily-checklist-section .bg-forest\/5,
+#daily-checklist-section #todays-note-edit-container,
+#daily-checklist-section #todays-note-display-container {
+  background: #FBF7EE;
+}
+
+/* Refined dark-ink typography for the report-delivery panel. */
+#plan-workspace .email-report-settings-container .email-report-settings-heading .eyebrow-dark {
+  color: #6B4322;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: .8rem;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: .02em;
+  line-height: 1.4;
+}
+
+#plan-workspace .email-report-settings-container .email-report-settings-heading h3 {
+  color: #1F2A24;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -.01em;
+  line-height: 1.25;
+}
+
+#plan-workspace .email-report-settings-container .email-report-settings-heading p:last-child {
+  color: #4B5563;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: .8rem;
+  font-weight: 400;
+  letter-spacing: .005em;
+  line-height: 1.55;
+}
+
+#plan-workspace .email-report-settings-container .email-report-recipient-field label {
+  color: #55351D;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  line-height: 1.4;
+}
+
+#plan-workspace .email-report-settings-container #report-recipient {
+  color: #1F2A24;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: .875rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+
+#plan-workspace .email-report-settings-container #report-recipient::placeholder {
+  color: #7A746B;
+  font-weight: 400;
+}
+
+#plan-workspace .email-report-settings-container .email-report-toggle {
+  color: #4B5563;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .005em;
+  line-height: 1.4;
+}
+
+#plan-workspace .email-report-settings-container .email-report-status {
+  color: #5B5145;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .005em;
+  line-height: 1.45;
+}
+
+#plan-workspace .email-report-settings-container .email-report-send-button {
+  color: #FFF9ED;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  line-height: 1.4;
 }
