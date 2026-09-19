@@ -24,8 +24,7 @@ header > div { min-width: 0; }
   .desktop-nav { display: flex; }
   .menu-toggle { display: none; }
   #mobile-menu,
-  #mobile-menu.hidden,
-  #mobile-menu:not(.hidden) { display: none !important; }
+  #mobile-menu.hidden { display: none !important; }
 }
 
 @media (max-width: 767px) {
@@ -45,6 +44,8 @@ header > div { min-width: 0; }
   width: 100%;
   max-width: 100%;
   max-height: calc(100vh - 4rem);
+  padding: 1rem;
+  background-color: #ffffff;
   overflow-x: hidden;
   overflow-y: auto;
   border-top: 1px solid #DED5BE;
@@ -96,19 +97,6 @@ body.view-storage #desktop-storage-open,
   background: #E8F1EA;
   color: #1B4332;
   font-weight: 700;
-}
-
-@media (max-width: 767px) {
-  #mobile-menu {
-    top: 4rem;
-    max-height: calc(100vh - 4rem);
-  }
-}
-
-@media (min-width: 768px) {
-  #mobile-menu-backdrop {
-    display: none !important;
-  }
 }
 
 .title {
