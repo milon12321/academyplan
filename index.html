@@ -46,6 +46,8 @@
       border-color:#E2E8F0;
       box-shadow:0 2px 4px -1px rgba(15,23,42,.04);
     }
+    #plan-workspace > section:first-child .workspace-card,
+    #plan-workspace > section:first-child .workspace-card .workspace-card { background:#FBF7EE; }
     #plan-workspace .workspace-heading { color:#0F172A; }
     #plan-workspace .workspace-button-primary { background:#1E293B; color:#FFFFFF; }
     #plan-workspace .workspace-button-primary:hover { background:#0F172A; }
@@ -140,14 +142,8 @@
     /* Menu destinations are presented as dedicated views, not stacked homepage sections. */
     body.view-account #landing-hero,
     body.view-account #study-storage,
-    body.view-account #owner-dashboard,
     body.view-storage #landing-hero,
-    body.view-storage #profile,
-    body.view-storage #owner-dashboard,
-    body.view-owner #landing-hero,
-    body.view-owner #study-storage,
-    body.view-owner #profile { display:none !important; }
-    body.view-owner #owner-dashboard { display:block !important; }
+    body.view-storage #profile { display:none !important; }
     body.view-account #profile { display:block !important; }
     body.view-storage #study-storage { display:block !important; }
     body.view-home #profile,
@@ -364,11 +360,6 @@
       visibility: visible;
     }
 
-    /* Owner diagnostics modal stays owner-only and does not affect page layout. */
-    #owner-health-modal { display:none; }
-    #owner-health-modal:not(.hidden) { display:block; }
-    #owner-health-modal .owner-health-panel { color:#0F172A; }
-
     .google-mark { display:inline-grid; place-items:center; width:1.35rem; height:1.35rem; border-radius:50%; color:#4285F4; font-weight:800; font-family:Arial,sans-serif; }
 
     #account-menu button,
@@ -429,7 +420,6 @@
       <nav id="desktop-nav" class="desktop-nav desktop-nav-bar items-center gap-2" aria-label="Main navigation" data-navigation="desktop" data-desktop-navigation="links">
         <button id="desktop-storage-open" type="button" data-route="storage" class="menu-nav-item rounded-lg px-3 py-2 text-sm font-semibold">📁 Study Storage</button>
         <a id="desktop-account-link" href="index.html?account#profile" class="menu-nav-item rounded-lg px-3 py-2 text-sm">Account</a>
-        <button id="desktop-owner-link" type="button" class="menu-nav-item hidden rounded-lg px-3 py-2 text-sm font-semibold">Owner Dashboard</button>
         <button id="desktop-privacy-open" type="button" class="menu-nav-item rounded-lg px-3 py-2 text-sm" aria-controls="privacy-modal" aria-haspopup="dialog">Privacy Notice</button>
       </nav>
       <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" class="menu-toggle responsive-menu-toggle w-10 h-10 items-center justify-center rounded-full border border-line" data-navigation="mobile" data-mobile-menu-toggle="true">
@@ -440,7 +430,6 @@
     <div id="mobile-menu" class="hidden border-t border-line bg-paper px-5 py-4 space-y-3" aria-label="Main navigation" aria-hidden="true">
       <button id="storage-open-mobile" type="button" data-route="storage" class="menu-nav-item block w-full text-left text-sm py-2 px-3 rounded-lg font-semibold" aria-controls="study-storage">📁 Study Storage</button>
       <a id="account-nav-link" href="index.html?account#profile" class="menu-nav-item block text-sm py-2 px-3 rounded-lg" aria-controls="profile">Account</a>
-      <button id="owner-nav-link" type="button" class="menu-nav-item hidden block w-full text-left text-sm py-2 px-3 rounded-lg font-semibold">Owner Dashboard</button>
       <button id="privacy-open" type="button" class="menu-nav-item block w-full text-left text-sm py-2 px-3 rounded-lg" aria-controls="privacy-modal" aria-haspopup="dialog">Privacy Notice</button>
       <button id="mobile-logout" type="button" class="hidden w-full text-left text-sm py-2 px-3 rounded-lg text-rust font-semibold">Log out</button>
     </div>
@@ -489,48 +478,9 @@
     </section>
 
 
-    <section id="owner-dashboard" class="hidden bg-slate-50 py-10 md:py-12" aria-labelledby="owner-dashboard-title">
-      <div class="max-w-6xl mx-auto px-5 sm:px-8">
-        <div class="workspace-card p-5 sm:p-7">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <p class="eyebrow-dark text-base">Restricted administration</p>
-              <h2 id="owner-dashboard-title" class="workspace-heading font-serif text-3xl mt-0.5">Owner Dashboard</h2>
-              <p class="mt-2 text-sm text-slate-600 max-w-2xl">View only website data that users submitted and consented to share. Passwords, private Gmail content, and unrelated activity are never available here.</p>
-            </div>
-            <span id="owner-access-badge" class="hidden rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Authorized</span>
-          </div>
-          <div id="owner-dashboard-status" class="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600" role="status" aria-live="polite">Checking administrator access…</div>
-          <div id="owner-dashboard-content" class="hidden mt-5">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <label class="flex-1"><span class="field-label text-slate-800">Search users</span><input id="owner-user-search" type="search" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm" placeholder="Search by name or email"></label>
-              <button id="owner-refresh-users" type="button" class="rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-900">Refresh</button>
-            </div>
-            <div id="owner-user-list" class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
-            <div class="mt-4 flex items-center justify-between"><button id="owner-previous-page" type="button" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">Previous</button><span id="owner-page-label" class="text-xs text-slate-500"></span><button id="owner-next-page" type="button" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">Next</button></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div id="owner-health-modal" class="hidden fixed inset-0 z-[70] bg-ink/45 p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="owner-health-title">
-      <div class="min-h-full flex items-center justify-center">
-        <div class="owner-health-panel w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-paper rounded-2xl border border-line shadow-2xl p-5 sm:p-7">
-          <div class="flex items-start justify-between gap-4">
-            <div><p class="eyebrow-dark text-base">Restricted diagnostics</p><h2 id="owner-health-title" class="font-serif text-2xl text-forest-dark mt-0.5">Owner System Health</h2></div>
-            <button id="owner-health-close" type="button" aria-label="Close system health" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
-          </div>
-          <div id="owner-health-status" class="mt-5 rounded-xl border border-line bg-white p-4 text-sm" role="status" aria-live="polite">Checking Firebase connection…</div>
-          <div class="mt-5 flex items-center justify-between gap-3"><h3 class="font-serif text-xl text-forest-dark">Recent error logs</h3><button id="owner-clear-logs" type="button" class="rounded-lg border border-rust px-3 py-2 text-xs font-semibold text-rust hover:bg-rust/5">Clear logs</button></div>
-          <div id="owner-error-log-list" class="mt-3 space-y-2"></div>
-          <p id="owner-error-log-empty" class="hidden mt-3 rounded-xl border border-dashed border-line p-5 text-center text-sm text-ink/60">No client-side errors have been recorded on this device.</p>
-        </div>
-      </div>
-    </div>
-
     <section id="profile" class="bg-paper py-10 md:py-12">
       <div class="max-w-6xl mx-auto px-5 sm:px-8">
-        <div id="account-card" class="max-w-2xl mx-auto bg-white rounded-2xl border border-line shadow-sm p-5 sm:p-7">
+        <div id="account-card" class="max-w-2xl mx-auto bg-paper rounded-2xl border border-line shadow-sm p-5 sm:p-7">
           <div class="flex items-start gap-4">
             <div id="profile-avatar" class="profile-avatar profile-avatar-placeholder w-16 h-16 shrink-0 rounded-full flex items-center justify-center overflow-hidden" role="img" aria-label="Academic workspace avatar">
               <span class="profile-avatar-mark" aria-hidden="true">▦</span>
@@ -838,12 +788,21 @@
             <span id="note-save-status" class="hidden mt-2 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700" role="status" aria-live="polite">Note saved!</span>
           </div>
 
-          <div id="email-report-settings-container" class="email-report-settings-container" style="display:flex; flex-wrap:wrap; align-items:center; gap:1rem; width:100%; margin-bottom:1.5rem;">
-            <label for="report-recipient" class="sr-only">Report recipient email</label>
-            <input id="report-recipient" type="email" value="milonsarkar1231@gmail.com" autocomplete="email" class="min-w-0 flex-1 sm:w-64 px-3 py-2 border border-[#CBD5E1] rounded-full text-xs text-slate-900 bg-white focus:border-blue-500" placeholder="recipient@example.com">
-            <button id="send-report" type="button" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-xs font-semibold shadow-sm transition-colors">✉ Send report</button>
-            <label for="auto-daily-report" class="flex items-center gap-2 text-xs font-semibold text-slate-800"><input id="auto-daily-report" type="checkbox" class="w-4 h-4 accent-amber-500"> Auto-send daily at 10:00 PM</label>
-            <span id="report-send-status" class="text-xs font-semibold text-slate-600" role="status" aria-live="polite">Daily reporting is off.</span>
+          <div id="email-report-settings-container" class="email-report-settings-container" aria-labelledby="report-settings-title">
+            <div class="email-report-settings-heading">
+              <p class="eyebrow-dark text-sm">Report delivery</p>
+              <h3 id="report-settings-title">Keep your progress within reach</h3>
+              <p>Choose where your study report should be sent and whether daily delivery is enabled.</p>
+            </div>
+            <div class="email-report-settings-controls">
+              <div class="email-report-recipient-field">
+                <label for="report-recipient">Report recipient email</label>
+                <input id="report-recipient" type="email" value="" autocomplete="email" placeholder="recipient@example.com">
+              </div>
+              <button id="send-report" type="button" class="email-report-send-button">✉ Send report</button>
+              <label for="auto-daily-report" class="email-report-toggle"><input id="auto-daily-report" type="checkbox"> <span>Auto-send daily at 10:00 PM</span></label>
+              <span id="report-send-status" class="email-report-status" role="status" aria-live="polite">Daily reporting is off.</span>
+            </div>
           </div>
 
           <section id="progress-overview-panel" class="workspace-card results-card progress-overview-content p-5 sm:p-7">
@@ -853,10 +812,10 @@
                 <h2 class="workspace-heading font-serif text-2xl mt-0.5">📊 Analytics dashboard</h2>
               </div>
               <div class="report-view-tabs">
-                <button id="report-tab-overview" type="button" data-report-tab="overview" data-report-action="overview" class="report-tab-button is-active" role="tab" aria-selected="true" aria-controls="progress-overview-container">Progress Overview</button>
-                <button id="report-tab-trend" type="button" data-report-tab="trend" data-report-action="trend" class="report-tab-button" role="tab" aria-selected="false" aria-controls="progress-trend-container">Progress Trend</button>
-                <button id="report-tab-summary" type="button" data-report-tab="summary" data-report-action="summary" class="report-tab-button" role="tab" aria-selected="false" aria-controls="daily-summary-container">Daily Summary</button>
-                <button id="report-show-all" type="button" data-report-tab="all" data-report-action="all" class="report-all-button" aria-pressed="false">Show All Reports</button>
+                <button id="report-tab-overview" type="button" data-report-tab="overview" data-report-action="overview" class="report-tab-button is-active" role="tab" aria-selected="true" aria-expanded="true" aria-controls="progress-overview-container">Progress Overview</button>
+                <button id="report-tab-trend" type="button" data-report-tab="trend" data-report-action="trend" class="report-tab-button" role="tab" aria-selected="false" aria-expanded="false" aria-controls="progress-trend-container">Progress Trend</button>
+                <button id="report-tab-summary" type="button" data-report-tab="summary" data-report-action="summary" class="report-tab-button" role="tab" aria-selected="false" aria-expanded="false" aria-controls="daily-summary-container">Daily Summary</button>
+                <button id="report-show-all" type="button" data-report-tab="all" data-report-action="all" class="report-all-button" aria-expanded="false" aria-pressed="false">Show All Reports</button>
               </div>
             </div>
             <div id="progress-overview-container" class="report-tab-content analytics-report-section" role="tabpanel" aria-labelledby="report-tab-overview" aria-hidden="false">
@@ -957,10 +916,8 @@
           <button id="privacy-close" type="button" aria-label="Close Privacy Notice" class="w-9 h-9 rounded-full border border-line text-xl hover:bg-forest/5">×</button>
         </div>
         <div class="mt-4 space-y-3 text-sm leading-relaxed text-slate-700">
-          <p>We collect only information you submit to this website or that is needed to operate your account, such as your Firebase user ID, display name, email address when provided, account timestamps, study-plan metadata, and your study content.</p>
-          <p>An authorized owner may access this website data only to operate, support, secure, and improve the service. Administrative access is restricted by Firebase authentication and server-side administrator authorization. Access may be recorded in an audit log.</p>
-          <p>The owner cannot see your Gmail password, private Gmail contents, Google Drive files, private activity outside this website, or data you did not submit here. Data is retained while needed to provide the service and may be deleted on a valid request, subject to legal or security retention requirements.</p>
-          <p>Google sign-in does not share your password with this site. For export, deletion, or privacy questions, contact the site owner at <a class="font-semibold underline" href="mailto:milonsarkar1231@gmail.com">milonsarkar1231@gmail.com</a>.</p>
+          <p>Your study plans, personal notes, and account information remain private to you. They are stored only on your local device or within your secured account workspace so you can access and manage them.</p>
+          <p>We do not monitor, observe, interfere with, or inspect your study activity or personal content. You remain in control of your information and can use the workspace with confidence.</p>
         </div>
       </div>
     </div>
@@ -1095,6 +1052,18 @@
       return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     };
 
+    // script.js is deferred, but the inline application bootstrap renders before
+    // deferred scripts execute. Define this shared helper early so the first
+    // render cannot call an undefined progress-state function.
+    if (typeof window.academyProgressState !== 'function') {
+      window.academyProgressState = function (done, total) {
+        const completed = Math.max(0, Number(done) || 0);
+        const available = Math.max(0, Number(total) || 0);
+        if (available > 0 && completed >= available) return 'is-complete';
+        return completed > 0 ? 'is-active' : 'is-neutral';
+      };
+    }
+
     window.academyCloudSet = function (reference, value) {
       if (!reference || typeof reference.set !== 'function') return Promise.resolve(false);
       try {
@@ -1130,13 +1099,6 @@
     const PLANS_KEY = 'academySavedPlans';
     // Production accounts are provided only by Firebase Authentication.
     window.IS_DEV_MODE = false;
-
-    // Optional convenience allowlist for showing the owner entry after verified sign-in.
-    // This is not a security boundary; the trusted OWNER_API_ENDPOINT must still
-    // verify an admin custom claim or server-side allowlist before returning data.
-    // Convenience navigation allowlist. The backend must still verify the
-    // Firebase admin claim before exposing any user data.
-    window.OWNER_ADMIN_EMAIL = window.OWNER_ADMIN_EMAIL || 'milonsarkar1231@gmail.com';
 
     // Firebase cloud sync. Add your Firebase project's web configuration here.
     const firebaseConfig = {
@@ -1296,10 +1258,8 @@
         if (user) {
           try {
             const tokenResult = await user.getIdTokenResult(true);
-            cloudUser.isOwner = tokenResult.claims.admin === true || tokenResult.claims.owner === true;
           } catch (error) {
-            cloudUser.isOwner = false;
-            console.warn('Administrator claim could not be read:', error);
+            console.warn('Firebase account token could not be refreshed:', error);
           }
         }
         if (!user) {
@@ -1508,15 +1468,6 @@
         localStorage.setItem(SESSION_KEY, JSON.stringify(profile));
       }
       const hasProfile = Boolean(profile && cloudUser && profile.uid === cloudUser.uid);
-      const ownerLink = $('owner-nav-link');
-      const configuredOwnerEmail = String(window.OWNER_ADMIN_EMAIL || '').trim().toLowerCase();
-      // Showing the entry is only a navigation convenience. The owner API must
-      // independently verify the Firebase token and administrator authorization.
-      const canShowOwner = Boolean(cloudUser && (
-        cloudUser.isOwner === true ||
-        (configuredOwnerEmail && String(cloudUser.email || '').toLowerCase() === configuredOwnerEmail)
-      ));
-      ownerLink?.classList.toggle('hidden', !canShowOwner);
       const lastVisitTimestamp = Number(localStorage.getItem('lastVisitTimestamp') || 0);
       const isRecentVisit = hasProfile && lastVisitTimestamp > 0 && Date.now() - lastVisitTimestamp < 5400000;
       const profileGreeting = hasProfile
@@ -1575,6 +1526,7 @@
           : '<span class="profile-avatar-mark" aria-hidden="true">▦</span>';
       }, { once: true });
       $('profile-menu-wrap').classList.toggle('hidden', !hasProfile);
+      if (typeof syncReportRecipientEmail === 'function') syncReportRecipientEmail();
       if (hasProfile) initializeAccountMenu();
       if (!hasProfile) {
         $('account-menu').classList.add('hidden');
@@ -2474,8 +2426,18 @@
         dailyReportSendInFlight = false;
       });
     }
-    $('report-recipient').value = localStorage.getItem('academyReportRecipient') || DEFAULT_REPORT_RECIPIENT;
+    function syncReportRecipientEmail() {
+      const input = $('report-recipient');
+      if (!input || input.dataset.recipientEdited === 'true') return;
+      const accountEmail = cloudUser?.email || state.profile?.cloudEmail || state.profile?.email || '';
+      const savedRecipient = localStorage.getItem('academyReportRecipient');
+      input.value = accountEmail || savedRecipient || DEFAULT_REPORT_RECIPIENT;
+      input.dataset.recipientInitialized = 'true';
+    }
+    syncReportRecipientEmail();
     $('report-recipient').addEventListener('input', event => {
+      event.target.dataset.recipientEdited = 'true';
+      event.target.dataset.recipientInitialized = 'true';
       localStorage.setItem('academyReportRecipient', event.target.value);
       clearReportRecipientError();
     });
@@ -2623,7 +2585,6 @@
       $('account-nav-link')?.click();
     });
     $('desktop-privacy-open')?.addEventListener('click', () => $('privacy-open')?.click());
-    $('desktop-owner-link')?.addEventListener('click', () => $('owner-nav-link')?.click());
     document.addEventListener('click', event => {
       if (menuToggle?.getAttribute('aria-expanded') !== 'true') return;
       if (!mobileMenu?.contains(event.target) && !menuToggle?.contains(event.target)) closeMobileMenu();
@@ -2797,7 +2758,7 @@
     });
 
     const accountMode = window.IS_DEV_MODE || new URLSearchParams(window.location.search).has('account') || window.location.hash === '#profile';
-    const viewNames = ['view-home', 'view-account', 'view-storage', 'view-owner'];
+    const viewNames = ['view-home', 'view-account', 'view-storage'];
     function setView(view) {
       viewNames.forEach(name => document.body.classList.toggle(name, name === `view-${view}`));
       document.body.classList.toggle('public-home', view === 'home');
@@ -2939,39 +2900,8 @@
       }
     }
 
-    // The browser only requests admin data from a trusted backend endpoint.
-    // Configure this to your deployed HTTPS Cloud Function/API; never put a
-    // service-account key or database-admin credential in this file.
-    // Set this to the deployed HTTPS backend that verifies Firebase admin claims.
-    const OWNER_API_ENDPOINT = '';
-    const OWNER_PAGE_SIZE = 12;
-    let ownerUsers = [];
-    let ownerPage = 0;
-    function ownerStatus(message, error = false) {
-      const status = $('owner-dashboard-status');
-      if (status) { status.textContent = message; status.className = `mt-5 rounded-xl border p-4 text-sm ${error ? 'border-red-200 bg-red-50 text-red-700' : 'border-slate-200 bg-white text-slate-600'}`; }
-    }
-    function isOwnerUser(user) {
-      const email = String(user?.email || '').trim().toLowerCase();
-      const allowedEmail = String(window.OWNER_ADMIN_EMAIL || '').trim().toLowerCase();
-      // This check improves the UI only. ownerApi() remains the actual security boundary.
-      return Boolean(user && (
-        user.isOwner === true ||
-        (allowedEmail && email === allowedEmail)
-      ));
-    }
-    async function ownerApi(path = '') {
-      if (!OWNER_API_ENDPOINT || !cloudUser) throw new Error('Owner API is not configured. Deploy a trusted server endpoint and configure OWNER_API_ENDPOINT.');
-      const token = await cloudUser.getIdToken(true);
-      const response = await fetch(`${OWNER_API_ENDPOINT}${path}`, { headers: { Authorization: `Bearer ${token}` } });
-      if (!response.ok) {
-        const message = response.status === 403 ? 'Administrator access was denied.' : `Owner service returned ${response.status}.`;
-        recordOwnerError('Owner API error', message, `${OWNER_API_ENDPOINT}${path}`);
-        throw new Error(message);
-      }
-      return response.json();
-    }
-    function renderOwnerUsers() {
+    /* Owner dashboard removed. */
+    /*
       const query = $('owner-user-search').value.trim().toLowerCase();
       const matches = ownerUsers.filter(user => `${user.displayName || ''} ${user.email || ''}`.toLowerCase().includes(query));
       const pages = Math.max(1, Math.ceil(matches.length / OWNER_PAGE_SIZE));
@@ -3024,20 +2954,8 @@
       }
     }
     function closeOwnerHealthModal() { $('owner-health-modal')?.classList.add('hidden'); }
-    async function openOwnerDashboard() {
-      closeMobileMenu();
-      if (!cloudUser) return ownerStatus('Sign in with the authorized Firebase account to continue.', true);
-      if (!isOwnerUser(cloudUser)) return ownerStatus('Administrator access denied.', true);
-      openOwnerHealthModal();
-    }
-    $('owner-nav-link')?.addEventListener('click', openOwnerDashboard);
-    $('owner-health-close')?.addEventListener('click', closeOwnerHealthModal);
-    $('owner-health-modal')?.addEventListener('click', event => { if (event.target === $('owner-health-modal')) closeOwnerHealthModal(); });
-    $('owner-clear-logs')?.addEventListener('click', () => { localStorage.removeItem('academyOwnerErrorLogs'); renderOwnerErrorLogs(); });
-    $('owner-user-search')?.addEventListener('input', () => { ownerPage = 0; renderOwnerUsers(); });
-    $('owner-refresh-users')?.addEventListener('click', loadOwnerUsers);
-    $('owner-previous-page')?.addEventListener('click', () => { ownerPage--; renderOwnerUsers(); });
-    $('owner-next-page')?.addEventListener('click', () => { ownerPage++; renderOwnerUsers(); });
+    async 
+    */
     const initialView = new URLSearchParams(window.location.search).has('storage')
       ? 'storage'
       : accountMode ? 'account' : 'home';
