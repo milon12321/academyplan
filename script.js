@@ -1,6 +1,28 @@
 // Application behavior is defined in index.html.
 // Styles belong in styles.css; this file intentionally contains only valid JavaScript.
 
+// Persist only the visible UI route; authentication and application data remain
+// owned by the existing Firebase and workspace logic.
+window.academyPersistViewTab = function (viewId) {
+  const allowedViews = new Set(['home', 'account', 'storage']);
+  if (!allowedViews.has(viewId)) return false;
+  try {
+    localStorage.setItem('activeViewTab', viewId);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+window.academyGetPersistedViewTab = function () {
+  try {
+    const viewId = localStorage.getItem('activeViewTab');
+    return ['home', 'account', 'storage'].includes(viewId) ? viewId : '';
+  } catch (error) {
+    return '';
+  }
+};
+
 // Format the elapsed study window shown on goal cards. An end time earlier than
 // the start time is treated as an overnight window.
 window.academyGetAvatarInitial = function (name) {
@@ -73,7 +95,7 @@ function initializeDailyNoteControls() {
     const badge = document.getElementById('all-days-count-badge');
     const syncToggle = () => {
       const expanded = !container.classList.contains('hidden');
-      if (label) label.textContent = expanded ? 'Hide All Days Overview' : 'Show All Days Overview';
+      if (label) label.textContent = expanded ? 'Hide Days Breakdown' : 'View All Days Breakdown';
       toggle.setAttribute('aria-expanded', String(expanded));
       container.setAttribute('aria-hidden', String(!expanded));
     };
@@ -82,6 +104,22 @@ function initializeDailyNoteControls() {
     toggle.addEventListener('click', () => {
       container.classList.toggle('hidden');
       syncToggle();
+    });
+
+    // Keep day navigation feedback transient while preserving the app's
+    // existing click handlers and day-selection state.
+    const navigationButtons = ['previous-day', 'jump-to-today', 'next-day']
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
+    let activeButtonTimer = null;
+    const markNavigationButton = button => {
+      navigationButtons.forEach(item => item.classList.remove('is-active'));
+      button.classList.add('is-active');
+      clearTimeout(activeButtonTimer);
+      activeButtonTimer = setTimeout(() => button.classList.remove('is-active'), 900);
+    };
+    navigationButtons.forEach(button => {
+      button.addEventListener('click', () => markNavigationButton(button), { passive: true });
     });
 
     // Day cards are rendered dynamically, so use one delegated listener.
@@ -233,6 +271,14 @@ window.academyToggleMobileMenu = function () {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeRecoveryModal, { once: true });
   else initializeRecoveryModal();
 })();
+
+// Keep Firebase login errors concise and user-facing without exposing provider details.
+window.academyLoginErrorMessage = function (error) {
+  const code = String(error?.code || '').toLowerCase();
+  if (code === 'auth/user-not-found') return 'No account found with this email. Please sign up first.';
+  if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') return 'Invalid email or password. Please try again.';
+  return error?.message || 'Email authentication failed.';
+};
 
 window.academyAccountRoute = function ({
   isAuthenticated = false,
@@ -705,12 +751,81 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
     if (!planInput || planInput.dataset.inputBound === 'true') return;
     planInput.dataset.inputBound = 'true';
     planInput.addEventListener('input', event => {
-      if (window.currentPlan) window.currentPlan.name = event.target.value;
+      const title = event.target.value;
+      // Keep both supported plan state shapes synchronized while the user types.
+      if (window.currentPlan) {
+        window.currentPlan.name = title;
+        window.currentPlan.title = title;
+      }
+      if (window.state?.plan) window.state.plan.title = title;
     });
+  };
+
+  // Plan-days changes update duration only. In particular, never copy a stale
+  // title into the Plan name field or schedule an asynchronous form overwrite.
+  const initializePlanDaysInput = () => {
+    const planDays = document.getElementById('plan-days');
+    if (!planDays || planDays.dataset.durationBound === 'true') return;
+    planDays.dataset.durationBound = 'true';
+
+    // Live calculations and preview/render work are hard-capped so typing
+    // cannot trigger unbounded day-by-day work on the main thread.
+    const MAX_PLAN_DAYS = 100;
+    let durationTimer = null;
+    let pendingDuration = 0;
+    let pendingRawDays = 0;
+
+    const updateEndDate = rawDays => {
+      const startInput = document.getElementById('plan-start-date');
+      const endDate = document.getElementById('plan-end-date');
+      if (!startInput?.value || !endDate || rawDays <= 0) {
+        if (endDate) endDate.value = '';
+        return;
+      }
+      const startDate = new Date(`${startInput.value}T00:00:00Z`);
+      if (Number.isNaN(startDate.getTime())) {
+        endDate.value = '';
+        return;
+      }
+      // Keep the displayed end date exact without generating one entry per day.
+      const end = new Date(startDate.getTime() + rawDays * 86400000);
+      if (Number.isNaN(end.getTime())) {
+        endDate.value = '';
+        return;
+      }
+      endDate.value = end.toISOString().slice(0, 10);
+    };
+
+    const syncDuration = () => {
+      durationTimer = null;
+      const duration = pendingDuration;
+      if (window.currentPlan) window.currentPlan.duration = duration;
+      if (window.state?.plan) window.state.plan.duration = duration;
+      // Only update scalar state and the end-date summary here. Full timeline
+      // generation remains deferred to the application's explicit actions.
+      updateEndDate(pendingRawDays);
+    };
+
+    const scheduleDurationSync = event => {
+      const rawValue = String(event.target.value || '').trim();
+      const numericValue = Number(rawValue);
+      pendingRawDays = Number.isFinite(numericValue)
+        ? Math.max(0, Math.trunc(numericValue))
+        : 0;
+      pendingDuration = Math.min(MAX_PLAN_DAYS, pendingRawDays);
+      clearTimeout(durationTimer);
+      // Coalesce keystrokes; no duration-sized arrays, loops, or DOM renders
+      // are performed by this live input path.
+      durationTimer = setTimeout(syncDuration, 300);
+    };
+
+    planDays.addEventListener('input', scheduleDurationSync);
+    planDays.addEventListener('change', scheduleDurationSync);
   };
 
   const initializeLocalMockTrigger = () => {
     initializePlanNameInput();
+    initializePlanDaysInput();
     initializeEmptyPlanControls();
     initializeDashboardStack();
     const yearButton = document.getElementById('copyright-year');
@@ -732,7 +847,6 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
       clearTimeout(developerWindowTimer);
       developerWindowTimer = null;
     };
-
     yearButton.addEventListener('click', () => {
       const now = Date.now();
       clickTimes = clickTimes.filter(time => now - time <= CLICK_WINDOW_MS);
