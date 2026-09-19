@@ -249,14 +249,14 @@ window.academyAccountRoute = function ({
   return 'login';
 };
 
-// Analytics tabs are controlled centrally so dynamic plan renders never leave
-// a hidden section occupying space or a visible chart without dimensions.
+// Analytics views are controlled centrally so dynamic plan renders preserve
+// the learner's selected open/collapsed state without affecting plan data.
 (() => {
-  const reportIds = [
-    'progress-overview-container',
-    'progress-trend-container',
-    'daily-summary-container'
-  ];
+  const reportSections = {
+    overview: 'progress-overview-container',
+    trend: 'progress-trend-container',
+    summary: 'daily-summary-container'
+  };
   const tabButtons = {
     overview: 'report-tab-overview',
     trend: 'report-tab-trend',
@@ -264,47 +264,63 @@ window.academyAccountRoute = function ({
     all: 'report-show-all'
   };
   let activeReportTab = 'overview';
+  let reportsExpanded = true;
+  let reportsShowingAll = false;
 
-  function switchReportTab(tabName = 'overview') {
-    const overview = document.getElementById('progress-overview-container');
-    const trend = document.getElementById('progress-trend-container');
-    const summary = document.getElementById('daily-summary-container');
-    if (!overview || !trend || !summary) return false;
+  function getReportSections() {
+    return Object.fromEntries(
+      Object.entries(reportSections).map(([name, id]) => [name, document.getElementById(id)])
+    );
+  }
 
-    const selected = ['overview', 'trend', 'summary', 'all'].includes(tabName) ? tabName : 'overview';
-    const visibility = {
-      overview: [true, false, false],
-      trend: [false, true, false],
-      summary: [false, false, true],
-      all: [true, true, true]
-    }[selected];
-    [overview, trend, summary].forEach((section, index) => {
-      section.classList.toggle('hidden', !visibility[index]);
-      section.setAttribute('aria-hidden', String(!visibility[index]));
+  function switchReportTab(tabName = 'overview', { toggle = false, preserveCollapsed = false } = {}) {
+    const sections = getReportSections();
+    if (Object.values(sections).some(section => !section)) return false;
+
+    const selected = Object.prototype.hasOwnProperty.call(tabButtons, tabName)
+      ? tabName
+      : 'overview';
+    const shouldCollapse = toggle && activeReportTab === selected && reportsExpanded;
+    const visible = shouldCollapse || (preserveCollapsed && !reportsExpanded)
+      ? { overview: false, trend: false, summary: false }
+      : selected === 'all'
+        ? { overview: true, trend: true, summary: true }
+        : { overview: selected === 'overview', trend: selected === 'trend', summary: selected === 'summary' };
+
+    Object.entries(sections).forEach(([name, section]) => {
+      const isVisible = visible[name];
+      section.classList.toggle('hidden', !isVisible);
+      section.setAttribute('aria-hidden', String(!isVisible));
     });
+
     activeReportTab = selected;
+    reportsExpanded = Object.values(visible).some(Boolean);
+    reportsShowingAll = selected === 'all' && reportsExpanded;
 
     Object.entries(tabButtons).forEach(([name, id]) => {
       const button = document.getElementById(id);
-      const active = name === selected;
+      const active = reportsExpanded && (name === selected || (name === 'all' && reportsShowingAll));
       button?.classList.toggle('is-active', active);
-      button?.setAttribute('aria-selected', String(active));
-      button?.setAttribute('aria-pressed', String(name === 'all' ? active : false));
+      if (name !== 'all') button?.setAttribute('aria-selected', String(active));
+      button?.setAttribute('aria-expanded', String(active));
+      button?.setAttribute('aria-pressed', String(active));
     });
 
-    // Let Chart.js and other responsive visualizations measure the newly visible section.
+    // Let responsive charts and other visualizations measure visible sections.
     window.dispatchEvent(new Event('resize'));
     window.dispatchEvent(new Event('reportviewchange'));
-    requestAnimationFrame?.(() => window.dispatchEvent(new Event('resize')));
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+    }
     return true;
   }
 
   window.switchReportTab = switchReportTab;
 
-  // The page's existing render() creates the N-day overview cards, trend data,
-  // and summary rows. Reapply the selected view after each of those renders.
+  // The page's render() refreshes report content dynamically. Reapply the
+  // current visibility state without reopening a section the user collapsed.
   window.academyRefreshAnalyticsView = function () {
-    return switchReportTab(activeReportTab);
+    return switchReportTab(activeReportTab, { preserveCollapsed: true });
   };
 
   const initializeReportTabs = () => {
@@ -314,7 +330,7 @@ window.academyAccountRoute = function ({
       button.dataset.reportBound = 'true';
       button.addEventListener('click', event => {
         event.preventDefault();
-        switchReportTab(tabName);
+        switchReportTab(tabName, { toggle: true });
       });
     });
     switchReportTab('overview');
@@ -741,9 +757,12 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
       if (event.target?.tagName === 'INPUT' || event.target?.tagName === 'TEXTAREA' || event.target?.isContentEditable) return;
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
 
-      const isDeveloperShortcut = event.ctrlKey && event.shiftKey &&
+      // Ctrl+Shift+L is the developer-only testing shortcut. Keep the check
+      // deliberately narrow so normal keyboard use cannot activate it.
+      const pressedKey = String(event.key || '').toLowerCase();
+      const isDeveloperShortcut = event.type === 'keydown' && event.ctrlKey && event.shiftKey &&
         !event.altKey && !event.metaKey &&
-        (String(event.key || '').toLowerCase() === 'l' || event.code === 'KeyL');
+        (pressedKey === MOCK_SHORTCUT || event.code === 'KeyL');
       if (!isDeveloperShortcut || event.repeat) return;
 
       // Prevent the browser/editor shortcut only outside editable controls.
@@ -762,10 +781,10 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
       }
     };
 
-    // Capture the shortcut before other page listeners can consume it. The
-    // keyup fallback also supports browsers that expose the key only on release.
+    // Capture the shortcut before other page listeners can consume it. Listen
+    // only on keydown so holding the key cannot trigger a second activation on
+    // keyup or create duplicate mock-account initialization.
     document.addEventListener('keydown', activateMockAccount, true);
-    document.addEventListener('keyup', activateMockAccount, true);
   };
 
   if (document.readyState === 'loading') {
