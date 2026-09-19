@@ -10,13 +10,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="script.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <!-- Firebase SDKs: replace the configuration values in firebaseConfig below. -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="script.js" defer></script>
   <script>
     tailwind.config = { theme: { extend: {
       colors: {
@@ -33,6 +33,9 @@
   <style>
     html { scroll-behavior:smooth; }
     body { background:#F8FAFC; }
+    body.auth-pending > :not(#auth-loading-overlay) { visibility:hidden; }
+    #auth-loading-overlay { display:flex; position:fixed; inset:0; z-index:90; align-items:center; justify-content:center; background:#F8FAFC; }
+    body:not(.auth-pending) #auth-loading-overlay { display:none; }
 
     /* Consistent premium card treatment for the planning workspace */
     #plan-workspace > section { background:#F8FAFC; }
@@ -137,6 +140,10 @@
     body.public-home.workspace-entry #landing-hero { display:none; }
     body.public-home:not(.workspace-entry) #profile { opacity:0; transform:translateY(12px); }
     #profile { transition:opacity .35s ease, transform .35s ease; }
+    #account-card.account-loading { position:relative; min-height:16rem; }
+    #account-card.account-loading > :not(#account-loading-state) { visibility:hidden; }
+    #account-loading-state { display:none; }
+    #account-card.account-loading #account-loading-state { display:flex; }
     body.logged-in #landing-hero { display:none; }
 
     /* Menu destinations are presented as dedicated views, not stacked homepage sections. */
@@ -410,7 +417,13 @@
     }
   </style>
 </head>
-<body class="font-sans text-ink antialiased">
+<body class="font-sans text-ink antialiased auth-pending">
+  <div id="auth-loading-overlay" role="status" aria-live="polite">
+    <div class="text-center">
+      <div class="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-line border-t-forest" aria-hidden="true"></div>
+      <p class="mt-4 text-sm font-semibold text-forest-dark">Restoring your workspace…</p>
+    </div>
+  </div>
   <header class="sticky top-0 z-40 bg-paper/90 backdrop-blur border-b border-line">
     <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
       <a href="index.html" id="workspace-logo" class="flex items-center gap-3" aria-label="Return to public home">
@@ -481,6 +494,13 @@
     <section id="profile" class="bg-paper py-10 md:py-12">
       <div class="max-w-6xl mx-auto px-5 sm:px-8">
         <div id="account-card" class="max-w-2xl mx-auto bg-paper rounded-2xl border border-line shadow-sm p-5 sm:p-7">
+          <div id="account-loading-state" class="hidden absolute inset-0 items-center justify-center rounded-2xl bg-paper/95 p-8 text-center" role="status" aria-live="polite">
+            <div>
+              <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-line border-t-forest" aria-hidden="true"></div>
+              <p class="mt-4 text-sm font-semibold text-forest-dark">Loading your workspace…</p>
+              <p class="mt-1 text-xs text-ink/60">Preparing your account details.</p>
+            </div>
+          </div>
           <div class="flex items-start gap-4">
             <div id="profile-avatar" class="profile-avatar profile-avatar-placeholder w-16 h-16 shrink-0 rounded-full flex items-center justify-center overflow-hidden" role="img" aria-label="Academic workspace avatar">
               <span class="profile-avatar-mark" aria-hidden="true">▦</span>
@@ -512,8 +532,8 @@
             </div>
           </div>
 
-          <div id="login-view">
-          <form id="login-form" class="mt-6 auth-form space-y-3" data-auth-flow="firebase-email">
+          <div id="login-view" aria-hidden="false">
+          <form id="login-form" class="mt-6 auth-form space-y-3" data-auth-flow="firebase-email" aria-label="Sign in to your workspace">
             <p class="text-sm text-ink/70 leading-relaxed">Sign in with your email and password, or continue securely with Google.</p>
             <div class="auth-fields space-y-3">
               <div><label for="login-email" class="field-label">Email</label><input id="login-email" name="email" type="email" inputmode="email" autocomplete="email" required class="auth-input w-full px-4 py-3 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
@@ -522,10 +542,17 @@
                   <label for="login-password" class="field-label mb-0">Password</label>
                   <button id="open-recovery" type="button" class="password-recovery-link text-xs font-semibold text-forest-dark">Forgot Password?</button>
                 </div>
-                <input id="login-password" name="password" type="password" autocomplete="current-password" minlength="6" required class="auth-input w-full px-4 py-3 border border-line rounded-xl text-sm" placeholder="At least 6 characters">
+                <div class="relative flex items-center">
+                  <input id="login-password" name="password" type="password" autocomplete="current-password" minlength="6" required class="auth-input w-full px-4 py-3 pr-12 border border-line rounded-xl text-sm" placeholder="At least 6 characters">
+                  <button id="toggle-login-password" type="button" class="absolute right-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-ink/55 hover:bg-forest/5 hover:text-forest-dark" aria-label="Show password" aria-pressed="false" title="Show password">
+                    <svg data-eye-open xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.5-6 9.75-6 9.75 6 9.75 6-3.5 6-9.75 6-9.75-6-9.75-6Z"/><circle cx="12" cy="12" r="2.75"/></svg>
+                    <svg data-eye-closed xmlns="http://www.w3.org/2000/svg" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m3 3 18 18M10.58 10.58A2 2 0 0 0 13.42 13.42M9.88 5.09A10.6 10.6 0 0 1 12 4.9c6.25 0 9.75 7.1 9.75 7.1a18.4 18.4 0 0 1-3.08 3.86M6.1 6.1C3.72 7.56 2.25 12 2.25 12s3.5 7.1 9.75 7.1a10.6 10.6 0 0 0 3.05-.45"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
             <button id="manual-auth-submit" type="submit" class="auth-submit w-full bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Log In</button>
+            <div id="login-error-message" class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3 text-center my-2" role="alert" aria-live="polite"></div>
             <p class="text-center text-sm text-ink/60"><span id="manual-auth-prompt">New here?</span> <button id="email-mode-toggle" type="button" class="font-semibold text-forest-dark underline underline-offset-2">Sign Up</button></p>
             <div class="auth-divider" aria-hidden="true"><span>OR</span></div>
             <button id="google-login" type="button" class="google-sign-in auth-google w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-800 font-semibold py-3 rounded-full text-sm shadow-sm hover:bg-slate-50 transition-colors"><span class="google-mark" aria-hidden="true">G</span> Sign in with Google</button>
@@ -533,13 +560,12 @@
           </form>
           </div>
 
-          <div id="signup-view" class="signup-view hidden mt-6" aria-labelledby="signup-title">
+          <div id="signup-view" class="signup-view hidden mt-6" aria-hidden="true" aria-labelledby="signup-title">
             <div class="signup-heading">
               <p class="eyebrow-dark text-base">Create your workspace account</p>
               <h3 id="signup-title" class="font-serif text-2xl text-forest-dark mt-0.5">Student registration</h3>
               <p class="mt-2 text-sm text-ink/65">Add your academic details once, then use your email and password to sign in.</p>
             </div>
-            <div id="signup-status" class="signup-status-banner hidden" role="alert" aria-live="polite"></div>
             <form id="signup-form" class="signup-form mt-5 grid sm:grid-cols-2 gap-3" novalidate>
               <div><label for="signup-full-name" class="field-label">Full Name</label><input id="signup-full-name" name="fullName" type="text" autocomplete="name" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
               <div><label for="signup-email" class="field-label">Email Address</label><input id="signup-email" name="email" type="email" autocomplete="email" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
@@ -549,26 +575,15 @@
               <div><label for="signup-year" class="field-label">Academic Year</label><select id="signup-year" name="year" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select year</option><option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option><option>Graduate</option></select></div>
               <div><label for="signup-semester" class="field-label">Semester</label><select id="signup-semester" name="semester" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select semester</option><option>1st semester</option><option>2nd semester</option><option>3rd semester</option><option>4th semester</option><option>5th semester</option><option>6th semester</option><option>7th semester</option><option>8th semester</option></select></div>
               <div class="profile-picture-field"><label for="signup-picture" class="field-label">Profile Picture <span class="font-normal text-ink/50">(optional)</span></label><label for="signup-picture" class="profile-picture-upload"><span class="profile-picture-upload-button">Choose File</span><span id="signup-picture-name" class="profile-picture-upload-name">No file chosen</span><input id="signup-picture" name="picture" type="file" accept="image/*" class="profile-picture-input"></label></div>
-              <div><label for="signup-password" class="field-label">Create Password</label><input id="signup-password" name="password" type="password" minlength="6" autocomplete="new-password" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"></div>
-              <div><label for="signup-confirm-password" class="field-label">Confirm Password</label><input id="signup-confirm-password" name="confirmPassword" type="password" minlength="6" autocomplete="new-password" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm"><p id="signup-password-match" class="hidden mt-1 text-xs font-semibold" role="status"></p></div>
+              <div><label for="signup-password" class="field-label">Create Password</label><div class="relative flex items-center"><input id="signup-password" name="password" type="password" minlength="6" autocomplete="new-password" required class="w-full px-4 py-2.5 pr-12 border border-line rounded-xl text-sm"><button id="toggle-signup-password" type="button" class="absolute right-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-ink/55 hover:bg-forest/5 hover:text-forest-dark" aria-label="Show password" aria-pressed="false" title="Show password"><svg data-eye-open xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.5-6 9.75-6 9.75 6 9.75 6-3.5 6-9.75 6-9.75-6-9.75-6Z"/><circle cx="12" cy="12" r="2.75"/></svg><svg data-eye-closed xmlns="http://www.w3.org/2000/svg" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m3 3 18 18M10.58 10.58A2 2 0 0 0 13.42 13.42M9.88 5.09A10.6 10.6 0 0 1 12 4.9c6.25 0 9.75 7.1 9.75 7.1a18.4 18.4 0 0 1-3.08 3.86M6.1 6.1C3.72 7.56 2.25 12 2.25 12s3.5 7.1 9.75 7.1a10.6 10.6 0 0 0 3.05-.45"/></svg></button></div></div>
+              <div><label for="signup-confirm-password" class="field-label">Confirm Password</label><div class="relative flex items-center"><input id="signup-confirm-password" name="confirmPassword" type="password" minlength="6" autocomplete="new-password" required class="w-full px-4 py-2.5 pr-12 border border-line rounded-xl text-sm"><button id="toggle-signup-confirm-password" type="button" class="absolute right-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-ink/55 hover:bg-forest/5 hover:text-forest-dark" aria-label="Show password" aria-pressed="false" title="Show password"><svg data-eye-open xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.5-6 9.75-6 9.75 6 9.75 6-3.5 6-9.75 6-9.75-6-9.75-6Z"/><circle cx="12" cy="12" r="2.75"/></svg><svg data-eye-closed xmlns="http://www.w3.org/2000/svg" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m3 3 18 18M10.58 10.58A2 2 0 0 0 13.42 13.42M9.88 5.09A10.6 10.6 0 0 1 12 4.9c6.25 0 9.75 7.1 9.75 7.1a18.4 18.4 0 0 1-3.08 3.86M6.1 6.1C3.72 7.56 2.25 12 2.25 12s3.5 7.1 9.75 7.1a10.6 10.6 0 0 0 3.05-.45"/></svg></button><p id="signup-password-match" class="hidden mt-1 text-xs font-semibold" role="status"></p></div></div>
+              <div id="signup-error-message" class="hidden sm:col-span-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3 text-center" role="alert" aria-live="polite"></div>
               <div class="sm:col-span-2 flex flex-col-reverse sm:flex-row gap-2 sm:justify-end mt-2"><button id="signup-back" type="button" class="border border-line hover:bg-forest/5 text-forest-dark font-semibold px-5 py-2.5 rounded-full text-sm">Back to Log In</button><button id="signup-submit" type="submit" class="bg-forest hover:bg-forest-dark text-paper font-semibold px-5 py-2.5 rounded-full text-sm">Create Account</button></div>
             </form>
           </div>
 
-          <form id="profile-form" class="mt-6 grid sm:grid-cols-2 gap-3">
-            <div><label for="profile-name" class="field-label">Full name</label><input id="profile-name" name="name" type="text" autocomplete="name" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your full name"></div>
-            <div><label for="profile-email" class="field-label">Email address <span class="font-normal text-ink/50">(optional)</span></label><input id="profile-email" name="email" type="email" autocomplete="email" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="you@example.com"></div>
-            <div><label for="profile-institution" class="field-label">Institution / university</label><input id="profile-institution" name="institution" type="text" autocomplete="organization" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your institution or university"></div>
-            <div><label for="profile-department" class="field-label">Department</label><input id="profile-department" name="department" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="Your department"></div>
-            <div><label for="profile-session" class="field-label">Session</label><input id="profile-session" name="session" type="text" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm" placeholder="2024–2025"></div>
-            <div><label for="profile-year" class="field-label">Year</label><select id="profile-year" name="year" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select year</option><option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option><option>Graduate</option></select></div>
-            <div><label for="profile-semester" class="field-label">Semester</label><select id="profile-semester" name="semester" required class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-white"><option value="">Select semester</option><option>1st semester</option><option>2nd semester</option><option>3rd semester</option><option>4th semester</option><option>5th semester</option><option>6th semester</option><option>7th semester</option><option>8th semester</option></select></div>
-            <div class="sm:col-span-2"><label for="profile-picture" class="field-label">Profile picture (optional)</label><input id="profile-picture" name="picture" type="file" accept="image/*" class="w-full px-4 py-2.5 border border-line rounded-xl text-sm bg-paper"></div>
-            <div class="sm:col-span-2 auth-divider" aria-hidden="true"><span>OR</span></div>
-            <button id="google-signup" type="button" class="sm:col-span-2 google-sign-in auth-google w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-800 font-semibold py-3 rounded-full text-sm shadow-sm hover:bg-slate-50 transition-colors"><span class="google-mark" aria-hidden="true">G</span> Continue with Google</button>
-            <button type="submit" class="sm:col-span-2 bg-forest hover:bg-forest-dark text-paper font-semibold py-3 rounded-full text-sm transition-colors">Save academic profile</button>
-            <p class="sm:col-span-2 text-center text-sm text-ink/60">Your Google account identifies your workspace; no separate password is required.</p>
-          </form>
+          <!-- Academic details are collected by #signup-form and the onboarding dialog.
+               Keeping one registration flow prevents competing authentication states. -->
 
           <div class="profile-section-divider" aria-hidden="true"></div>
           <div id="profile-details" class="hidden mt-6 grid sm:grid-cols-2 gap-3 text-sm"></div>
@@ -1087,21 +1102,42 @@
       const loginStatus = document.getElementById('login-status');
       const profileSaved = document.getElementById('profile-saved');
       const showLogin = mode === 'login';
-      if (!loginForm || !profileForm) return;
+      if (!loginForm) return;
       document.getElementById('login-view')?.classList.toggle('hidden', !showLogin);
       document.getElementById('signup-view')?.classList.toggle('hidden', showLogin);
       loginForm.classList.toggle('hidden', !showLogin);
-      profileForm.classList.toggle('hidden', showLogin);
       if (heading) heading.textContent = showLogin ? 'Sign in to your workspace' : 'Create your workspace account';
       if (loginStatus) loginStatus.classList.add('hidden');
       if (profileSaved) profileSaved.classList.add('hidden');
-      document.getElementById(showLogin ? 'login-id' : 'profile-name')?.focus();
+      document.getElementById(showLogin ? 'login-email' : 'signup-full-name')?.focus();
     };
 
-    const KEY = 'academyPollPlan';
-    const PLANS_KEY = 'academySavedPlans';
+    let KEY = null;
+    // Plan data is always isolated by Firebase UID. No shared plan key is used.
+    let PLANS_KEY = null;
+    let TRASH_KEY = null;
+    function setUserPlanStorage(uid) {
+      PLANS_KEY = uid ? `study_plans_${uid}` : null;
+      KEY = uid ? `study_plan_${uid}` : null;
+      return PLANS_KEY;
+    }
+    function readUserPlans(uid) {
+      const key = uid ? `study_plans_${uid}` : null;
+      return key ? readCachedJSON(key, []) : [];
+    }
+    function clearPlanViewState() {
+      state.plans = [];
+      state.plan = null;
+      state.day = 0;
+      window.currentPlan = null;
+      renderActivePlanSelector();
+      render();
+    }
     // Production accounts are provided only by Firebase Authentication.
     window.IS_DEV_MODE = false;
+    // Prevent the automatic post-registration auth event from rendering the
+    // account workspace before registration redirects back to login.
+    window.isRegisteringRedirect = false;
 
     // Firebase cloud sync. Add your Firebase project's web configuration here.
     const firebaseConfig = {
@@ -1218,11 +1254,39 @@
     async function loadCloudAccount(user) {
       if (!window.academyDatabase) return;
       const academyId = user.uid;
-      const snapshot = await window.academyDatabase.ref(`users/${academyId}`).once('value');
+      const userReference = window.academyDatabase.ref(`users/${academyId}`);
+      const snapshot = await userReference.once('value');
       const cloud = snapshot.val();
+      if (!cloud?.profile) {
+        const defaultProfile = {
+          id: user.uid,
+          uid: user.uid,
+          fullName: user.displayName || 'Google User',
+          name: user.displayName || 'Google User',
+          email: user.email || '',
+          cloudEmail: user.email || '',
+          picture: user.photoURL || '',
+          photoURL: user.photoURL || '',
+          institution: 'Not specified',
+          department: 'Not specified',
+          session: 'Not specified',
+          year: 'Not specified',
+          semester: 'Not specified'
+        };
+        await userReference.child('profile').set(defaultProfile);
+      }
+      setUserPlanStorage(user.uid);
+      TRASH_KEY = `study_trash_${user.uid}`;
+      const userPlans = readUserPlans(user.uid);
+      const userTrash = readCachedJSON(TRASH_KEY, []);
+      state.trash = Array.isArray(cloud?.trash) ? cloud.trash : (Array.isArray(userTrash) ? userTrash : []);
       if (Array.isArray(cloud?.plans) && cloud.plans.length) {
         state.plans = cloud.plans;
         state.plan = state.plans.find(plan => plan.id === cloud.activePlanId) || state.plans[0];
+      } else if (userPlans.length) {
+        state.plans = userPlans;
+        state.plan = state.plans[0] || null;
+        scheduleCloudSave();
       } else if (state.plans.length) {
         // Preserve the instant local cache while seeding a first cloud copy.
         // This also makes migration from an existing device lossless.
@@ -1243,21 +1307,72 @@
       }
       localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile));
       localStorage.setItem(SESSION_KEY, JSON.stringify(state.profile));
-      localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
-      if (state.plan) localStorage.setItem(KEY, JSON.stringify(state.plan));
+              if (PLANS_KEY) localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+        if (KEY && state.plan) localStorage.setItem(KEY, JSON.stringify(state.plan));
       cloudSyncReady = true;
+      if (PLANS_KEY) localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+      if (TRASH_KEY) localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+      setProfileHydrationState(false);
       renderProfile();
       if (state.profile) {
         render();
         if (!hasAcademicDetails(state.profile)) showOnboardingProfile(state.profile);
       }
     }
+    function finishAuthInitialization() {
+      document.body.classList.remove('auth-pending');
+      $('auth-loading-overlay')?.setAttribute('aria-hidden', 'true');
+    }
+
     function bindCloudAuth() {
-      if (window.IS_DEV_MODE || !window.academyAuth) return;
+      if (window.IS_DEV_MODE || !window.academyAuth) {
+        finishAuthInitialization();
+        return;
+      }
       window.academyAuth.onAuthStateChanged(async user => {
+        if (window.isRegisteringRedirect) {
+          // Registration signs the new account in automatically. Keep the
+          // account/dashboard hidden while that transient auth event settles.
+          cloudUser = null;
+          cloudUserAcademyId = null;
+          cloudSyncReady = false;
+          setProfileHydrationState(false);
+          $('plan-workspace')?.classList.add('hidden');
+          $('profile-details')?.classList.add('hidden');
+          $('signup-view')?.classList.add('hidden');
+          $('login-view')?.classList.remove('hidden');
+          $('login-form')?.classList.remove('hidden');
+          $('profile-heading').textContent = 'Sign in to your workspace';
+          resetLoginForm();
+          const registeredEmail = user?.email || '';
+          // Clear the guard before signOut() emits its signed-out callback;
+          // otherwise that callback could re-enter this branch.
+          window.isRegisteringRedirect = false;
+          try {
+            await window.academyAuth.signOut();
+          } catch (error) {
+            console.warn('Post-registration sign-out failed:', error);
+          }
+          if (registeredEmail) $('login-email').value = registeredEmail;
+          const loginMessage = $('login-error-message');
+          if (loginMessage) {
+            loginMessage.textContent = 'Account created successfully! Please log in.';
+            loginMessage.className = 'text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 text-center my-2';
+            loginMessage.setAttribute('role', 'status');
+            loginMessage.setAttribute('aria-live', 'polite');
+          }
+          $('login-email')?.focus();
+          return;
+        }
         cloudUser = user;
         cloudUserAcademyId = user?.uid || null;
         cloudSyncReady = false;
+        if (user) {
+          // A restored Firebase session always resumes in the authenticated workspace.
+          setView('account');
+          $('plan-workspace')?.classList.add('hidden');
+        }
+        setProfileHydrationState(Boolean(user));
         if (user) {
           try {
             const tokenResult = await user.getIdTokenResult(true);
@@ -1266,14 +1381,34 @@
           }
         }
         if (!user) {
+          clearUIState();
+          resetLoginForm();
           cloudUserAcademyId = null;
+          cloudSyncReady = false;
+          setUserPlanStorage(null);
+          TRASH_KEY = null;
+          clearPlanViewState();
+          state.profile = null;
+          setProfileHydrationState(false);
+          renderProfile();
+          finishAuthInitialization();
+          setView('home');
           return;
         }
-        cloudLoadPromise = loadCloudAccount(user).catch(error => console.error('Cloud load failed:', error));
+        // Keep the account card in its loading state until the UID-scoped
+        // profile query and all dependent account data have resolved.
+        renderProfile();
+        cloudLoadPromise = loadCloudAccount(user).catch(error => {
+          console.error('Cloud load failed:', error);
+          setProfileHydrationState(false);
+          renderProfile();
+        });
         await cloudLoadPromise;
+        // Reveal the account route only after the profile and UID-scoped plans are ready.
+        finishAuthInitialization();
+        setView('account');
       });
     }
-    const TRASH_KEY = 'academyTrashPlans';
     const DEFAULT_PLAN_TITLE = '';
     const DEFAULT_PLAN_DURATION = window.academyPlanDefaults?.duration ?? 0;
     const TRASH_RETENTION_DAYS = 3;
@@ -1283,35 +1418,34 @@
     const readCachedJSON = (key, fallback) => typeof window.academyReadJSON === 'function'
       ? window.academyReadJSON(key, fallback)
       : fallback;
-    const savedPlans = readCachedJSON(PLANS_KEY, []);
-    const legacyPlan = readCachedJSON(KEY, null);
-    const legacyPlanHasContent = window.academyPlanHasContent(legacyPlan);
-    const cachedPlans = Array.isArray(savedPlans) ? savedPlans : [];
-    const storedPlans = cachedPlans.length ? cachedPlans : (legacyPlanHasContent ? [legacyPlan] : []);
+    // Do not hydrate any plan data until Firebase identifies the account.
+    const savedPlans = [];
+    const legacyPlan = null;
+    const legacyPlanHasContent = false;
+    const cachedPlans = [];
+    const storedPlans = [];
     const migratedPlans = storedPlans.map(plan => {
       if (window.academyIsLegacyPlanTitle?.(plan.title)) return { ...plan, title: '' };
       return plan;
     });
-    const state = { plans: Array.isArray(migratedPlans) ? migratedPlans : [], trash: readCachedJSON(TRASH_KEY, []), plan: null, profile: readCachedJSON(SESSION_KEY, null), day: 0 };
+    const state = { plans: [], trash: [], plan: null, profile: readCachedJSON(SESSION_KEY, null), day: 0 };
     if (!Array.isArray(state.trash)) state.trash = [];
     if (state.profile && typeof state.profile !== 'object') state.profile = null;
-    if (migratedPlans.some((plan, index) => plan !== storedPlans[index])) {
-      localStorage.setItem(PLANS_KEY, JSON.stringify(migratedPlans));
-      if (migratedPlans[0]) localStorage.setItem(KEY, JSON.stringify(migratedPlans[0]));
-    }
+    // Legacy shared plan caches are intentionally ignored and never migrated.
+    // Plans are loaded only after Firebase supplies the current user's UID.
     cleanTrash();
     function cleanTrash() {
       const cutoff = Date.now() - TRASH_RETENTION_DAYS * 24 * 60 * 60 * 1000;
       state.trash = state.trash.filter(item => new Date(item.deletedAt).getTime() > cutoff);
-      localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+      if (TRASH_KEY) localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
       scheduleCloudSave();
     }
-    state.plan = state.plans[0] || null;
+    state.plan = null;
     window.currentPlan = state.plan;
     if (state.plan && window.academyIsLegacyPlanTitle?.(state.plan.title)) {
       state.plan.title = '';
-      localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
-      localStorage.setItem(KEY, JSON.stringify(state.plan));
+      if (PLANS_KEY) localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+      if (KEY) localStorage.setItem(KEY, JSON.stringify(state.plan));
     }
     const $ = id => document.getElementById(id);
     const planNameInput = () => $('plan-name-input');
@@ -1334,8 +1468,8 @@
       const index = state.plans.findIndex(plan => plan.id === state.plan.id);
       if (index === -1 && !forceAdd) return false;
       if (index === -1) state.plans.unshift(state.plan); else state.plans[index] = state.plan;
-      localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
-      localStorage.setItem(KEY, JSON.stringify(state.plan));
+      if (PLANS_KEY) localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
+      if (KEY) localStorage.setItem(KEY, JSON.stringify(state.plan));
       scheduleCloudSave();
       return true;
     };
@@ -1415,6 +1549,43 @@
       });
     }
 
+    function clearUIState() {
+      // Remove all session-specific presentation data before showing login again.
+      const avatar = $('profile-avatar');
+      if (avatar) {
+        avatar.classList.remove('profile-avatar-initial');
+        avatar.classList.add('profile-avatar-placeholder');
+        avatar.setAttribute('aria-label', 'Academic workspace avatar');
+        avatar.innerHTML = '<span class="profile-avatar-mark" aria-hidden="true">▦</span>';
+      }
+
+      ['displayName', 'displayEmail', 'menu-profile-id', 'profile-id'].forEach(id => {
+        const element = $(id);
+        if (element) element.textContent = '';
+      });
+      $('profile-contact')?.classList.add('hidden');
+      $('profile-details')?.classList.add('hidden');
+      $('profile-actions')?.classList.add('hidden');
+      $('profile-menu-wrap')?.classList.add('hidden');
+      $('account-menu')?.classList.add('hidden');
+      $('account-menu-toggle')?.setAttribute('aria-expanded', 'false');
+
+      document.querySelectorAll('input[type="email"], input[type="password"]').forEach(input => {
+        input.value = '';
+      });
+      ['login-error-message', 'login-status', 'signup-status', 'signup-error-message', 'profile-saved'].forEach(id => {
+        const message = $(id);
+        if (!message) return;
+        message.textContent = '';
+        message.classList.add('hidden');
+      });
+      if (typeof state !== 'undefined') state.profile = null;
+      cloudUserAcademyId = null;
+      $('profile-heading') && ($('profile-heading').textContent = 'Sign in to your workspace');
+      $('login-form')?.classList.remove('hidden');
+      $('signup-view')?.classList.add('hidden');
+    }
+
     function hasAcademicDetails(profile) {
       return Boolean(profile && ['institution', 'department', 'session', 'year', 'semester']
         .every(field => String(profile[field] || '').trim()));
@@ -1462,8 +1633,24 @@
 
     $('onboarding-profile-form')?.addEventListener('submit', saveOnboardingProfile);
 
+    let profileHydrationReady = false;
+
+    function setProfileHydrationState(isLoading) {
+      profileHydrationReady = !isLoading;
+      const accountCard = $('account-card');
+      const loadingState = $('account-loading-state');
+      if (accountCard) accountCard.classList.toggle('account-loading', isLoading);
+      if (loadingState) loadingState.setAttribute('aria-hidden', String(!isLoading));
+    }
+
     function renderProfile() {
       const profile = state.profile;
+      const accountCard = $('account-card');
+      if (!cloudUser) clearUIState();
+      const hasAuthenticatedUser = Boolean(cloudUser);
+      const profileReady = profileHydrationReady && hasAuthenticatedUser && profile && profile.uid === cloudUser.uid && hasAcademicDetails(profile);
+      if (accountCard) accountCard.classList.toggle('account-loading', hasAuthenticatedUser && !profileReady);
+      if (hasAuthenticatedUser && !profileReady) return;
       if (profile && !profile.id && cloudUser) {
         profile.id = cloudUser.uid;
         profile.uid = cloudUser.uid;
@@ -1477,34 +1664,42 @@
         ? (profile.fullName || profile.name || cloudUser?.displayName || 'Student Profile')
         : 'Student Profile';
       if (hasProfile && !isRecentVisit) localStorage.setItem('lastVisitTimestamp', String(Date.now()));
-      $('plan-workspace').classList.toggle('hidden', !hasProfile);
+      const planWorkspace = $('plan-workspace');
+      if (planWorkspace) planWorkspace.classList.toggle('hidden', !hasProfile);
       document.body.classList.toggle('logged-in', hasProfile && accountMode);
-      $('login-view').classList.toggle('hidden', hasProfile);
-      $('signup-view').classList.add('hidden');
-      $('login-form').classList.toggle('hidden', hasProfile);
-      $('profile-id').classList.add('hidden');
-      $('menu-profile-id').textContent = hasProfile ? profile.id : '';
-      $('profile-name').value = profile?.fullName || profile?.name || cloudUser?.displayName || '';
-      $('profile-email').value = profile?.email || profile?.cloudEmail || cloudUser?.email || '';
+      const loginView = $('login-view');
+      if (loginView) loginView.classList.toggle('hidden', hasProfile);
+      const signupView = $('signup-view');
+      if (signupView) signupView.classList.add('hidden');
+      const loginForm = $('login-form');
+      if (loginForm) loginForm.classList.toggle('hidden', hasProfile);
+      const profileId = $('profile-id');
+      if (profileId) profileId.classList.add('hidden');
+      const menuProfileId = $('menu-profile-id');
+      if (menuProfileId) menuProfileId.textContent = hasProfile ? profile.id : '';
       if (typeof updateProfileDisplay === 'function') updateProfileDisplay(profile);
-      $('profile-institution').value = profile?.institution || '';
-      $('profile-department').value = profile?.department || '';
-      $('profile-session').value = profile?.session || '';
-      $('profile-year').value = profile?.year || '';
-      $('profile-semester').value = profile?.semester || '';
-      $('profile-heading').textContent = cloudUser
-        ? (profile?.fullName || profile?.name || cloudUser.displayName || 'Student Profile')
-        : 'Sign in to your workspace';
+      const profileHeading = $('profile-heading');
+      if (profileHeading) {
+        profileHeading.textContent = cloudUser
+          ? (profile?.fullName || profile?.name || cloudUser.displayName || 'Student Profile')
+          : 'Sign in to your workspace';
+      }
       const showLogin = !hasProfile && !cloudUser;
-      $('profile-form').classList.toggle('hidden', hasProfile || showLogin);
-      $('login-form').classList.toggle('hidden', hasProfile || !showLogin);
-      $('profile-details').classList.toggle('hidden', !hasProfile);
-      $('profile-actions').classList.toggle('hidden', !hasProfile);
-      $('logout').classList.toggle('hidden', !hasProfile);
-      $('mobile-logout').classList.toggle('hidden', !hasProfile);
-      $('profile-saved').classList.add('hidden');
-      if (hasProfile) {
-        $('profile-details').innerHTML = [
+      if (loginForm) loginForm.classList.toggle('hidden', hasProfile || !showLogin);
+      if (loginView) loginView.classList.toggle('hidden', hasProfile || !showLogin);
+      if (signupView) signupView.classList.add('hidden');
+      const profileDetails = $('profile-details');
+      if (profileDetails) profileDetails.classList.toggle('hidden', !hasProfile);
+      const profileActions = $('profile-actions');
+      if (profileActions) profileActions.classList.toggle('hidden', !hasProfile);
+      const logoutButton = $('logout');
+      if (logoutButton) logoutButton.classList.toggle('hidden', !hasProfile);
+      const mobileLogout = $('mobile-logout');
+      if (mobileLogout) mobileLogout.classList.toggle('hidden', !hasProfile);
+      const profileSaved = $('profile-saved');
+      if (profileSaved) profileSaved.classList.add('hidden');
+      if (hasProfile && profileDetails) {
+        profileDetails.innerHTML = [
           ['Institution / university', profile.institution], ['Department', profile.department],
           ['Session', profile.session], ['Year', profile.year], ['Semester', profile.semester]
         ].map(([label, value]) => `<div class="rounded-xl bg-paper border border-line p-3"><div class="text-xs text-ink/55">${label}</div><div class="font-semibold text-forest-dark mt-1">${escapeHtml(value || 'Not provided')}</div></div>`).join('');
@@ -1513,27 +1708,33 @@
       const displayName = profile?.fullName || profile?.name || cloudUser?.displayName || '';
       const photoUrl = profile?.picture || cloudUser?.photoURL || '';
       const initial = displayName.trim().charAt(0).toUpperCase();
-      avatar.classList.toggle('profile-avatar-placeholder', !photoUrl && !initial);
-      avatar.classList.toggle('profile-avatar-initial', !photoUrl && Boolean(initial));
-      avatar.setAttribute('aria-label', photoUrl ? `${displayName || 'Student'} profile picture` : initial ? `${displayName} avatar` : 'Academic workspace avatar');
-      avatar.innerHTML = photoUrl
-        ? `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(displayName || 'Student')}" class="avatar-image w-full h-full" data-avatar-image>`
-        : initial
-          ? `<span class="profile-avatar-initial-mark" aria-hidden="true">${escapeHtml(initial)}</span>`
-          : '<span class="profile-avatar-mark" aria-hidden="true">▦</span>';
-      avatar.querySelector('[data-avatar-image]')?.addEventListener('error', () => {
-        avatar.classList.remove('profile-avatar-placeholder');
-        avatar.classList.add('profile-avatar-initial');
-        avatar.innerHTML = initial
-          ? `<span class="profile-avatar-initial-mark" aria-hidden="true">${escapeHtml(initial)}</span>`
-          : '<span class="profile-avatar-mark" aria-hidden="true">▦</span>';
-      }, { once: true });
-      $('profile-menu-wrap').classList.toggle('hidden', !hasProfile);
+      if (avatar) {
+        avatar.classList.toggle('profile-avatar-placeholder', !photoUrl && !initial);
+        avatar.classList.toggle('profile-avatar-initial', !photoUrl && Boolean(initial));
+        avatar.setAttribute('aria-label', photoUrl ? `${displayName || 'Student'} profile picture` : initial ? `${displayName} avatar` : 'Academic workspace avatar');
+        avatar.innerHTML = photoUrl
+          ? `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(displayName || 'Student')}" class="avatar-image w-full h-full" data-avatar-image>`
+          : initial
+            ? `<span class="profile-avatar-initial-mark" aria-hidden="true">${escapeHtml(initial)}</span>`
+            : '<span class="profile-avatar-mark" aria-hidden="true">▦</span>';
+        const avatarImage = avatar.querySelector('[data-avatar-image]');
+        if (avatarImage) avatarImage.addEventListener('error', () => {
+          avatar.classList.remove('profile-avatar-placeholder');
+          avatar.classList.add('profile-avatar-initial');
+          avatar.innerHTML = initial
+            ? `<span class="profile-avatar-initial-mark" aria-hidden="true">${escapeHtml(initial)}</span>`
+            : '<span class="profile-avatar-mark" aria-hidden="true">▦</span>';
+        }, { once: true });
+      }
+      const profileMenuWrap = $('profile-menu-wrap');
+      if (profileMenuWrap) profileMenuWrap.classList.toggle('hidden', !hasProfile);
       if (typeof syncReportRecipientEmail === 'function') syncReportRecipientEmail();
       if (hasProfile) initializeAccountMenu();
       if (!hasProfile) {
-        $('account-menu').classList.add('hidden');
-        $('account-menu-toggle').setAttribute('aria-expanded', 'false');
+        const accountMenu = $('account-menu');
+        if (accountMenu) accountMenu.classList.add('hidden');
+        const accountMenuToggle = $('account-menu-toggle');
+        if (accountMenuToggle) accountMenuToggle.setAttribute('aria-expanded', 'false');
       }
     }
 
@@ -1642,8 +1843,8 @@
       selectedPlanIds.clear();
       if (state.plan && ids.includes(state.plan.id)) state.plan = state.plans[0] || null;
       localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
-      localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
-      if (state.plan) localStorage.setItem(KEY, JSON.stringify(state.plan)); else localStorage.removeItem(KEY);
+      if (TRASH_KEY) localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+      if (KEY && state.plan) localStorage.setItem(KEY, JSON.stringify(state.plan)); else if (KEY) localStorage.removeItem(KEY);
       scheduleCloudSave();
       state.day = 0;
       render();
@@ -1941,7 +2142,9 @@
       reader.readAsDataURL(file);
     });
 
-    $('profile-form').addEventListener('submit', async e=>{
+          // Academic profile details are persisted by signup and onboarding flows.
+    const legacyProfileForm = $('profile-form');
+    if (legacyProfileForm) legacyProfileForm.addEventListener('submit', async e=>{
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
       const picture = $('profile-picture').files[0];
@@ -1975,17 +2178,18 @@
       render();
     });
     function switchAccountView(mode) {
+      resetLoginForm();
+      if (mode === 'login') clearUIState();
       if (typeof window.academyToggleAccountMode === 'function') {
         window.academyToggleAccountMode(mode);
       } else {
         const showLogin = mode === 'login';
         $('login-view')?.classList.toggle('hidden', !showLogin);
         $('signup-view')?.classList.toggle('hidden', showLogin);
-        $('login-form').classList.toggle('hidden', !showLogin);
-        $('profile-form').classList.toggle('hidden', showLogin);
+        $('login-form')?.classList.toggle('hidden', !showLogin);
         $('profile-heading').textContent = showLogin ? 'Sign in to your workspace' : 'Create your workspace account';
-        $('login-status').classList.add('hidden');
-        (showLogin ? $('login-id') : $('profile-name')).focus();
+        $('login-status')?.classList.add('hidden');
+        (showLogin ? $('login-email') : $('signup-full-name'))?.focus();
       }
     }
     async function signInWithGoogle() {
@@ -1994,12 +2198,28 @@
         $('login-status').classList.remove('hidden');
         return;
       }
+      const button = $('google-login');
+      const provider = new firebase.auth.GoogleAuthProvider();
       try {
-        const provider = new firebase.auth.GoogleAuthProvider();
+        button?.setAttribute('aria-busy', 'true');
         await window.academyAuth.signInWithPopup(provider);
       } catch (error) {
-        $('login-status').textContent = error.message || 'Google sign-in failed.';
-        $('login-status').classList.remove('hidden');
+        const code = String(error?.code || '').toLowerCase();
+        const shouldRedirect = ['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/operation-not-supported-in-this-environment'].includes(code);
+        if (shouldRedirect) {
+          try {
+            await window.academyAuth.signInWithRedirect(provider);
+            return;
+          } catch (redirectError) {
+            $('login-status').textContent = redirectError.message || 'Google sign-in failed.';
+            $('login-status').classList.remove('hidden');
+          }
+        } else {
+          $('login-status').textContent = error.message || 'Google sign-in failed.';
+          $('login-status').classList.remove('hidden');
+        }
+      } finally {
+        button?.removeAttribute('aria-busy');
       }
     }
 
@@ -2012,65 +2232,176 @@
       $('login-status').classList.add('hidden');
     }
 
+    function resetLoginForm() {
+      const form = $('login-form');
+      const email = $('login-email');
+      const password = $('login-password');
+      const button = $('manual-auth-submit');
+      const errorMessage = $('login-error-message');
+      const status = $('login-status');
+
+      if (form && typeof form.reset === 'function') form.reset();
+      if (email) email.value = '';
+      if (password) password.value = '';
+      if (button) {
+        button.disabled = false;
+        button.textContent = 'Log In';
+        button.classList.remove('bg-emerald-600', 'hover:bg-emerald-700', 'login-success');
+        button.classList.add('bg-forest', 'hover:bg-forest-dark');
+      }
+      if (errorMessage) {
+        errorMessage.textContent = '';
+        errorMessage.innerHTML = '';
+        errorMessage.className = 'hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3 text-center my-2';
+      }
+      if (status) {
+        status.textContent = '';
+        status.className = 'hidden text-sm text-rust font-semibold';
+      }
+    }
+
     const clearLoginStatus = () => {
       const status = $('login-status');
+      const errorMessage = $('login-error-message');
       const button = $('manual-auth-submit');
       if (status) {
         status.textContent = '';
         status.className = 'hidden text-sm text-rust font-semibold';
       }
-      button?.classList.remove('login-success');
+      if (errorMessage) {
+        errorMessage.textContent = '';
+        errorMessage.classList.add('hidden');
+      }
+      if (button) button.classList.remove('login-success');
     };
 
-    $('login-email')?.addEventListener('input', clearLoginStatus);
-    $('login-password')?.addEventListener('input', clearLoginStatus);
+    function bindPasswordVisibilityToggle(buttonId, inputId) {
+      const button = $(buttonId);
+      const input = $(inputId);
+      if (!button || !input || button.dataset.passwordToggleBound === 'true') return;
+      button.dataset.passwordToggleBound = 'true';
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+        button.setAttribute('title', isHidden ? 'Hide password' : 'Show password');
+        button.setAttribute('aria-pressed', String(isHidden));
+        button.querySelector('[data-eye-open]')?.classList.toggle('hidden', isHidden);
+        button.querySelector('[data-eye-closed]')?.classList.toggle('hidden', !isHidden);
+      });
+    }
 
-    $('login-form')?.addEventListener('submit', async event => {
+    bindPasswordVisibilityToggle('toggle-login-password', 'login-password');
+    bindPasswordVisibilityToggle('toggle-signup-password', 'signup-password');
+    bindPasswordVisibilityToggle('toggle-signup-confirm-password', 'signup-confirm-password');
+
+    const loginEmailInput = $('login-email');
+    const loginPasswordInput = $('login-password');
+    if (loginEmailInput) loginEmailInput.addEventListener('input', () => {
+      clearLoginStatus();
+      const errorMessage = $('login-error-message');
+      if (errorMessage) {
+        errorMessage.textContent = '';
+        errorMessage.className = 'hidden text-sm rounded-lg p-3 text-center my-2';
+      }
+    });
+    if (loginPasswordInput) loginPasswordInput.addEventListener('input', () => {
+      clearLoginStatus();
+      const errorMessage = $('login-error-message');
+      if (errorMessage) {
+        errorMessage.textContent = '';
+        errorMessage.className = 'hidden text-sm rounded-lg p-3 text-center my-2';
+      }
+    });
+
+    const loginForm = $('login-form');
+    if (loginForm) loginForm.addEventListener('submit', async event => {
       event.preventDefault();
-      const email = $('login-email').value.trim();
-      const password = $('login-password').value;
+
+      const emailInput = $('login-email');
+      const passwordInput = $('login-password');
       const status = $('login-status');
+      const errorMessage = $('login-error-message');
+      const button = $('manual-auth-submit');
+      const email = emailInput ? emailInput.value.trim() : '';
+      const password = passwordInput ? passwordInput.value : '';
+      const defaultButtonText = emailAuthSignUpMode ? 'Sign Up' : 'Log In';
+      const isSignUp = emailAuthSignUpMode;
+
+      clearLoginStatus();
+      if (errorMessage) {
+        errorMessage.textContent = '';
+        errorMessage.className = 'hidden text-sm rounded-lg p-3 text-center my-2';
+      }
+      if (button) {
+        button.disabled = true;
+        button.textContent = isSignUp ? 'Creating account…' : 'Logging in...';
+        button.classList.remove('bg-emerald-600', 'hover:bg-emerald-700', 'login-success');
+        button.classList.add('bg-forest');
+      }
+      if (status) status.classList.add('hidden');
+
       if (!window.academyAuth) {
-        status.textContent = 'Email sign-in is unavailable. Check the Firebase configuration.';
-        status.className = 'text-sm text-rust font-semibold';
-        status.classList.remove('hidden');
+        const unavailableMessage = 'Email sign-in is unavailable. Check the Firebase configuration.';
+        if (errorMessage) {
+          errorMessage.textContent = unavailableMessage;
+          errorMessage.className = 'text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3 text-center my-2';
+        }
+        if (button) {
+          button.disabled = false;
+          button.textContent = defaultButtonText;
+        }
         return;
       }
-      const button = $('manual-auth-submit');
-      button.disabled = true;
-      button.textContent = emailAuthSignUpMode ? 'Creating account…' : 'Signing in…';
-      status.classList.add('hidden');
+
       try {
-        if (emailAuthSignUpMode) {
+        if (isSignUp) {
           await window.academyAuth.createUserWithEmailAndPassword(email, password);
-        } else {
-          await window.academyAuth.signInWithEmailAndPassword(email, password);
-          status.textContent = 'Success! Directing to workspace...';
-          status.className = 'text-sm font-semibold login-success';
-          status.classList.remove('hidden');
-          button.classList.add('login-success');
-          button.textContent = 'Success! Directing to workspace...';
+          return;
+        }
+
+        await window.academyAuth.signInWithEmailAndPassword(email, password);
+        if (errorMessage) {
+          errorMessage.textContent = 'Login successful! Redirecting to your workspace...';
+          errorMessage.className = 'text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 text-center my-2';
+        }
+        if (button) {
+          button.disabled = true;
+          button.textContent = 'Success! Redirecting...';
+          button.classList.remove('bg-forest', 'hover:bg-forest-dark');
+          button.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'login-success');
         }
       } catch (error) {
-        const code = String(error?.code || '').toLowerCase();
-        status.textContent = code === 'auth/user-not-found'
-          ? 'No account found with this email. Please sign up first.'
-          : code === 'auth/wrong-password' || code === 'auth/invalid-credential'
-            ? 'Invalid email or password. Please try again.'
-            : error.message || 'Email authentication failed.';
-        status.className = 'text-sm text-rust font-semibold';
-        status.classList.remove('hidden');
-        updateEmailAuthMode();
-      } finally {
-        button.disabled = false;
-        if (document.body.contains(button) && !button.classList.contains('login-success')) updateEmailAuthMode();
+        const code = String(error && error.code ? error.code : '').toLowerCase();
+        const message = code === 'auth/invalid-email' || code === 'auth/user-not-found' ||
+          code === 'auth/wrong-password' || code === 'auth/invalid-credential'
+          ? 'Invalid email or password. Please try again.'
+          : (error && error.message) || 'Email authentication failed. Please try again.';
+        if (errorMessage) {
+          errorMessage.textContent = message;
+          errorMessage.className = 'text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3 text-center my-2';
+        }
+        if (status) {
+          status.textContent = message;
+          status.className = 'hidden text-sm text-rust font-semibold';
+        }
+        if (button) {
+          button.disabled = false;
+          button.textContent = defaultButtonText;
+          button.classList.remove('bg-emerald-600', 'hover:bg-emerald-700', 'login-success');
+          button.classList.add('bg-forest', 'hover:bg-forest-dark');
+        }
       }
     });
-    $('email-mode-toggle')?.addEventListener('click', () => {
-      emailAuthSignUpMode = !emailAuthSignUpMode;
-      updateEmailAuthMode();
-      $('login-email').focus();
-    });
+    // script.js owns the login/sign-up view transition and signup form binding.
+    $('email-mode-toggle')?.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      resetLoginForm();
+      window.academyToggleAccountMode?.('signup');
+    }, true);
+    resetLoginForm();
     updateEmailAuthMode();
     $('google-login')?.addEventListener('click', signInWithGoogle);
     $('google-signup')?.addEventListener('click', signInWithGoogle);
@@ -2127,7 +2458,7 @@
       state.plans.unshift(item.plan);
       state.plan = item.plan;
       localStorage.setItem(PLANS_KEY, JSON.stringify(state.plans));
-      localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
+      if (TRASH_KEY) localStorage.setItem(TRASH_KEY, JSON.stringify(state.trash));
       scheduleCloudSave();
       state.day = 0;
       closeTrashPreview();
@@ -2148,14 +2479,19 @@
       reader.readAsDataURL(picture);
     });
     function logout() {
+      // Clear the visible session immediately; Firebase sign-out may resolve later.
+      clearUIState();
+      resetLoginForm();
       // Keep the profile and plan saved so the user can return with the Google account.
       if (window.academyAuth && cloudUser) window.academyAuth.signOut().catch(console.error);
       cloudUser = null;
       cloudUserAcademyId = null;
       cloudSyncReady = false;
+      setUserPlanStorage(null);
+      TRASH_KEY = null;
+      clearPlanViewState();
       state.profile = null;
       localStorage.removeItem(SESSION_KEY);
-      $('profile-form').reset();
       $('login-form').reset();
       renderProfile();
       $('profile-saved').textContent = 'You have been logged out. Your plan remains saved on this device.';
@@ -2841,6 +3177,17 @@
       viewNames.forEach(name => document.body.classList.toggle(name, name === `view-${validView}`));
       document.body.classList.toggle('public-home', validView === 'home');
       document.body.classList.toggle('workspace-entry', validView === 'account');
+      const viewElements = {
+        home: ['landing-hero'],
+        account: ['profile'],
+        storage: ['study-storage']
+      };
+      Object.entries(viewElements).forEach(([name, ids]) => {
+        ids.forEach(id => {
+          const element = $(id);
+          if (element) element.setAttribute('aria-hidden', String(name !== validView));
+        });
+      });
       if (persist) window.academyPersistViewTab?.(validView);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       if (validView === 'account') {
@@ -3036,11 +3383,11 @@
     async 
     */
     const savedView = window.academyGetPersistedViewTab?.() || localStorage.getItem('activeViewTab');
+    // Keep the initial route hidden behind the auth gate. Firebase decides
+    // whether a restored session belongs on Account or the public home view.
     const initialView = new URLSearchParams(window.location.search).has('storage')
       ? 'storage'
-      : accountMode ? 'account'
-        : viewNames.includes(`view-${savedView}`) ? savedView
-          : 'home';
+      : 'home';
     setView(initialView, { persist: false });
     if (initialView === 'storage') {
       storageModal?.classList.add('storage-modal-open');
@@ -3151,22 +3498,89 @@
     // Switch between registration and existing-account views without reloading.
     window.academyToggleAccountMode = function (mode) {
       const loginForm = document.getElementById('login-form');
-      const profileForm = document.getElementById('profile-form');
       const heading = document.getElementById('profile-heading');
       const loginStatus = document.getElementById('login-status');
       const profileSaved = document.getElementById('profile-saved');
       const showLogin = mode === 'login';
-      if (!loginForm || !profileForm) return;
+      if (!loginForm) return;
       document.getElementById('login-view')?.classList.toggle('hidden', !showLogin);
       document.getElementById('signup-view')?.classList.toggle('hidden', showLogin);
       loginForm.classList.toggle('hidden', !showLogin);
-      profileForm.classList.toggle('hidden', showLogin);
+      document.getElementById('login-view').classList.toggle('hidden', !showLogin);
+      document.getElementById('signup-view').classList.toggle('hidden', showLogin);
       if (heading) heading.textContent = showLogin ? 'Sign in to your workspace' : 'Create your workspace account';
       if (loginStatus) loginStatus.classList.add('hidden');
       if (profileSaved) profileSaved.classList.add('hidden');
-      const target = document.getElementById(showLogin ? 'login-id' : 'profile-name');
+      const target = document.getElementById(showLogin ? 'login-email' : 'signup-full-name');
       if (target) target.focus();
     };
+  </script>
+  <script>
+    // Final authentication UI synchronizer. Firebase Auth remains the source
+    // of truth; this only keeps the existing panels mutually exclusive.
+    (() => {
+      const byId = id => document.getElementById(id);
+      const showAuthMode = mode => {
+        const login = byId('login-view');
+        const signup = byId('signup-view');
+        const form = byId('login-form');
+        const isLogin = mode === 'login';
+        if (isLogin) clearUIState();
+        login?.classList.toggle('hidden', !isLogin);
+        signup?.classList.toggle('hidden', isLogin);
+        form?.classList.toggle('hidden', !isLogin);
+        byId('profile-heading').textContent = isLogin
+          ? 'Sign in to your workspace'
+          : 'Create your workspace account';
+      };
+
+      byId('email-mode-toggle')?.addEventListener('click', event => {
+        event.preventDefault();
+        showAuthMode('signup');
+        byId('signup-full-name')?.focus();
+      });
+      byId('signup-back')?.addEventListener('click', event => {
+        event.preventDefault();
+        resetLoginForm();
+        showAuthMode('login');
+        byId('login-email')?.focus();
+      });
+
+      if (window.academyAuth?.onAuthStateChanged) {
+        window.academyAuth.onAuthStateChanged(user => {
+          if (window.isRegisteringRedirect) {
+            byId('plan-workspace')?.classList.add('hidden');
+            byId('profile-details')?.classList.add('hidden');
+            byId('signup-view')?.classList.add('hidden');
+            byId('login-view')?.classList.remove('hidden');
+            byId('login-form')?.classList.remove('hidden');
+            byId('profile-heading').textContent = 'Sign in to your workspace';
+            return;
+          }
+          document.body.classList.toggle('logged-in', Boolean(user));
+          if (user) {
+            byId('login-view')?.classList.add('hidden');
+            byId('signup-view')?.classList.add('hidden');
+            byId('login-form')?.classList.add('hidden');
+            // The primary auth callback reveals the workspace only after the
+            // UID-scoped Realtime Database profile has finished hydrating.
+            if (profileHydrationReady) {
+              byId('profile-details')?.classList.remove('hidden');
+              byId('plan-workspace')?.classList.remove('hidden');
+            } else {
+              byId('profile-details')?.classList.add('hidden');
+              byId('plan-workspace')?.classList.add('hidden');
+            }
+          } else {
+            resetLoginForm();
+            setProfileHydrationState(false);
+            byId('profile-details')?.classList.add('hidden');
+            byId('plan-workspace')?.classList.add('hidden');
+            showAuthMode('login');
+          }
+        });
+      }
+    })();
   </script>
 </body>
 </html>
