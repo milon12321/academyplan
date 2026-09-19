@@ -272,6 +272,73 @@ window.academyToggleMobileMenu = function () {
   else initializeRecoveryModal();
 })();
 
+// Keep modal dialogs keyboard-accessible without coupling them to one feature.
+(() => {
+  const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  const dialogIds = [
+    'privacy-modal', 'recovery-modal', 'onboarding-profile-modal', 'edit-profile-modal',
+    'saved-plans-modal', 'restore-plans-modal', 'report-preview', 'saved-plan-preview', 'trash-preview'
+  ];
+  const previouslyFocused = new Map();
+
+  const isOpen = dialog => dialog && !dialog.classList.contains('hidden');
+  const closeDialog = dialog => {
+    if (!dialog || !isOpen(dialog)) return;
+    if (dialog.id === 'recovery-modal') {
+      window.academyReturnToLogin?.();
+      return;
+    }
+    const closeButton = dialog.querySelector('[aria-label*="Close"], [id$="-close"], [id^="close-"]');
+    closeButton?.click();
+    if (isOpen(dialog)) dialog.classList.add('hidden');
+    const focusTarget = previouslyFocused.get(dialog.id);
+    if (focusTarget && document.contains(focusTarget)) focusTarget.focus();
+    previouslyFocused.delete(dialog.id);
+  };
+
+  const bindDialogs = () => {
+    dialogIds.forEach(id => {
+      const dialog = document.getElementById(id);
+      if (!dialog || dialog.dataset.a11yBound === 'true') return;
+      dialog.dataset.a11yBound = 'true';
+      dialog.setAttribute('aria-hidden', 'true');
+
+      const observer = new MutationObserver(() => {
+        const open = isOpen(dialog);
+        dialog.setAttribute('aria-hidden', String(!open));
+        if (open) {
+          if (!previouslyFocused.has(id)) previouslyFocused.set(id, document.activeElement);
+          requestAnimationFrame(() => dialog.querySelector(focusableSelector)?.focus());
+        }
+      });
+      observer.observe(dialog, { attributes: true, attributeFilter: ['class'] });
+
+      dialog.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          closeDialog(dialog);
+          return;
+        }
+        if (event.key !== 'Tab') return;
+        const focusable = [...dialog.querySelectorAll(focusableSelector)].filter(item => item.offsetParent !== null);
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
+    });
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindDialogs, { once: true });
+  else bindDialogs();
+})();
+
 // Keep Firebase login errors concise and user-facing without exposing provider details.
 window.academyLoginErrorMessage = function (error) {
   const code = String(error?.code || '').toLowerCase();
@@ -418,17 +485,57 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
 (() => {
   const $ = id => document.getElementById(id);
   const showSignupStatus = (message, type = 'error') => {
-    const status = $('signup-status');
-    if (!status) return;
-    status.textContent = message;
-    status.className = `signup-status-banner signup-status-${type}`;
-    status.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    const errorMessage = $('signup-error-message');
+    if (!errorMessage) return;
+    const isSuccess = type === 'success';
+    errorMessage.textContent = message;
+    errorMessage.className = isSuccess
+      ? 'sm:col-span-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 text-center'
+      : 'sm:col-span-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3 text-center';
+    errorMessage.classList.remove('hidden');
+    errorMessage.setAttribute('role', isSuccess ? 'status' : 'alert');
+  };
+  const resetSignupForm = () => {
+    const form = $('signup-form');
+    const submit = $('signup-submit');
+    const passwordMatch = $('signup-password-match');
+    if (form && typeof form.reset === 'function') form.reset();
+    if (submit) {
+      submit.disabled = false;
+      submit.textContent = 'Create Account';
+      submit.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+      submit.classList.add('bg-forest', 'hover:bg-forest-dark');
+    }
+    if ($('signup-picture-name')) $('signup-picture-name').textContent = 'No file chosen';
+    const errorMessage = $('signup-error-message');
+    if (errorMessage) {
+      errorMessage.textContent = '';
+      errorMessage.innerHTML = '';
+      errorMessage.className = 'hidden sm:col-span-2 text-sm rounded-lg p-3 text-center';
+      errorMessage.setAttribute('aria-hidden', 'true');
+    }
+    if (passwordMatch) {
+      passwordMatch.textContent = '';
+      passwordMatch.className = 'hidden mt-1 text-xs font-semibold';
+      passwordMatch.setAttribute('aria-hidden', 'true');
+    }
+  };
+  window.resetSignupForm = resetSignupForm;
+  const resetSignupSubmit = () => {
+    const submit = $('signup-submit');
+    if (!submit) return;
+    submit.disabled = false;
+    submit.textContent = 'Create Account';
+    submit.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+    submit.classList.add('bg-forest', 'hover:bg-forest-dark');
   };
   const clearSignupStatus = () => {
-    const status = $('signup-status');
-    if (!status) return;
-    status.textContent = '';
-    status.className = 'signup-status-banner hidden';
+    const errorMessage = $('signup-error-message');
+    if (!errorMessage) return;
+    errorMessage.textContent = '';
+    errorMessage.innerHTML = '';
+    errorMessage.className = 'hidden sm:col-span-2 text-sm rounded-lg p-3 text-center';
+    errorMessage.setAttribute('aria-hidden', 'true');
   };
   const validateSignupForm = form => {
     const requiredFields = [
@@ -455,10 +562,18 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
     return '';
   };
   const setSignupVisible = visible => {
-    // Keep the two authentication cards mutually exclusive.
-    $('signup-view')?.classList.toggle('hidden', !visible);
-    $('login-view')?.classList.toggle('hidden', visible);
-    $('login-form')?.classList.toggle('hidden', visible);
+    // Keep the two authentication cards mutually exclusive and expose the
+    // active form state to assistive technology.
+    if (visible) resetSignupForm();
+    const signupView = $('signup-view');
+    const loginView = $('login-view');
+    const loginForm = $('login-form');
+    signupView?.classList.toggle('hidden', !visible);
+    loginView?.classList.toggle('hidden', visible);
+    loginForm?.classList.toggle('hidden', visible);
+    signupView?.setAttribute('aria-hidden', String(!visible));
+    loginView?.setAttribute('aria-hidden', String(visible));
+    loginForm?.setAttribute('aria-hidden', String(visible));
     $('profile-heading') && ($('profile-heading').textContent = visible
       ? 'Create your workspace account'
       : 'Sign in to your workspace');
@@ -486,10 +601,18 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
     const form = $('signup-form');
     if (!form || form.dataset.bound === 'true') return;
     form.dataset.bound = 'true';
-    if (!$('signup-view')?.classList.contains('hidden')) setSignupVisible(true);
+    resetSignupForm();
     $('signup-picture')?.addEventListener('change', event => {
       const fileName = $('signup-picture-name');
       if (fileName) fileName.textContent = event.target.files?.[0]?.name || 'No file chosen';
+    });
+    const clearSignupFeedbackOnInput = () => {
+      clearSignupStatus();
+      resetSignupSubmit();
+    };
+    form.querySelectorAll('input, select').forEach(field => {
+      field.addEventListener('input', clearSignupFeedbackOnInput);
+      field.addEventListener('change', clearSignupFeedbackOnInput);
     });
     $('signup-password')?.addEventListener('input', updatePasswordMatch);
     $('signup-confirm-password')?.addEventListener('input', updatePasswordMatch);
@@ -519,8 +642,17 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
       }
 
       const submit = $('signup-submit');
+      if (!submit) {
+        showSignupStatus('The registration form is unavailable. Please refresh and try again.', 'error');
+        return;
+      }
       submit.disabled = true;
       submit.textContent = 'Creating account…';
+      submit.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+      submit.classList.add('bg-forest', 'hover:bg-forest-dark');
+      // Firebase emits an authenticated state immediately after account
+      // creation. Guard that transient event so the account view never flashes.
+      window.isRegisteringRedirect = true;
       try {
         // Firebase Auth stores the exact email/password pair used here. The
         // returned UID is then used as the only key for the academic profile.
@@ -555,29 +687,48 @@ window.academyFormatGoalDuration = function (fromTime, toTime) {
         });
         localStorage.setItem('academyProfile', JSON.stringify(profile));
         localStorage.setItem('academyLoggedIn', JSON.stringify(profile));
-        showSignupStatus('Account successfully created! Redirecting to login…', 'success');
-        form.reset();
+        submit.disabled = true;
+        submit.textContent = 'Success! Redirecting...';
+        submit.classList.remove('bg-forest', 'hover:bg-forest-dark');
+        submit.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+        showSignupStatus('Account created successfully! Please log in.', 'success');
 
-        // createUserWithEmailAndPassword signs the new user in automatically.
-        // Sign out only after Auth and Database have both completed so the next
-        // login uses the same email/password pair against Firebase Auth.
-        await auth.signOut();
-        setTimeout(() => {
+        // The auth-state listener owns the guarded sign-out and direct return
+        // to login, preventing the authenticated workspace from flashing.
+        if (!window.isRegisteringRedirect) {
+          await auth.signOut();
+          resetSignupForm();
           setSignupVisible(false);
-          $('login-email').value = email;
-          $('login-password').value = '';
-          $('login-password').focus();
-          clearSignupStatus();
-        }, 1200);
+          if ($('login-email')) $('login-email').value = email;
+          if ($('login-password')) $('login-password').value = '';
+          const loginMessage = $('login-error-message');
+          if (loginMessage) {
+            loginMessage.textContent = 'Account created successfully! Please log in.';
+            loginMessage.className = 'text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 text-center my-2';
+            loginMessage.setAttribute('role', 'status');
+            loginMessage.setAttribute('aria-live', 'polite');
+          }
+          $('login-email')?.focus();
+        }
       } catch (error) {
-        showSignupStatus(error?.message || 'Account creation failed. Please try again.', 'error');
-      } finally {
-        submit.disabled = false;
-        submit.textContent = 'Create Account';
+        // A failed registration must not leave the next auth-state event
+        // trapped in the post-registration redirect guard.
+        window.isRegisteringRedirect = false;
+        const code = String(error?.code || '').toLowerCase();
+        const message = code === 'auth/email-already-in-use'
+          ? 'An account with this email already exists. Please log in instead.'
+          : code === 'auth/invalid-email'
+            ? 'Enter a valid email address.'
+            : code === 'auth/weak-password'
+              ? 'Create Password must be at least 6 characters.'
+              : 'Account creation failed. Please check your details and try again.';
+        showSignupStatus(message, 'error');
+        resetSignupSubmit();
       }
     });
   };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeSignup, { once: true }); else initializeSignup();
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initializeSignup, { once: true }); else initializeSignup();
+    resetSignupForm();
 })();
 
 // Local UI-only testing hook. It never authenticates with Firebase or enables
