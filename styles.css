@@ -89,7 +89,9 @@ header > div { min-width: 0; }
   transform: translateY(1px);
 }
 body.view-account #account-nav-link,
+body.view-account #desktop-account-link,
 body.view-storage #storage-open-mobile,
+body.view-storage #desktop-storage-open,
 .menu-nav-item.is-active {
   background: #E8F1EA;
   color: #1B4332;
@@ -168,6 +170,23 @@ body.view-storage #storage-open-mobile,
   }
 }
 
+/* Keep the four planning sections visually consistent. */
+#plan-workspace .section-card {
+  padding: 1rem;
+  border: 1px solid #DED5BE;
+  border-radius: .75rem;
+  background: #FDFBF7;
+}
+
+#plan-workspace .plan-section-card {
+  background: #FDFBF7;
+}
+
+/* The Plan name field aligns with labels inside the other section cards. */
+#plan-workspace label[for="plan-name-input"] {
+  margin: 0 0 .25rem;
+}
+
 .plan-name-input {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -229,6 +248,33 @@ body.view-storage #storage-open-mobile,
 .auth-input { background: #FFFFFF; color: #1E293B; }
 .auth-input:focus { border-color: #1B4332; box-shadow: 0 0 0 3px rgba(27, 67, 50, .1); }
 .auth-submit, .auth-google { min-height: 3rem; }
+
+/* Clear inline feedback and a distinct success state for login completion. */
+#login-status:not(.hidden) {
+  display: block;
+  margin-top: .75rem;
+  padding: .75rem .9rem;
+  border: 1px solid #FECACA;
+  border-radius: .75rem;
+  background: #FEF2F2;
+  color: #B91C1C;
+  line-height: 1.45;
+}
+#login-status.login-success {
+  border-color: #86EFAC;
+  background: #DCFCE7;
+  color: #166534;
+}
+#manual-auth-submit.login-success {
+  background: #2E7D32;
+}
+#manual-auth-submit.login-success:hover {
+  background: #256628;
+}
+#manual-auth-submit:disabled {
+  cursor: wait;
+  opacity: .85;
+}
 
 /* Password recovery feedback remains clear and consistent with the auth card. */
 #recovery-status:not(.hidden) {
@@ -336,16 +382,17 @@ body.view-storage #storage-open-mobile,
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #E5D9C5;
   border-radius: 1rem;
-  background: #F8FAFC;
+  background: #F7F3EB;
 }
 .day-navigation-main { display: flex; align-items: flex-end; gap: .75rem; min-width: 0; flex: 1; }
 .day-navigation-main .field-label { margin-bottom: .55rem; white-space: nowrap; }
-.day-selector { min-width: 0; flex: 1; padding: .7rem .85rem; border: 1px solid #CBD5E1; border-radius: .75rem; background: #FFFFFF; color: #1E293B; font-size: .875rem; font-weight: 600; }
+.day-selector { min-width: 0; flex: 1; padding: .7rem .85rem; border: 1px solid #D6C7AD; border-radius: .75rem; background: #FFFDF8; color: #3F3528; font-size: .875rem; font-weight: 600; }
+.day-selector:focus { border-color: #B77932; box-shadow: 0 0 0 3px rgba(183, 121, 50, .14); }
 .day-navigation-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }
-.day-navigation-button { padding: .65rem .8rem; border: 1px solid #CBD5E1; border-radius: .7rem; background: #FFFFFF; color: #334155; font-size: .75rem; font-weight: 700; transition: background-color .2s ease, color .2s ease; }
-.day-navigation-button:hover { background: #1E293B; color: #FFFFFF; }
+.day-navigation-button { padding: .65rem .8rem; border: 1px solid #C58A43; border-radius: .7rem; background: #F7E3B5; color: #6B4322; font-size: .75rem; font-weight: 700; transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
+.day-navigation-button:hover { border-color: #7A4423; background: #7A4423; color: #FFF9ED; }
 
 /* Goal Item Card Styling */
 .goal-item-card {
@@ -756,6 +803,144 @@ header > div {
 /* Keep the outer daily checklist workspace card on the same warm paper tone. */
 #daily-checklist-section > .max-w-6xl > .dashboard-stack-container > .daily-checklist-card {
   background: #FBF7EE;
+}
+
+/* Warm, contained styling for day navigation feedback and the all-days overview. */
+#daily-checklist-section .day-navigation-button {
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+#daily-checklist-section .day-navigation-button:focus-visible,
+#daily-checklist-section .day-navigation-button.is-active {
+  border-color: #7A4423;
+  background: #7A4423;
+  color: #FFF9ED;
+  box-shadow: 0 4px 10px rgba(122, 68, 35, .2);
+}
+#daily-checklist-section .day-navigation-button:active {
+  transform: translateY(1px);
+}
+#daily-checklist-section .all-days-overview-card {
+  margin-top: 1rem;
+  padding: .75rem;
+  border: 1px solid #E5D9C5;
+  border-radius: 1rem;
+  background: #F7F3EB;
+}
+#daily-checklist-section .all-days-overview-card .toggle-days-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .7rem 1rem;
+  border: 1px solid #C58A43;
+  border-radius: .75rem;
+  background: #FFF8E9;
+  color: #55351D;
+  font-size: .8rem;
+  font-weight: 700;
+  text-align: left;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+#daily-checklist-section .all-days-overview-card .toggle-days-btn:hover,
+#daily-checklist-section .all-days-overview-card .toggle-days-btn:focus-visible {
+  border-color: #7A4423;
+  background: #F7E3B5;
+  color: #55351D;
+  box-shadow: 0 4px 10px rgba(122, 68, 35, .14);
+}
+#daily-checklist-section .all-days-overview-card .toggle-days-btn:active {
+  transform: translateY(1px);
+  background: #EBCB83;
+}
+#daily-checklist-section .all-days-overview-card .all-days-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: .65rem;
+  margin-top: .75rem;
+  padding: .75rem;
+  border: 1px solid #E5D9C5;
+  border-radius: .75rem;
+  background: #FBF7EE;
+}
+#daily-checklist-section .all-days-overview-card .all-days-container.hidden {
+  display: none;
+}
+#daily-checklist-section .all-days-overview-card .day-progress-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .65rem;
+  width: 100%;
+  min-height: 4.25rem;
+  padding: .7rem;
+  border: 1px solid #E5D9C5;
+  border-radius: .75rem;
+  background: #FFFDF8;
+  color: #3F3528;
+  text-align: left;
+  transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+#daily-checklist-section .all-days-overview-card .day-progress-item:hover,
+#daily-checklist-section .all-days-overview-card .day-progress-item:focus-visible,
+#daily-checklist-section .all-days-overview-card .day-progress-item.is-selected {
+  border-color: #C58A43;
+  background: #FFF8E9;
+  box-shadow: 0 4px 10px rgba(107, 67, 34, .1);
+}
+#daily-checklist-section .all-days-overview-card .day-progress-item:active {
+  transform: translateY(1px);
+}
+#daily-checklist-section .all-days-overview-card .day-progress-ring {
+  display: grid;
+  place-items: center;
+  width: 2.65rem;
+  height: 2.65rem;
+  border: 3px solid #E5D9C5;
+  border-radius: 50%;
+  background: conic-gradient(#C58A43 var(--progress), #EDE5D7 0);
+  color: #55351D;
+  font-size: .65rem;
+  font-weight: 800;
+}
+#daily-checklist-section .all-days-overview-card .day-progress-ring > span {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #FFFDF8;
+}
+#daily-checklist-section .all-days-overview-card .day-progress-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: .15rem;
+}
+#daily-checklist-section .all-days-overview-card .day-progress-copy strong {
+  overflow: hidden;
+  color: #55351D;
+  font-size: .75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#daily-checklist-section .all-days-overview-card .day-progress-copy small,
+#daily-checklist-section .all-days-overview-card .day-progress-status {
+  color: #79552F;
+  font-size: .65rem;
+}
+#daily-checklist-section .all-days-overview-card .day-progress-status {
+  padding: .2rem .45rem;
+  border: 1px solid #E5D9C5;
+  border-radius: 999px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+#daily-checklist-section .all-days-overview-card .day-progress-status.is-complete { border-color: #86EFAC; background: #DCFCE7; color: #166534; }
+#daily-checklist-section .all-days-overview-card .day-progress-status.is-active { border-color: #93C5FD; background: #DBEAFE; color: #1D4ED8; }
+#daily-checklist-section .all-days-overview-card .day-progress-status.is-neutral { background: #F3EDDC; }
+@media (prefers-reduced-motion: reduce) {
+  #daily-checklist-section .day-navigation-button { transition: none; }
 }
 
 /* Match the remaining daily checklist sub-cards to the warm paper theme. */
